@@ -7,3 +7,5 @@ install:
 script:
   - flake8 . --exclude=tests
   - pytest tests
+after_success:
+  coveralls
