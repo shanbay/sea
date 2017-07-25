@@ -10,5 +10,5 @@ def test_import_string():
     assert utils.import_string('XXXXXXXXXXXX', True) is None
     assert utils.import_string('datetime.XXXXXXXXXXXX', True) is None
     assert utils.import_string('sea.app.Sea') is Sea
-    pytest.raises(ImportError, utils.import_string, 'XXXXXXXXXXXXXXXX')
-    pytest.raises(ImportError, utils.import_string, 'cgi.XXXXXXXXXX')
+    with pytest.raises(ImportError):
+        utils.import_string('notexist')
