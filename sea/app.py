@@ -21,15 +21,16 @@ class Sea:
 
         self.root_path = root_path
         self.config = self.config_class(root_path, self.default_config)
-        self.error_handler_spec = {}
         self.servicers = {}
         self.extensions = {}
 
     def register_servicer(self, servicer):
         name = servicer.__name__
         if name in self.servicers:
-            return
+            raise RuntimeError('servicer duplicated: {}'.format(name))
         add_func = self._get_servicer_add_func(servicer)
+        if add_func is None:
+            raise RuntimeError('register servicer failed: {}'.format(name))
         self.servicers[name] = (add_func, servicer)
 
     def _get_servicer_add_func(self, servicer):
@@ -43,6 +44,7 @@ def create_app(app_class=Sea):
     env = os.environ.get('SEA_ENV', 'development')
     config = importlib.import_module('app.configs.{}'.format(env))
 
+    global _app
     _app = app_class(os.path.abspath(os.getcwd()))
     _app.config.from_object(config.Config)
 
@@ -56,4 +58,9 @@ def create_app(app_class=Sea):
         _ext = getattr(_extensions, _ext)
         _ext.init_app(_app)
 
+    return _app
+
+
+def current_app():
+    global _app
     return _app
