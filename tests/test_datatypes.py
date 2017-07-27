@@ -1,5 +1,6 @@
 import pytest
 import pickle
+import copy
 
 from sea import datatypes
 
@@ -22,8 +23,17 @@ class TestImmutableDict:
         assert 'foo' in d
         assert 'foox' not in d
         assert len(d) == 3
-        dd = datatypes.ImmutableDict.fromkeys(d.keys(), 'OK')
+        dd = datatypes.ImmutableDict.fromkeys(data.keys(), 'OK')
         assert dd['foo'] == 'OK'
+        assert type(dd) == datatypes.ImmutableDict
+        dd = d.copy()
+        assert dd['foo'] == 1
+        assert type(dd) == dict
+        dd = copy.copy(d)
+        assert dd['foo'] == 1
+        assert type(dd) == datatypes.ImmutableDict
+        s = repr(dd)
+        assert "ImmutableDict({" in s
 
     def test_dict_is_hashable(self):
         immutable = datatypes.ImmutableDict({'a': 1, 'b': 2})
@@ -56,6 +66,8 @@ class TestImmutableDict:
             d.update({'foo': 2})
         with pytest.raises(TypeError) as exc:
             del d['foo']
+        with pytest.raises(TypeError) as exc:
+            d.popitem()
         assert exc.match('ImmutableDict') is not None
 
 

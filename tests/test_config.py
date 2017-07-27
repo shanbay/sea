@@ -1,6 +1,8 @@
+import json
 import os.path
 
 from sea.app import Sea
+from sea.config import ConfigAttribute, Config
 
 
 def test_config_from_class():
@@ -24,3 +26,17 @@ def test_config_from_class():
     d = app.config.get_namespace(
         'TEST_', lowercase=False, trim_namespace=False)
     assert 'TEST_KEY' in d
+    s = repr(app.config)
+    assert '<Config' in s
+
+
+def test_config_attribute():
+    class App:
+        x = ConfigAttribute('n_x', json.loads)
+
+    assert type(App.x) == ConfigAttribute
+    a = App()
+    a.config = Config('root', {'n_x': json.dumps({'foo': 'bar'})})
+    assert 'foo' in a.x
+    a.x = json.dumps({'a': 1})
+    assert 'a' in a.x

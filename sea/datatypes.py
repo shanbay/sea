@@ -10,9 +10,7 @@ class ImmutableDict(dict):
 
     @classmethod
     def fromkeys(cls, keys, value=None):
-        instance = super(cls, cls).__new__(cls)
-        instance.__init__(zip(keys, repeat(value)))
-        return instance
+        return cls(zip(keys, repeat(value)))
 
     def __reduce_ex__(self, protocol):
         return type(self), (dict(self),)
