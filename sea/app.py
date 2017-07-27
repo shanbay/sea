@@ -1,4 +1,5 @@
 import inspect
+import os.path
 
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict
@@ -16,6 +17,8 @@ class Sea:
     def __init__(self, root_path, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        if not os.path.isabs(root_path):
+            root_path = os.path.abspath(root_path)
         self.root_path = root_path
         self.config = self.config_class(root_path, self.default_config)
         self.servicers = {}

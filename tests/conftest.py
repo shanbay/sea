@@ -1,4 +1,6 @@
 import sys
 import os.path
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'wd'))
+cur = os.path.dirname(__file__)
+sys.path.append(os.path.join(cur, 'wd'))
+sys.path.append(os.path.join(cur, '..'))

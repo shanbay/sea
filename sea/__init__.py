@@ -1,17 +1,21 @@
 import os
-import os.path
 import importlib
 import inspect
 
 from sea.app import Sea
+from sea.extensions import AbstractExtension
+
+_app = None
 
 
-def create_app(app_class=Sea):
+def create_app(root_path, app_class=Sea):
     env = os.environ.get('SEA_ENV', 'development')
     config = importlib.import_module('app.configs.{}'.format(env))
 
     global _app
-    _app = app_class(os.path.abspath(os.getcwd()))
+    if _app is not None:
+        return _app
+    _app = app_class(root_path)
     _app.config.from_object(config.Config)
 
     from app import servicers as _servicers
@@ -22,7 +26,8 @@ def create_app(app_class=Sea):
     from app import extensions as _extensions
     for _ext in dir(_extensions):
         _ext = getattr(_extensions, _ext)
-        _ext.init_app(_app)
+        if isinstance(_ext, AbstractExtension):
+            _ext.init_app(_app)
 
     return _app
 

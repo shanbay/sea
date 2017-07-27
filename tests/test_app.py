@@ -2,16 +2,8 @@ import pytest
 import os.path
 
 from sea import app
-from sea.servicer import MetaServicer
 
-import grpc_mock
-
-
-class PersonServicer(grpc_mock.PersonServicer, metaclass=MetaServicer):
-    DEFAULT_MSG_CLASS = str
-
-    def get_a_person(self, request, context):
-        return
+from app.servicers import GreeterServicer, helloworld_pb2_grpc
 
 
 def test_sea():
@@ -29,11 +21,11 @@ def test_sea():
     assert _app.debug
     assert _app.testing
 
-    _app.register_servicer(PersonServicer)
-    assert 'PersonServicer' in _app.servicers
-    servicer = _app.servicers['PersonServicer']
+    _app.register_servicer(GreeterServicer)
+    assert 'GreeterServicer' in _app.servicers
+    servicer = _app.servicers['GreeterServicer']
     assert isinstance(servicer, tuple)
-    assert servicer == (grpc_mock.add_PersonServicer_to_server, PersonServicer)
+    assert servicer == (helloworld_pb2_grpc.add_GreeterServicer_to_server, GreeterServicer)
     with pytest.raises(RuntimeError):
-        _app.register_servicer(PersonServicer)
+        _app.register_servicer(GreeterServicer)
 

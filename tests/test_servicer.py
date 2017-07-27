@@ -33,7 +33,7 @@ def test_meta_servicer():
     context = HelloContext()
     ret = servicer.return_error(None, context)
     assert ret == {}
-    assert context.code == grpc.StatusCode.INVALID_ARGUMENT
+    assert context.code is grpc.StatusCode.INVALID_ARGUMENT
     assert context.details == 'error'
 
     ret = servicer.return_normal(None, context)
