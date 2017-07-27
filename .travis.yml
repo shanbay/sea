@@ -2,10 +2,13 @@ language: python
 python:
   - "3.5"
   - "3.6"
+env:
+  - CODECLIMATE_REPO_TOKEN=19c5e18e184070a726bb6fc703e321e526ca638df16f9623654044bcccdb1a9d
 install:
   - pip install -r requirements.txt
 script:
   - flake8 . --exclude=tests
   - pytest tests
 after_success:
-  coveralls
+  - coveralls
+  - codeclimate-test-reporter
