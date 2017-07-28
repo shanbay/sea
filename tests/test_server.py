@@ -14,13 +14,13 @@ def test_server():
     s = Server(app)
 
     assert isinstance(s.register, ConsulRegister)
+    assert not s._stopped
 
-    p = Process(target=s.run, args=('10241',))
+    def _term(pid):
+        time.sleep(0.5)
+        os.kill(pid, signal.SIGINT)
+
+    p = Process(target=_term, args=(os.getpid(),))
     p.start()
-
-    assert p.is_alive()
-    os.kill(p.pid, signal.SIGUSR1)
-    assert p.is_alive()
-    os.kill(p.pid, signal.SIGINT)
-    time.sleep(1)
-    assert not p.is_alive()
+    s.run('10240')
+    assert s._stopped

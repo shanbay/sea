@@ -1,4 +1,4 @@
-from sea.extensions.consul import Consul
+from sea.extensions.consul import Consul as OriginConsul
 
 
 class MockKv:
@@ -34,7 +34,7 @@ class MockConsulClient:
         self.kv = MockKv()
 
 
-class SeaConsul(Consul):
+class Consul(OriginConsul):
 
     def init_app(self, app):
         opts = app.config.get_namespace('CONSUL_')

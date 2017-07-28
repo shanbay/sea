@@ -1,10 +1,7 @@
 import signal
-import sys
+import time
 from concurrent import futures
 import grpc
-
-
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
 class Server:
@@ -17,6 +14,7 @@ class Server:
         regconf = self.app.config.get_namespace('REGISTER_')
         self.register = regconf['class'](
             self.app.extensions[regconf['client']])
+        self._stopped = False
 
     def run(self, port):
         port = str(port)
@@ -25,12 +23,9 @@ class Server:
             self.register.register(name, port)
         self.server.add_insecure_port('[::]:{}'.format(port))
         self.server.start()
-
         self.register_signal()
-
-        import time
-        while True:
-            time.sleep(_ONE_DAY_IN_SECONDS)
+        while not self._stopped:
+            time.sleep(1)
 
     def register_signal(self):
         signal.signal(signal.SIGINT, self._stop_handler)
@@ -40,4 +35,4 @@ class Server:
 
     def _stop_handler(self, signum, frame):
         self.server.stop(0)
-        sys.exit(0)
+        self._stopped = True
