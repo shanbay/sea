@@ -1,6 +1,6 @@
 import grpc
 
-from sea.servicer import MetaServicer
+from sea.servicer import ServicerMeta
 from sea import exceptions
 
 
@@ -17,7 +17,7 @@ class HelloContext():
         self.details = details
 
 
-class HelloServicer(metaclass=MetaServicer):
+class HelloServicer(metaclass=ServicerMeta):
 
     DEFAULT_MSG_CLASS = dict
 
