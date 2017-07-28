@@ -9,6 +9,7 @@ install:
 script:
   - flake8 . --exclude=tests
   - pytest tests
+  - coverage combine
 after_success:
   - coveralls
   - codeclimate-test-reporter

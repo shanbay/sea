@@ -3,6 +3,7 @@ import os.path
 
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict
+from sea.register import ConsulRegister
 
 
 class Sea:
@@ -11,7 +12,12 @@ class Sea:
     testing = ConfigAttribute('TESTING')
     default_config = ImmutableDict({
         'DEBUG': False,
-        'TESTING': False
+        'TESTING': False,
+        'WORKERS': 3,
+        'REGISTER_CLASS': ConsulRegister,
+        'REGISTER_CLIENT': 'consul',
+        'CONSUL_HOST': '127.0.0.1',
+        'CONSUL_PORT': 8500
     })
 
     def __init__(self, root_path, *args, **kwargs):
@@ -36,3 +42,7 @@ class Sea:
             if b.__name__ == servicer.__name__:
                 m = inspect.getmodule(b)
                 return getattr(m, 'add_{}_to_server'.format(b.__name__))
+
+    def register_extension(self, name, ext):
+        ext.init_app(self)
+        self.extensions[name] = ext

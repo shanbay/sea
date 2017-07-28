@@ -1,10 +1,4 @@
-from sea.extensions import AbstractExtension
+from tests.helpers import Consul
 
 
-class Cache(AbstractExtension):
-
-    def init_app(self, app):
-        return app
-
-
-cache = Cache()
+consul = Consul()

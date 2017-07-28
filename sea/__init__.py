@@ -24,10 +24,10 @@ def create_app(root_path, app_class=Sea):
             _app.register_servicer(_servicer)
 
     from app import extensions as _extensions
-    for _ext in dir(_extensions):
-        _ext = getattr(_extensions, _ext)
+    for _ext_name in dir(_extensions):
+        _ext = getattr(_extensions, _ext_name)
         if isinstance(_ext, AbstractExtension):
-            _ext.init_app(_app)
+            _app.register_extension(_ext_name, _ext)
 
     return _app
 

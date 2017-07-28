@@ -4,6 +4,7 @@ import os.path
 from sea import app
 
 from app.servicers import GreeterServicer, helloworld_pb2_grpc
+from app.extensions import consul
 
 
 def test_sea():
@@ -29,3 +30,6 @@ def test_sea():
     with pytest.raises(RuntimeError):
         _app.register_servicer(GreeterServicer)
 
+    _app.register_extension('consul', consul)
+    ext = _app.extensions['consul']
+    assert ext is consul
