@@ -1,20 +1,23 @@
+from consul import Check
+
+
 class ConsulRegister:
 
     def __init__(self, client):
 
         self.client = client
 
-    def register(self, name, port):
-        return self.client.kv.put(name, port)
+    def register(self, name, publish_host, port):
+        return self.client.agent.service.register(
+            name, address=publish_host, port=port,
+            check=Check.tcp(publish_host, port, "10s"))
 
-    def deregister(self, name):
-        return self.client.kv.delete(name)
+    def deregister(self, name, publish_host, port):
+        return self.client.agent.service.deregister(name)
 
-    def get_port(self, name):
-        _, data = self.client.kv.get(name)
-        if data is None:
+    def service_url(self, name):
+        _, nodes = self.client.catalog.service(name)
+        if len(nodes) == 0:
             return None
-        port = data['Value']
-        if isinstance(port, bytes):
-            port = port.decode()
-        return port
+        port = nodes[0]['ServicePort']
+        return '{}.service.{}:{}'.format(name, self.client.dc, port)

@@ -1,37 +1,53 @@
 from sea.extensions.consul import Consul as OriginConsul
 
 
-class MockKv:
+class MockAgent:
+    class MockService:
+        def register(self, name, address, port, check=None):
+            self.name = name
+            self.address = address,
+            self.port = port
+            self.check = check
+            return True
+
+        def deregister(self, name):
+            self.name = None
+            return True
 
     def __init__(self):
-        self.v = None
+        self.service = self.MockService()
 
-    def put(self, name, value):
-        self.v = value
-        return True
 
-    def delete(self, name):
-        self.v = None
-        return True
+class MockCatalog:
 
-    def get(self, name):
-        if self.v is None:
-            return ('2771385', None)
-        return ('2771385',
-                {
-                    'CreateIndex': 2771381,
-                    'Flags': 0,
-                    'Key': 'testk',
-                    'LockIndex': 0,
-                    'ModifyIndex': 2771385,
-                    'Value': self.v.encode()
-                })
+    def __init__(self, agent):
+        self.agent = agent
+
+    def service(self, name):
+        service = self.agent.service
+        if service.name == name:
+            return ('2791405', [{
+                    'Address': service.address,
+                    'CreateIndex': 2791238,
+                    'ModifyIndex': 2791405,
+                    'Node': 'nd1',
+                    'ServiceAddress': service.address,
+                    'ServiceEnableTagOverride': False,
+                    'ServiceID': name,
+                    'ServiceName': name,
+                    'ServicePort': service.port,
+                    'ServiceTags': []
+                    }])
+        else:
+            return ('2791405', [])
 
 
 class MockConsulClient:
 
     def __init__(self, **kwargs):
-        self.kv = MockKv()
+        self.agent = MockAgent()
+        self.catalog = MockCatalog(self.agent)
+        self.dc = 'consul'
 
 
 class Consul(OriginConsul):

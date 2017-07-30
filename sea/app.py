@@ -13,11 +13,14 @@ class Sea:
     default_config = ImmutableDict({
         'DEBUG': False,
         'TESTING': False,
-        'WORKERS': 3,
+        'GRPC_WORKERS': 3,
+        'GRPC_HOST': '[::]',
+        'GRPC_PORT': 6000,
         'REGISTER_CLASS': ConsulRegister,
         'REGISTER_CLIENT': 'consul',
         'CONSUL_HOST': '127.0.0.1',
-        'CONSUL_PORT': 8500
+        'CONSUL_PORT': 8500,
+        'CONSUL_DC': 'consul'
     })
 
     def __init__(self, root_path, *args, **kwargs):
