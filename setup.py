@@ -1,9 +1,19 @@
 from setuptools import setup, find_packages
+import re
+
+_version_re = re.compile(r'__version__\s+=\s+(.*)')
+
+with open('sea/__init__.py') as f:
+    version = _version_re.search(f.read()).group(1).strip()
+
+with open('README.md') as f:
+    readme = f.read()
 
 setup(
     name='sea',
-    version='0.0.1',
+    version=version,
     description='shanbay rpc framework',
+    long_description=readme,
     url='https://github.com/shanbay/sea',
     author='Michael Ding',
     author_email='yandy.ding@gmail.com',
@@ -28,4 +38,7 @@ setup(
     install_requires=[
         'grpcio>=1.4.0,<1.5.0'
     ],
+    entry_points={
+        'console_scripts': ['sea=sea.cli:sea_main', 'seac=sea.cli:seac_main']
+    }
 )

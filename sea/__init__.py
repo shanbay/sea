@@ -5,6 +5,7 @@ import inspect
 from sea.app import Sea
 from sea.extensions import AbstractExtension
 
+__version__ = '0.1.0'
 _app = None
 
 

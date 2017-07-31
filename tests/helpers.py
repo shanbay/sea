@@ -1,4 +1,4 @@
-from sea.extensions.consul import Consul as OriginConsul
+from sea.contrib.extensions.consul import Consul as OriginConsul
 
 
 class MockAgent:
