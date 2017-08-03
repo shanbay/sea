@@ -15,14 +15,20 @@ def test_abscmd():
 
 def test_cmd_server():
     os.environ.setdefault('SEA_ENV', 'testing')
-    with mock.patch('sea.cli.Server', autospec=True) as mocked:
-        sys.argv = 'sea -w ./tests/wd s -b 127.0.0.1'.split()
+    sys.argv = 'sea s -b 127.0.0.1 -f wrong'.split()
+    with pytest.raises(ValueError):
+        cli.main()
+    sys.argv = 'sea -w ./tests/wd s -b 127.0.0.1'.split()
+    with mock.patch('sea.cli.Server', autospec=True):
         assert isinstance(cli.main(), mock.Mock)
 
 
 def test_cmd_console():
     os.environ.setdefault('SEA_ENV', 'testing')
-    sys.argv = 'sea c'.split()
+    sys.argv = 'sea c -f wrong'.split()
+    with pytest.raises(ValueError):
+        cli.main()
+    sys.argv = 'sea -w ./tests/wd c'.split()
     mocked = mock.MagicMock()
     mocked.embed = mock.MagicMock(return_value='Embed Called')
     mocked.interact = mock.MagicMock(return_value='Interact Called')
@@ -31,3 +37,18 @@ def test_cmd_console():
         mocked.embed.side_effect = ImportError
         with mock.patch('sea.cli.code', new=mocked):
             assert cli.main() == 'Interact Called'
+
+
+def test_cmd_new():
+    os.environ.setdefault('SEA_ENV', 'testing')
+    sys.argv = 'sea new -f wrong'.split()
+    with pytest.raises(ValueError):
+        cli.main()
+    sys.argv = 'sea new myproject'.split()
+    # TODO
+
+
+def test_cmd_task():
+    os.environ.setdefault('SEA_ENV', 'testing')
+    sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
+    assert cli.main() == 101

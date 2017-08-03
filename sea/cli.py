@@ -6,10 +6,40 @@ import abc
 
 from sea import create_app
 from sea.server import Server
+from sea.utils import import_string
+
+
+class TaskOption:
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
 
 
 class TaskManager:
-    pass
+
+    def __init__(self):
+        self.tasks = {}
+
+    def task(self, name):
+        def wrapper(func):
+            self.tasks[name] = func
+            return func
+        return wrapper
+
+    def option(self, *args, **kwargs):
+        def wrapper(func):
+            opts = getattr(func, 'opts', [])
+            if not opts:
+                func.opts = opts
+            opts.append(TaskOption(*args, **kwargs))
+            return func
+        return wrapper
+
+    def __getitem__(self, name):
+        return self.tasks[name]
+
+
+taskm = TaskManager()
 
 
 class AbstractCommand(metaclass=abc.ABCMeta):
@@ -32,7 +62,9 @@ class ServerCmd(AbstractCommand):
             help='published host which others can connect through')
         return p
 
-    def run(self, args):
+    def run(self, args, extra=[]):
+        if extra:
+            raise ValueError
         app = create_app(args.workdir)
         s = Server(app, args.host)
         return s.run()
@@ -44,7 +76,9 @@ class ConsoleCmd(AbstractCommand):
             'console', aliases=['c'], help='Run Console')
         return p
 
-    def run(self, args):
+    def run(self, args, extra=[]):
+        if extra:
+            raise ValueError
         banner = """
         [Sea Console]:
         the following vars are included:
@@ -68,21 +102,39 @@ class NewCmd(AbstractCommand):
             'project', help='project name')
         return p
 
-    def run(self, args):
-        pass
+    def run(self, args, extra=[]):
+        if extra:
+            raise ValueError
 
 
 class TaskCmd(AbstractCommand):
 
+    def load_tasks(self, app):
+        root = os.path.join(app.root_path, 'tasks')
+        for m in os.listdir(root):
+            if m != '__init__.py' and \
+                    m.endswith('.py') and \
+                    os.path.isfile(os.path.join(root, m)):
+                import_string('tasks.{}'.format(m[:-3]))
+        global taskm
+        return taskm
+
     def opt(self, subparsers):
         p = subparsers.add_parser(
-            'invoke', help='Invoke Sea Tasks')
+            'invoke', aliases=['i'], help='Invoke Sea Tasks')
         p.add_argument(
             'task', help='task name')
         return p
 
-    def run(self, args):
-        pass
+    def run(self, args, extra=[]):
+        app = create_app(args.workdir)
+        taskm = self.load_tasks(app)
+        func = taskm[args.task]
+        opts = getattr(func, 'opts', [])
+        parser = argparse.ArgumentParser('seatask')
+        for opt in opts:
+            parser.add_argument(*opt.args, **opt.kwargs)
+        return func(**vars(parser.parse_args(extra)))
 
 
 def main():
@@ -97,5 +149,5 @@ def main():
             cmd.opt(subparsers).set_defaults(handler=cmd.run)
 
     args = sys.argv[1:]
-    args = root.parse_args(args)
-    return args.handler(args)
+    args, extra = root.parse_known_args(args)
+    return args.handler(args, extra)
