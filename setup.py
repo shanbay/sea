@@ -39,6 +39,6 @@ setup(
         'grpcio>=1.4.0,<1.5.0'
     ],
     entry_points={
-        'console_scripts': ['sea=sea.cli:sea_main', 'seac=sea.cli:seac_main']
+        'console_scripts': ['sea=sea.cli:main']
     }
 )

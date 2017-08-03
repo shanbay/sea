@@ -1,4 +1,5 @@
 import os
+import sys
 import importlib
 import inspect
 
@@ -25,6 +26,8 @@ def _load_extensions(target):
 
 
 def create_app(root_path, app_class=Sea):
+    sys.path.append(root_path)
+
     env = os.environ.get('SEA_ENV', 'development')
     config = importlib.import_module('app.configs.{}'.format(env))
 
