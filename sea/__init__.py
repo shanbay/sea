@@ -1,12 +1,12 @@
 import os
 import sys
-import importlib
 import inspect
 
 from sea.app import Sea
 from sea.extensions import AbstractExtension
+from sea.utils import import_string
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 _app = None
 
 
@@ -29,7 +29,7 @@ def create_app(root_path, app_class=Sea):
     sys.path.append(root_path)
 
     env = os.environ.get('SEA_ENV', 'development')
-    config = importlib.import_module('app.configs.{}'.format(env))
+    config = import_string('app.configs.{}'.format(env))
 
     global _app
     if _app is not None:
