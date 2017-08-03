@@ -22,5 +22,5 @@ def test_server():
 
     p = Process(target=_term, args=(os.getpid(),))
     p.start()
-    s.run()
+    assert s.run()
     assert s._stopped

@@ -4,6 +4,7 @@ import sea
 
 
 def test_app():
+    sea._app = None
     assert sea.current_app() is None
     os.environ.setdefault('SEA_ENV', 'testing')
     app = sea.create_app('.')

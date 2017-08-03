@@ -30,6 +30,7 @@ class Server:
         self.register_signal()
         while not self._stopped:
             time.sleep(1)
+        return True
 
     def register_signal(self):
         signal.signal(signal.SIGINT, self._stop_handler)
