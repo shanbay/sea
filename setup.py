@@ -1,10 +1,12 @@
 from setuptools import setup, find_packages
 import re
+import ast
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
 with open('sea/__init__.py') as f:
-    version = _version_re.search(f.read()).group(1).strip()
+    version = str(ast.literal_eval(_version_re.search(
+        f.read()).group(1)))
 
 with open('README.md') as f:
     readme = f.read()
