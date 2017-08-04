@@ -30,13 +30,13 @@ def create_app(root_path, app_class=Sea):
     sys.path.append(os.path.join(root_path, 'protos'))
 
     env = os.environ.get('SEA_ENV', 'development')
-    config = import_string('app.configs.{}'.format(env))
+    config = import_string('configs.{}'.format(env))
 
     global _app
     if _app is not None:
         return _app
     _app = app_class(root_path)
-    _app.config.from_object(config.Config)
+    _app.config.from_object(config)
 
     _load_servicers(_app)
     _load_extensions(_app)
