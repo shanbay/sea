@@ -1,15 +1,12 @@
-import os
-
 import sea
 
 
 def test_app():
     sea._app = None
     assert sea.current_app() is None
-    os.environ.setdefault('SEA_ENV', 'testing')
-    app = sea.create_app('.')
+    app = sea.create_app('./tests/wd')
     assert sea.current_app() is app
-    assert sea.create_app(os.getcwd()) is app
+    assert sea.create_app('./tests/wd') is app
     assert app.testing
 
     from app.configs.default import Config

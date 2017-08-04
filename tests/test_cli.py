@@ -14,7 +14,6 @@ def test_abscmd():
 
 
 def test_cmd_server():
-    os.environ.setdefault('SEA_ENV', 'testing')
     sys.argv = 'sea s -b 127.0.0.1 -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
@@ -24,7 +23,6 @@ def test_cmd_server():
 
 
 def test_cmd_console():
-    os.environ.setdefault('SEA_ENV', 'testing')
     sys.argv = 'sea c -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
@@ -40,7 +38,6 @@ def test_cmd_console():
 
 
 def test_cmd_new():
-    os.environ.setdefault('SEA_ENV', 'testing')
     sys.argv = 'sea new -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
@@ -49,6 +46,5 @@ def test_cmd_new():
 
 
 def test_cmd_task():
-    os.environ.setdefault('SEA_ENV', 'testing')
     sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
     assert cli.main() == 101

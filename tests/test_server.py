@@ -9,8 +9,7 @@ from sea.register import ConsulRegister
 
 
 def test_server():
-    os.environ.setdefault('SEA_ENV', 'testing')
-    app = sea.create_app('.')
+    app = sea.create_app('./tests/wd')
     s = Server(app, '127.0.0.1')
 
     assert isinstance(s.register, ConsulRegister)

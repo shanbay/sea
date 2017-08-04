@@ -27,6 +27,7 @@ def _load_extensions(target):
 
 def create_app(root_path, app_class=Sea):
     sys.path.append(root_path)
+    sys.path.append(os.path.join(root_path, 'protos'))
 
     env = os.environ.get('SEA_ENV', 'development')
     config = import_string('app.configs.{}'.format(env))

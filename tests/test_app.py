@@ -1,14 +1,16 @@
 import pytest
+import sys
 import os.path
 
 from sea import app
 
-from app.servicers import GreeterServicer, helloworld_pb2_grpc
-from app.extensions import consul
-
 
 def test_sea():
-    _app = app.Sea(os.path.dirname(__file__))
+    root_path = './tests/wd'
+    sys.path.append(root_path)
+    sys.path.append(os.path.join(root_path, 'protos'))
+
+    _app = app.Sea(root_path)
     assert not _app.debug
     assert not _app.testing
     assert _app.extensions == {}
@@ -21,6 +23,9 @@ def test_sea():
     _app.config.from_object(C)
     assert _app.debug
     assert _app.testing
+
+    from app.servicers import GreeterServicer, helloworld_pb2_grpc
+    from app.extensions import consul
 
     _app.register_servicer(GreeterServicer)
     assert 'GreeterServicer' in _app.servicers
