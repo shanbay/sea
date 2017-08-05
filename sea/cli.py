@@ -98,8 +98,14 @@ class NewCmd(AbstractCommand):
     def opt(self, subparsers):
         p = subparsers.add_parser(
             'new', aliases=['n'], help='Create Sea Project')
+        p.add_argument('project', help='project name')
         p.add_argument(
-            'project', help='project name')
+            '--skip-git', action='store_true',
+            help='skip add git files and run git init')
+        p.add_argument(
+            '--skip-orator', action='store_true', help='skip orator')
+        p.add_argument(
+            '--skip-consul', action='store_true', help='skip consul')
         return p
 
     def run(self, args, extra=[]):
