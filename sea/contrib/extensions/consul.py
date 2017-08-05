@@ -1,14 +1,5 @@
-import sys
-
 from sea.extensions import AbstractExtension
-
-try:
-    import consul
-except ImportError as e:
-    print(
-        '{}\nyou need run: pip install python-consul'.format(e),
-        file=sys.stderr)
-    sys.exit(2)
+import consul
 
 
 class Consul(AbstractExtension):
