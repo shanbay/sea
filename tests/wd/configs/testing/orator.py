@@ -1,7 +1,5 @@
-CACHE_URL = 'redis://localhost:2379'
-
 DATABASES = {
-    'default': {
+    'sqlite': {
         'driver': 'sqlite3',
         'host': 'localhost',
         'database': 'database',
