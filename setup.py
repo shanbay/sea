@@ -40,7 +40,13 @@ setup(
     install_requires=[
         'grpcio>=1.4.0,<1.5.0'
     ],
+    extras_require={
+        'consul': ['python-consul'],
+        'orator': ['orator']
+    },
     entry_points={
-        'console_scripts': ['sea=sea.cli:main']
+        'console_scripts': [
+            'sea=sea.cli:main',
+            'seaorator=sea.contrib.extensions.orator.cli:main']
     }
 )

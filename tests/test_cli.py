@@ -47,3 +47,19 @@ def test_cmd_new():
 def test_cmd_task():
     sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
     assert cli.main() == 101
+    sys.argv = 'sea -w ./tests/wd i getconfig'.split()
+    assert cli.main()
+
+    class EntryPoint:
+        def load(self):
+            @cli.taskm.task('xyz')
+            def f2():
+                return "hello"
+            return f2
+
+    def new_entry_iter(name):
+        return [EntryPoint()]
+
+    with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
+        sys.argv = 'sea -w ./tests/wd i xyz'.split()
+        assert cli.main() == 'hello'

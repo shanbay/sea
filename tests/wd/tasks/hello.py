@@ -1,10 +1,12 @@
 from sea.cli import taskm
+from sea import current_app
 
 
-@taskm.task('assign')
-@taskm.option('-n', '--name', default='Hello')
+@taskm.task('getconfig')
+@taskm.option('-n', '--name', default='TESTING')
 def f1(name):
-    return name
+    app = current_app()
+    return app.config.get(name)
 
 
 @taskm.task('plusone')

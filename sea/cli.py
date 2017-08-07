@@ -109,15 +109,20 @@ class NewCmd(AbstractCommand):
 
 class TaskCmd(AbstractCommand):
 
-    def load_tasks(self, app):
+    def _load_plugin_tasks(self):
+        import pkg_resources
+        for ep in pkg_resources.iter_entry_points('sea.tasks'):
+            ep.load()
+        return True
+
+    def _load_app_tasks(self, app):
         root = os.path.join(app.root_path, 'tasks')
         for m in os.listdir(root):
             if m != '__init__.py' and \
                     m.endswith('.py') and \
                     os.path.isfile(os.path.join(root, m)):
                 import_string('tasks.{}'.format(m[:-3]))
-        global taskm
-        return taskm
+        return True
 
     def opt(self, subparsers):
         p = subparsers.add_parser(
@@ -128,7 +133,9 @@ class TaskCmd(AbstractCommand):
 
     def run(self, args, extra=[]):
         app = create_app(args.workdir)
-        taskm = self.load_tasks(app)
+        self._load_plugin_tasks()
+        self._load_app_tasks(app)
+        global taskm
         func = taskm[args.task]
         opts = getattr(func, 'opts', [])
         parser = argparse.ArgumentParser('seatask')
