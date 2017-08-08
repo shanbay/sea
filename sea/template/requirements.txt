@@ -1,0 +1,7 @@
+{%- if not skip_orator -%}
+orator
+{% endif -%}
+{%- if not skip_consul -%}
+python-consul
+{% endif -%}
+pytest
