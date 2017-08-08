@@ -100,6 +100,12 @@ class NewCmd(AbstractCommand):
     PACKAGE_DIR = os.path.dirname(__file__)
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_DIRECTORIES = ['__pycache__']
+    IGNORED_FILES = {
+        'git': ['./.gitignore'],
+        'orator': ['configs/development/orator.tpl',
+                   'configs/testing/orator.tpl'],
+        'consul': []
+    }
 
     def opt(self, subparsers):
         p = subparsers.add_parser(
@@ -122,20 +128,18 @@ class NewCmd(AbstractCommand):
 
         # skip some unneeded files
         skip_files = []
-        if args.__dict__.get('skip_git', False):
-            skip_files.append('.gitignore')
-        if args.__dict__.get('skip_orator', False):
-            skip_files.append('orator.tpl')
-        if args.__dict__.get('skip_consul', False):
-            skip_files.append('consul.tpl')
+        for ignore_key in self.IGNORED_FILES.keys():
+            if hasattr(args, 'skip_' + ignore_key) and \
+                    getattr(args, 'skip_' + ignore_key):
+                skip_files.extend(self.IGNORED_FILES[ignore_key])
 
         # traverse all files in template dir
         for dir_path, dirs, filenames in os.walk(self.TMPLPATH):
             dirs[:] = [d for d in dirs if d not in self.IGNORED_DIRECTORIES]
             for filename in filenames:
-                if filename not in skip_files:
-                    rel_path = os.path.join(
-                        os.path.relpath(dir_path, self.TMPLPATH), filename)
+                rel_path = os.path.join(
+                    os.path.relpath(dir_path, self.TMPLPATH), filename)
+                if rel_path not in skip_files:
                     template = env.get_template(rel_path)
                     dest_file = os.path.join(dest_path,
                                              rel_path).replace('.tpl', '.py')
@@ -143,7 +147,9 @@ class NewCmd(AbstractCommand):
                     os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                     print(dest_file)
                     with open(dest_file, 'w') as f:
-                        f.write(template.render(**args.__dict__))
+                        f.write(template.render(**{k: v for k, v in
+                                                args.__dict__.items()
+                                                if not k.startswith('__')}))
 
 
 class TaskCmd(AbstractCommand):
