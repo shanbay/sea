@@ -7,6 +7,7 @@ import abc
 from sea import create_app
 from sea.server import Server
 from sea.utils import import_string
+from sea.command import generate_code
 
 
 class TaskOption:
@@ -109,6 +110,7 @@ class NewCmd(AbstractCommand):
         return p
 
     def run(self, args, extra=[]):
+        generate_code('{}/{}'.format(os.getcwd(), args.project), args.__dict__)
         if extra:
             raise ValueError
 
