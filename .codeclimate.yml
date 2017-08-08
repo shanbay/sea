@@ -1,5 +1,18 @@
+---
 engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  fixme:
+    enabled: true
   radon:
     enabled: true
     config:
       threshold: "C"
+ratings:
+  paths:
+  - "**.py"
+exclude_paths:
+- tests/
