@@ -1,5 +1,7 @@
 import sys
 import pytest
+import os
+import shutil
 from unittest import mock
 
 from sea import cli
@@ -37,6 +39,7 @@ def test_cmd_console():
 
 
 def test_cmd_new():
+    shutil.rmtree('tests/myproject', ignore_errors=True)
     sys.argv = 'sea new -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
@@ -56,7 +59,7 @@ def test_cmd_new():
     """
     with open('./tests/myproject/app/servicers.py', 'r') as f:
         content = f.read()
-    import os, shutil
+
     from textwrap import dedent
     assert content == dedent(correct_code).rstrip()
     assert not os.path.exists('./tests/myproject/condfigs/development/orator.py')

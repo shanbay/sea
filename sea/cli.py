@@ -3,12 +3,12 @@ import os
 import argparse
 import code
 import abc
+import shutil
+from jinja2 import Environment, FileSystemLoader
 
 from sea import create_app
 from sea.server import Server
 from sea.utils import import_string
-
-from jinja2 import Environment, FileSystemLoader
 
 
 class TaskOption:
@@ -99,7 +99,6 @@ class NewCmd(AbstractCommand):
 
     PACKAGE_DIR = os.path.dirname(__file__)
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
-    IGNORED_DIRECTORIES = ['__pycache__']
     IGNORED_FILES = {
         'git': ['gitignore'],
         'orator': ['configs/development/orator.tpl',
@@ -120,38 +119,42 @@ class NewCmd(AbstractCommand):
             '--skip-consul', action='store_true', help='skip consul')
         return p
 
+    def _build_skip_files(self, args):
+        skipped = set()
+        for ignore_key in self.IGNORED_FILES.keys():
+            if getattr(args, 'skip_' + ignore_key):
+                for f in self.IGNORED_FILES[ignore_key]:
+                    skipped.add(os.path.join(self.TMPLPATH, f))
+        return skipped
+
+    def _gen_project(self, path, skip={}, ctx={}):
+        env = Environment(loader=FileSystemLoader(self.TMPLPATH))
+        for dirpath, dirnames, filenames in os.walk(self.TMPLPATH):
+            for fn in filenames:
+                src = os.path.join(dirpath, fn)
+                if src not in skip:
+                    relfn = os.path.relpath(src, self.TMPLPATH)
+                    dst = os.path.join(path, relfn)
+                    # create the parentdir if not exists
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    r, ext = os.path.splitext(dst)
+                    if ext == '.tmpl':
+                        with open(r, 'w') as f:
+                            tmpl = env.get_template(relfn)
+                            f.write(tmpl.render(**ctx))
+                    else:
+                        shutil.copyfile(src, dst)
+
+                    print('created: {}'.format(dst))
+
     def run(self, args, extra=[]):
         if extra:
             raise ValueError
-        dest_path = '{}/{}'.format(os.getcwd(), args.project)
-        args.project = args.project.split('/')[-1]
-        env = Environment(loader=FileSystemLoader(self.TMPLPATH))
-
-        # skip some unneeded files
-        skip_files = []
-        for ignore_key in self.IGNORED_FILES.keys():
-            if hasattr(args, 'skip_' + ignore_key) and \
-                    getattr(args, 'skip_' + ignore_key):
-                skip_files.extend([os.path.join(self.TMPLPATH, k)
-                                   for k in self.IGNORED_FILES[ignore_key]])
-
-        # traverse all files in template dir
-        for root, dirs, filenames in os.walk(self.TMPLPATH):
-            dirs[:] = [d for d in dirs if d not in self.IGNORED_DIRECTORIES]
-            for filename in filenames:
-                fn = os.path.join(root, filename)
-                if fn not in skip_files:
-                    rel_path = os.path.relpath(fn, self.TMPLPATH)
-                    template = env.get_template(rel_path)
-                    dest_file = os.path.join(
-                        dest_path, rel_path).replace('.tpl', '.py')
-                    # create the parentdir if not exists
-                    os.makedirs(os.path.dirname(dest_file), exist_ok=True)
-                    print(dest_file)
-                    with open(dest_file, 'w') as f:
-                        f.write(template.render(**{k: v for k, v in
-                                                args.__dict__.items()
-                                                if not k.startswith('__')}))
+        path = os.path.join(os.getcwd(), args.project)
+        args.project = os.path.basename(path)
+        return self._gen_project(
+                    path, skip=self._build_skip_files(args),
+                    ctx=vars(args))
 
 
 class TaskCmd(AbstractCommand):
