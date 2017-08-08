@@ -1,5 +1,7 @@
 import sys
 import pytest
+import os
+import shutil
 from unittest import mock
 
 from sea import cli
@@ -37,11 +39,31 @@ def test_cmd_console():
 
 
 def test_cmd_new():
+    shutil.rmtree('tests/myproject', ignore_errors=True)
     sys.argv = 'sea new -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
-    sys.argv = 'sea new myproject'.split()
-    # TODO
+    sys.argv = ('sea new tests/myproject'
+                ' --skip-git --skip-consul --skip-orator').split()
+    cli.main()
+    correct_code = """\
+    import myproject_pb2
+    import myproject_pb2_grpc
+
+    from sea.servicer import ServicerMeta
+
+
+    class MyprojectServicer(myproject_pb2_grpc.MyprojectServicer, metaclass=ServicerMeta):
+
+        pass
+    """
+    with open('./tests/myproject/app/servicers.py', 'r') as f:
+        content = f.read()
+
+    from textwrap import dedent
+    assert content == dedent(correct_code).rstrip()
+    assert not os.path.exists('./tests/myproject/condfigs/development/orator.py')
+    shutil.rmtree('tests/myproject')
 
 
 def test_cmd_task():

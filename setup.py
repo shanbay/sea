@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import os
 import re
 import ast
 
@@ -10,6 +11,22 @@ with open('sea/__init__.py') as f:
 
 with open('README.md') as f:
     readme = f.read()
+
+
+def find_package_data(package):
+    """
+    Return all files under the root package, that are not in a
+    package themselves.
+    """
+    walk = [(dirpath.replace(package + os.sep, '', 1), filenames)
+            for dirpath, dirnames, filenames in os.walk(package)]
+
+    filepaths = []
+    for base, filenames in walk:
+        filepaths.extend([os.path.join(base, filename)
+                          for filename in filenames])
+    return filepaths
+
 
 setup(
     name='sea',
@@ -36,9 +53,11 @@ setup(
     ],
     keywords=['rpc', 'grpc'],
     packages=find_packages(exclude=['tests']),
+    package_data={'sea': find_package_data('sea')},
     test_suite="tests",
     install_requires=[
-        'grpcio>=1.4.0,<1.5.0'
+        'grpcio>=1.4.0,<1.5.0',
+        'jinja2'
     ],
     extras_require={
         'consul': ['python-consul'],

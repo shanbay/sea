@@ -1,0 +1,9 @@
+import {{ project }}_pb2
+import {{ project }}_pb2_grpc
+
+from sea.servicer import ServicerMeta
+
+
+class {{ project.title() }}Servicer({{ project }}_pb2_grpc.{{ project.title() }}Servicer, metaclass=ServicerMeta):
+
+    pass

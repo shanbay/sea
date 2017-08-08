@@ -3,6 +3,8 @@ import os
 import argparse
 import code
 import abc
+import shutil
+from jinja2 import Environment, FileSystemLoader
 
 from sea import create_app
 from sea.server import Server
@@ -95,16 +97,64 @@ class ConsoleCmd(AbstractCommand):
 
 class NewCmd(AbstractCommand):
 
+    PACKAGE_DIR = os.path.dirname(__file__)
+    TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
+    IGNORED_FILES = {
+        'git': ['gitignore'],
+        'orator': ['configs/development/orator.tpl',
+                   'configs/testing/orator.tpl'],
+        'consul': []
+    }
+
     def opt(self, subparsers):
         p = subparsers.add_parser(
             'new', aliases=['n'], help='Create Sea Project')
+        p.add_argument('project', help='project name')
         p.add_argument(
-            'project', help='project name')
+            '--skip-git', action='store_true',
+            help='skip add git files and run git init')
+        p.add_argument(
+            '--skip-orator', action='store_true', help='skip orator')
+        p.add_argument(
+            '--skip-consul', action='store_true', help='skip consul')
         return p
+
+    def _build_skip_files(self, args):
+        skipped = set()
+        for ignore_key in self.IGNORED_FILES.keys():
+            if getattr(args, 'skip_' + ignore_key):
+                for f in self.IGNORED_FILES[ignore_key]:
+                    skipped.add(os.path.join(self.TMPLPATH, f))
+        return skipped
+
+    def _gen_project(self, path, skip={}, ctx={}):
+        env = Environment(loader=FileSystemLoader(self.TMPLPATH))
+        for dirpath, dirnames, filenames in os.walk(self.TMPLPATH):
+            for fn in filenames:
+                src = os.path.join(dirpath, fn)
+                if src not in skip:
+                    relfn = os.path.relpath(src, self.TMPLPATH)
+                    dst = os.path.join(path, relfn)
+                    # create the parentdir if not exists
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    r, ext = os.path.splitext(dst)
+                    if ext == '.tmpl':
+                        with open(r, 'w') as f:
+                            tmpl = env.get_template(relfn)
+                            f.write(tmpl.render(**ctx))
+                    else:
+                        shutil.copyfile(src, dst)
+
+                    print('created: {}'.format(dst))
 
     def run(self, args, extra=[]):
         if extra:
             raise ValueError
+        path = os.path.join(os.getcwd(), args.project)
+        args.project = os.path.basename(path)
+        return self._gen_project(
+                    path, skip=self._build_skip_files(args),
+                    ctx=vars(args))
 
 
 class TaskCmd(AbstractCommand):
