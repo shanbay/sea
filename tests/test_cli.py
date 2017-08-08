@@ -40,8 +40,27 @@ def test_cmd_new():
     sys.argv = 'sea new -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
-    sys.argv = 'sea new myproject'.split()
-    # TODO
+    sys.argv = ('sea new myproject'
+                ' --skip-git --skip-consul --skip-orator').split()
+    cli.main()
+    correct_code = """\
+    import myproject_pb2
+    import myproject_pb2_grpc
+
+    from sea.servicer import ServicerMeta
+
+
+    class GreeterServicer(myproject_pb2_grpc.GreeterServicer, metaclass=ServicerMeta):
+
+        DEFAULT_MSG_CLASS = myproject_pb2.EmptyReply
+    """
+    with open('./myproject/app/servicers.py', 'r') as f:
+        content = f.read()
+    import os, shutil
+    from textwrap import dedent
+    assert content == dedent(correct_code).rstrip()
+    assert not os.path.exists('./myproject/condfigs/development/orator.py')
+    shutil.rmtree('myproject')
 
 
 def test_cmd_task():

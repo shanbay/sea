@@ -25,7 +25,7 @@ def find_package_data(package):
     for base, filenames in walk:
         filepaths.extend([os.path.join(base, filename)
                           for filename in filenames])
-    return {package: filepaths}
+    return filepaths
 
 
 setup(
@@ -53,7 +53,7 @@ setup(
     ],
     keywords=['rpc', 'grpc'],
     packages=find_packages(exclude=['tests']),
-    package_data=find_package_data('sea'),
+    package_data={'sea': find_package_data('sea')},
     test_suite="tests",
     install_requires=[
         'grpcio>=1.4.0,<1.5.0',
