@@ -40,7 +40,7 @@ def test_cmd_new():
     sys.argv = 'sea new -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
-    sys.argv = ('sea new myproject'
+    sys.argv = ('sea new abab/myproject'
                 ' --skip-git --skip-consul --skip-orator').split()
     cli.main()
     correct_code = """\
@@ -54,13 +54,13 @@ def test_cmd_new():
 
         DEFAULT_MSG_CLASS = myproject_pb2.EmptyReply
     """
-    with open('./myproject/app/servicers.py', 'r') as f:
+    with open('./abab/myproject/app/servicers.py', 'r') as f:
         content = f.read()
     import os, shutil
     from textwrap import dedent
     assert content == dedent(correct_code).rstrip()
-    assert not os.path.exists('./myproject/condfigs/development/orator.py')
-    shutil.rmtree('myproject')
+    assert not os.path.exists('./abab/myproject/condfigs/development/orator.py')
+    shutil.rmtree('abab')
 
 
 def test_cmd_task():
