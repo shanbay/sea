@@ -54,10 +54,10 @@ setup(
     keywords=['rpc', 'grpc'],
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('sea'),
-    # include_package_data=True,
     test_suite="tests",
     install_requires=[
-        'grpcio>=1.4.0,<1.5.0'
+        'grpcio>=1.4.0,<1.5.0',
+        'jinja2'
     ],
     extras_require={
         'consul': ['python-consul'],
