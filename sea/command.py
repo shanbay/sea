@@ -25,9 +25,11 @@ def generate_code(dest_path, kwargs):
         dirs[:] = [d for d in dirs if d not in IGNORED_DIRECTORIES]
         for filename in filenames:
             if filename not in skip_files:
-                rel_path = os.path.join(os.path.relpath(dir_path, TMPLPATH), filename)
+                rel_path = os.path.join(os.path.relpath(dir_path, TMPLPATH),
+                                        filename)
                 template = env.get_template(rel_path)
-                dest_file = os.path.join(dest_path, rel_path).replace('.tpl', '.py')
+                dest_file = os.path.join(dest_path,
+                                         rel_path).replace('.tpl', '.py')
                 # create the parentdir if not exists
                 os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                 print(dest_file)
