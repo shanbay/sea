@@ -101,7 +101,7 @@ class NewCmd(AbstractCommand):
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_DIRECTORIES = ['__pycache__']
     IGNORED_FILES = {
-        'git': ['./.gitignore'],
+        'git': ['gitignore'],
         'orator': ['configs/development/orator.tpl',
                    'configs/testing/orator.tpl'],
         'consul': []
@@ -124,6 +124,7 @@ class NewCmd(AbstractCommand):
         if extra:
             raise ValueError
         dest_path = '{}/{}'.format(os.getcwd(), args.project)
+        args.project = args.project.split('/')[-1]
         env = Environment(loader=FileSystemLoader(self.TMPLPATH))
 
         # skip some unneeded files
@@ -131,18 +132,19 @@ class NewCmd(AbstractCommand):
         for ignore_key in self.IGNORED_FILES.keys():
             if hasattr(args, 'skip_' + ignore_key) and \
                     getattr(args, 'skip_' + ignore_key):
-                skip_files.extend(self.IGNORED_FILES[ignore_key])
+                skip_files.extend([os.path.join(self.TMPLPATH, k)
+                                   for k in self.IGNORED_FILES[ignore_key]])
 
         # traverse all files in template dir
-        for dir_path, dirs, filenames in os.walk(self.TMPLPATH):
+        for root, dirs, filenames in os.walk(self.TMPLPATH):
             dirs[:] = [d for d in dirs if d not in self.IGNORED_DIRECTORIES]
             for filename in filenames:
-                rel_path = os.path.join(
-                    os.path.relpath(dir_path, self.TMPLPATH), filename)
-                if rel_path not in skip_files:
+                fn = os.path.join(root, filename)
+                if fn not in skip_files:
+                    rel_path = os.path.relpath(fn, self.TMPLPATH)
                     template = env.get_template(rel_path)
-                    dest_file = os.path.join(dest_path,
-                                             rel_path).replace('.tpl', '.py')
+                    dest_file = os.path.join(
+                        dest_path, rel_path).replace('.tpl', '.py')
                     # create the parentdir if not exists
                     os.makedirs(os.path.dirname(dest_file), exist_ok=True)
                     print(dest_file)
