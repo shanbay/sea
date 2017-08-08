@@ -5,7 +5,7 @@ python:
 install:
   - pip install -r requirements.txt
 script:
-  - flake8 . --exclude=tests
+  - flake8 . --exclude=tests,*_pb2.py
   - pytest tests
 after_success:
   - CODECLIMATE_REPO_TOKEN=19c5e18e184070a726bb6fc703e321e526ca638df16f9623654044bcccdb1a9d codeclimate-test-reporter
