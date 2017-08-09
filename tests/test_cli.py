@@ -31,11 +31,10 @@ def test_cmd_console():
     mocked = mock.MagicMock()
     mocked.embed = mock.MagicMock(return_value='Embed Called')
     mocked.interact = mock.MagicMock(return_value='Interact Called')
-    with mock.patch.dict('sys.modules', {'IPython': mocked}):
+    with mock.patch.dict('sys.modules', {'IPython': mocked, 'code': mocked}):
         assert cli.main() == 'Embed Called'
         mocked.embed.side_effect = ImportError
-        with mock.patch('sea.cli.code', new=mocked):
-            assert cli.main() == 'Interact Called'
+        assert cli.main() == 'Interact Called'
 
 
 def test_cmd_new():
@@ -63,6 +62,14 @@ def test_cmd_new():
     from textwrap import dedent
     assert content == dedent(correct_code).rstrip()
     assert not os.path.exists('./tests/myproject/condfigs/development/orator.py')
+
+    correct_code = """\
+    pytest
+    """
+    with open('./tests/myproject/requirements.txt', 'r') as f:
+        content = f.read()
+    assert content == dedent(correct_code).rstrip()
+
     shutil.rmtree('tests/myproject')
 
 

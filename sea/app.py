@@ -29,6 +29,7 @@ class Sea:
         if not os.path.isabs(root_path):
             root_path = os.path.abspath(root_path)
         self.root_path = root_path
+        self.name = os.path.basename(root_path)
         self.config = self.config_class(root_path, self.default_config)
         self.servicers = {}
         self.extensions = {}

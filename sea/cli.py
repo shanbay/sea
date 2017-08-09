@@ -1,10 +1,7 @@
 import sys
 import os
 import argparse
-import code
 import abc
-import shutil
-from jinja2 import Environment, FileSystemLoader
 
 from sea import create_app
 from sea.server import Server
@@ -92,6 +89,7 @@ class ConsoleCmd(AbstractCommand):
             from IPython import embed
             return embed(banner1=banner, user_ns=ctx)
         except ImportError:
+            import code
             return code.interact(banner, local=ctx)
 
 
@@ -128,6 +126,8 @@ class NewCmd(AbstractCommand):
         return skipped
 
     def _gen_project(self, path, skip={}, ctx={}):
+        import shutil
+        from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader(self.TMPLPATH))
         for dirpath, dirnames, filenames in os.walk(self.TMPLPATH):
             for fn in filenames:
