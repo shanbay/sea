@@ -66,6 +66,8 @@ setup(
     entry_points={
         'console_scripts': [
             'sea=sea.cli:main',
-            'seaorator=sea.contrib.extensions.orator.cli:main']
+            'seaorator=sea.contrib.extensions.orator.cli:main',
+            'seacelery=sea.contrib.extensions.celery.cli:main'
+            ]
     }
 )
