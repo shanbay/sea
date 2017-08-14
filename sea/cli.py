@@ -99,9 +99,12 @@ class NewCmd(AbstractCommand):
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
         'git': ['gitignore'],
-        'orator': ['configs/development/orator.tpl',
-                   'configs/testing/orator.tpl'],
-        'consul': []
+        'consul': [],
+        'orator': ['configs/development/orator.py.tmpl',
+                   'configs/testing/orator.py.tmpl'],
+        'celery': ['configs/development/celery.py.tmpl',
+                   'configs/testing/celery.py.tmpl',
+                   'app/tasks.py.tmpl'],
     }
 
     def opt(self, subparsers):
@@ -113,6 +116,8 @@ class NewCmd(AbstractCommand):
             help='skip add git files and run git init')
         p.add_argument(
             '--skip-orator', action='store_true', help='skip orator')
+        p.add_argument(
+            '--skip-celery', action='store_true', help='skip celery')
         p.add_argument(
             '--skip-consul', action='store_true', help='skip consul')
         return p
