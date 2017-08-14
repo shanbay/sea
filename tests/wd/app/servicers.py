@@ -1,7 +1,8 @@
 import helloworld_pb2
 import helloworld_pb2_grpc
-import ns.helloworld_pb2
-import ns.helloworld_pb2_grpc
+import worldhello_pb2
+import worldhello_pb2_grpc
+
 
 from sea.servicer import ServicerMeta
 
@@ -14,7 +15,7 @@ class GreeterServicer(helloworld_pb2_grpc.GreeterServicer, metaclass=ServicerMet
         return helloworld_pb2.HelloReply(message='Hello, %s!' % request.name)
 
 
-class NSGreeterServicer(ns.helloworld_pb2_grpc.GreeterServicer, metaclass=ServicerMeta):
+class GreeterTwoServicer(worldhello_pb2_grpc.GreeterServicer, metaclass=ServicerMeta):
 
     def SayHello(self, request, context):
-        return helloworld_pb2.HelloReply(message='Hello, %s!' % request.name)
+        return worldhello_pb2.HelloReply(message='Hello, %s!' % request.name)
