@@ -62,8 +62,10 @@ def test_cmd_new():
     from textwrap import dedent
     assert content == dedent(correct_code).rstrip()
     assert not os.path.exists('./tests/myproject/condfigs/development/orator.py')
+    assert os.path.exists('./tests/myproject/app/tasks.py')
 
     correct_code = """\
+    celery
     pytest
     """
     with open('./tests/myproject/requirements.txt', 'r') as f:

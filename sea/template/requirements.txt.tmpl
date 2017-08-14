@@ -4,4 +4,7 @@ orator
 {%- if not skip_consul -%}
 python-consul
 {% endif -%}
+{%- if not skip_celery -%}
+celery
+{% endif -%}
 pytest

@@ -1,5 +1,6 @@
 grpcio>=1.4.0,<1.5.0
 orator
+celery
 python-consul
 pytest
 pytest-cov
