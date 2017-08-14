@@ -25,7 +25,7 @@ class Server:
     def run(self):
         for name, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), self.server)
-            self.register.register(name, self.publish_host, self.port)
+        self.register.register(self.app.name, self.publish_host, self.port)
         self.server.start()
         self.register_signal()
         while not self._stopped:

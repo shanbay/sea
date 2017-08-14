@@ -43,7 +43,7 @@ class Sea:
 
     def _get_servicer_add_func(self, servicer):
         for b in servicer.__bases__:
-            if b.__name__ == servicer.__name__:
+            if b.__name__.endswith('Servicer'):
                 m = inspect.getmodule(b)
                 return getattr(m, 'add_{}_to_server'.format(b.__name__))
 
