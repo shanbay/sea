@@ -19,8 +19,9 @@ def test_cmd_server():
     with pytest.raises(ValueError):
         cli.main()
     sys.argv = 'sea -w ./tests/wd s -b 127.0.0.1'.split()
-    with mock.patch('sea.cli.Server', autospec=True):
-        assert isinstance(cli.main(), mock.Mock)
+    with mock.patch('sea.cli.Server', autospec=True) as mocked:
+        cli.main()
+        mocked.return_value.run.assert_called_with()
 
 
 def test_cmd_console():
@@ -29,12 +30,12 @@ def test_cmd_console():
         cli.main()
     sys.argv = 'sea -w ./tests/wd c'.split()
     mocked = mock.MagicMock()
-    mocked.embed = mock.MagicMock(return_value='Embed Called')
-    mocked.interact = mock.MagicMock(return_value='Interact Called')
     with mock.patch.dict('sys.modules', {'IPython': mocked, 'code': mocked}):
-        assert cli.main() == 'Embed Called'
+        cli.main()
+        assert mocked.embed.called
         mocked.embed.side_effect = ImportError
-        assert cli.main() == 'Interact Called'
+        cli.main()
+        assert mocked.interact.called
 
 
 def test_cmd_new():
@@ -65,6 +66,7 @@ def test_cmd_new():
     assert os.path.exists('./tests/myproject/app/tasks.py')
 
     correct_code = """\
+    redis
     celery
     pytest
     """

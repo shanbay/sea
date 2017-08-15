@@ -1,6 +1,7 @@
 DATABASES = {
-    'sqlite': {
-        'driver': 'sqlite3',
+    'default': 'db',
+    'db': {
+        'driver': 'mysql',
         'host': 'localhost',
         'database': 'database',
         'user': 'root',

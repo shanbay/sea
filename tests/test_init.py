@@ -13,7 +13,7 @@ def test_app():
     from app.servicers import GreeterServicer, helloworld_pb2_grpc
     from app.extensions import consul
 
-    assert app.config.get('CACHE_URL') == default.CACHE_URL
+    assert app.config.get('CACHE_BACKEND') == default.CACHE_BACKEND
     servicer = app.servicers['GreeterServicer']
     assert servicer == (
         helloworld_pb2_grpc.add_GreeterServicer_to_server, GreeterServicer)
