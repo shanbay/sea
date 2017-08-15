@@ -1,5 +1,9 @@
 {%- if not skip_orator -%}
 orator
+mysqlclient
+{% endif -%}
+{%- if not skip_cache -%}
+redis
 {% endif -%}
 {%- if not skip_consul -%}
 python-consul

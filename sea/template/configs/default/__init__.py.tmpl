@@ -1,2 +1,12 @@
 {% if not skip_orator -%}from . import orator as ORATOR{%- endif %}
 {% if not skip_celery -%}from . import celery as CELERY{%- endif %}
+{% if not skip_cache -%}
+CACHE_BACKEND = 'Redis'
+CACHE_HOST = 'localhost'
+CACHE_DB = 0
+CACHE_PORT = 6379
+CACHE_PASSWORD = 'abcdef'
+{%- endif %}
+
+TESTING = False
+DEBUG = True

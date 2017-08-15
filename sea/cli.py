@@ -102,6 +102,7 @@ class NewCmd(AbstractCommand):
         'consul': [],
         'orator': ['configs/development/orator.py.tmpl',
                    'configs/testing/orator.py.tmpl'],
+        'cache': [],
         'celery': ['configs/development/celery.py.tmpl',
                    'configs/testing/celery.py.tmpl',
                    'app/tasks.py.tmpl'],
@@ -116,6 +117,8 @@ class NewCmd(AbstractCommand):
             help='skip add git files and run git init')
         p.add_argument(
             '--skip-orator', action='store_true', help='skip orator')
+        p.add_argument(
+            '--skip-cache', action='store_true', help='skip cache')
         p.add_argument(
             '--skip-celery', action='store_true', help='skip celery')
         p.add_argument(

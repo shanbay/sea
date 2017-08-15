@@ -4,6 +4,9 @@ from sea.contrib.extensions.consul import Consul
 {%- if not skip_orator -%}
 from sea.contrib.extensions.orator import Orator
 {% endif %}
+{%- if not skip_cache -%}
+from sea.contrib.extensions.cache import Cache
+{% endif %}
 {%- if not skip_celery -%}
 from sea.contrib.extensions.celery import Celery
 {% endif %}
@@ -13,6 +16,9 @@ consul = Consul()
 {% endif -%}
 {%- if not skip_orator -%}
 db = Orator()
+{% endif %}
+{%- if not skip_cache -%}
+cache = Cache()
 {% endif %}
 {%- if not skip_celery -%}
 celeryapp = Celery()

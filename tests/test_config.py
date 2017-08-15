@@ -39,4 +39,4 @@ def test_config_attribute():
     a.config = Config('root', {'n_x': json.dumps({'foo': 'bar'})})
     assert 'foo' in a.x
     a.x = json.dumps({'a': 1})
-    assert 'a' in a.x
+    assert 'a' in a.config['n_x']
