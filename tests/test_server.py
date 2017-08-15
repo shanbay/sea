@@ -16,7 +16,7 @@ def test_server():
     assert not s._stopped
 
     def _term(pid):
-        time.sleep(0.5)
+        time.sleep(1.5)
         os.kill(pid, signal.SIGINT)
 
     p = Process(target=_term, args=(os.getpid(),))
