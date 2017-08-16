@@ -4,6 +4,7 @@ import os.path
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict
 from sea.register import ConsulRegister
+from sea import exceptions
 
 
 class Sea:
@@ -37,7 +38,8 @@ class Sea:
     def register_servicer(self, servicer):
         name = servicer.__name__
         if name in self.servicers:
-            raise RuntimeError('servicer duplicated: {}'.format(name))
+            raise exceptions.ConfigException(
+                'servicer duplicated: {}'.format(name))
         add_func = self._get_servicer_add_func(servicer)
         self.servicers[name] = (add_func, servicer)
 

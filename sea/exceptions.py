@@ -1,6 +1,10 @@
 import grpc
 
 
+class ConfigException(RuntimeError):
+    pass
+
+
 class RpcException(Exception):
 
     code = None
