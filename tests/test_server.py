@@ -1,7 +1,6 @@
 import os
 import signal
-import time
-from multiprocessing import Process
+from unittest import mock
 
 import sea
 from sea.server import Server
@@ -15,11 +14,6 @@ def test_server():
     assert isinstance(s.register, ConsulRegister)
     assert not s._stopped
 
-    def _term(pid):
-        time.sleep(1.5)
-        os.kill(pid, signal.SIGINT)
-
-    p = Process(target=_term, args=(os.getpid(),))
-    p.start()
-    assert s.run()
-    assert s._stopped
+    with mock.patch('time.sleep', new=lambda s: os.kill(os.getpid(), signal.SIGINT)):
+        assert s.run()
+        assert s._stopped

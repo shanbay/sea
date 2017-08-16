@@ -108,8 +108,9 @@ def test_simple_backend():
     assert c.set('key', 'value', ttl=1)
     assert c.get('key') == 'value'
     assert not c.set('extra', 'value')
-    time.sleep(2.1)
-    assert c.set('extra', 'value')
+    aminlater = time.time() + 60
+    with mock.patch('time.time', new=lambda: aminlater):
+        assert c.set('extra', 'value')
     assert c.delete('nokey') == 0
     assert c.delete('extra') == 1
     c.set('key', 'value')
@@ -119,8 +120,8 @@ def test_simple_backend():
     c.set('key', 'value')
     assert c.expire('key', 1) == 1
     assert c.get('key') == 'value'
-    time.sleep(2.1)
-    assert c.get('key') is None
+    with mock.patch('time.time', new=lambda: aminlater):
+        assert c.get('key') is None
     assert c.expireat('nokey', int(time.time())) == 0
     c.set('key', 'value')
     assert c.expireat('key', int(time.time() - 1)) == 1
