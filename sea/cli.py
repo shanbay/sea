@@ -8,20 +8,20 @@ from sea.server import Server
 from sea.utils import import_string
 
 
-class TaskOption:
+class JobOption:
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
 
 
-class TaskManager:
+class JobManager:
 
     def __init__(self):
-        self.tasks = {}
+        self.jobs = {}
 
-    def task(self, name):
+    def job(self, name):
         def wrapper(func):
-            self.tasks[name] = func
+            self.jobs[name] = func
             return func
         return wrapper
 
@@ -30,15 +30,15 @@ class TaskManager:
             opts = getattr(func, 'opts', [])
             if not opts:
                 func.opts = opts
-            opts.append(TaskOption(*args, **kwargs))
+            opts.append(JobOption(*args, **kwargs))
             return func
         return wrapper
 
     def __getitem__(self, name):
-        return self.tasks[name]
+        return self.jobs[name]
 
 
-taskm = TaskManager()
+jobm = JobManager()
 
 
 class AbstractCommand(metaclass=abc.ABCMeta):
@@ -165,38 +165,38 @@ class NewCmd(AbstractCommand):
                     ctx=vars(args))
 
 
-class TaskCmd(AbstractCommand):
+class JobCmd(AbstractCommand):
 
-    def _load_plugin_tasks(self):
+    def _load_plugin_jobs(self):
         import pkg_resources
-        for ep in pkg_resources.iter_entry_points('sea.tasks'):
+        for ep in pkg_resources.iter_entry_points('sea.jobs'):
             ep.load()
         return True
 
-    def _load_app_tasks(self, app):
-        root = os.path.join(app.root_path, 'tasks')
+    def _load_app_jobs(self, app):
+        root = os.path.join(app.root_path, 'jobs')
         for m in os.listdir(root):
             if m != '__init__.py' and \
                     m.endswith('.py') and \
                     os.path.isfile(os.path.join(root, m)):
-                import_string('tasks.{}'.format(m[:-3]))
+                import_string('jobs.{}'.format(m[:-3]))
         return True
 
     def opt(self, subparsers):
         p = subparsers.add_parser(
-            'invoke', aliases=['i'], help='Invoke Sea Tasks')
+            'invoke', aliases=['i'], help='Invoke Sea jobs')
         p.add_argument(
-            'task', help='task name')
+            'job', help='job name')
         return p
 
     def run(self, args, extra=[]):
         app = create_app(args.workdir)
-        self._load_plugin_tasks()
-        self._load_app_tasks(app)
-        global taskm
-        func = taskm[args.task]
+        self._load_plugin_jobs()
+        self._load_app_jobs(app)
+        global jobm
+        func = jobm[args.job]
         opts = getattr(func, 'opts', [])
-        parser = argparse.ArgumentParser('seatask')
+        parser = argparse.ArgumentParser('seajob')
         for opt in opts:
             parser.add_argument(*opt.args, **opt.kwargs)
         return func(**vars(parser.parse_args(extra)))
