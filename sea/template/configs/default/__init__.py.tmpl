@@ -2,6 +2,7 @@
 {% if not skip_celery -%}from . import celery as CELERY{%- endif %}
 {% if not skip_cache -%}
 CACHE_BACKEND = 'Redis'
+CACHE_PREFIX = '{{ project }}'
 CACHE_HOST = 'localhost'
 CACHE_DB = 0
 CACHE_PORT = 6379

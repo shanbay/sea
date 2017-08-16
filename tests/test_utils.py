@@ -16,3 +16,20 @@ def test_import_string():
         utils.import_string('notexist')
     with pytest.raises(ImportError):
         utils.import_string('datetime.XXXXXXXXXXXX')
+
+
+def test_cached_property():
+    class ForTest:
+
+        def __init__(self):
+            self.count = 0
+
+        @utils.cached_property
+        def cached_count(self):
+            return self.count
+
+    assert isinstance(ForTest.cached_count, utils.cached_property)
+    ins = ForTest()
+    assert ins.cached_count == 0
+    ins.count = 10
+    assert ins.cached_count == 0
