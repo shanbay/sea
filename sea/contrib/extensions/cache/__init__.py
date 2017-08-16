@@ -46,6 +46,17 @@ class Cache(AbstractExtension):
             ttl = self.default_ttl
 
         def decorator(f):
+            @functools.wraps(f)
+            def wrapper(*args, **kwargs):
+                if callable(unless) and unless(*args, **kwargs):
+                    return f(*args, **kwargs)
+                key = wrapper.make_cache_key(*args, **kwargs)
+                rv = self._backend.get(key)
+                if rv is None:
+                    rv = f(*args, **kwargs)
+                    self._backend.set(key, rv, ttl=wrapper.ttl)
+                return rv
+
             def make_cache_key(*args, **kwargs):
                 if callable(cache_key):
                     key = cache_key(f, *args, **kwargs)
@@ -53,18 +64,9 @@ class Cache(AbstractExtension):
                     key = cache_key
                 return '{}.{}'.format(self.app.name, key)
 
-            @functools.wraps(f)
-            def wrapper(*args, **kwargs):
-                if callable(unless) and unless(*args, **kwargs):
-                    return f(*args, **kwargs)
-                key = make_cache_key(*args, **kwargs)
-                rv = self._backend.get(key)
-                if rv is None:
-                    rv = f(*args, **kwargs)
-                    self._backend.set(key, rv, ttl=ttl)
-                return rv
-
             wrapper.uncached = f
+            wrapper.ttl = ttl
+            wrapper.make_cache_key = make_cache_key
 
             return wrapper
         return decorator
