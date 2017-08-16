@@ -77,7 +77,7 @@ def test_cmd_new():
     shutil.rmtree('tests/myproject')
 
 
-def test_cmd_task():
+def test_cmd_job():
     sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
     assert cli.main() == 101
     sys.argv = 'sea -w ./tests/wd i getconfig'.split()
@@ -85,7 +85,7 @@ def test_cmd_task():
 
     class EntryPoint:
         def load(self):
-            @cli.taskm.task('xyz')
+            @cli.jobm.job('xyz')
             def f2():
                 return "hello"
             return f2
