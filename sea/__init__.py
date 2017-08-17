@@ -38,8 +38,8 @@ def create_app(root_path, app_class=Sea):
     _app = app_class(root_path)
     _app.config.from_object(config)
 
-    _load_servicers(_app)
     _load_extensions(_app)
+    _load_servicers(_app)
 
     return _app
 

@@ -47,16 +47,21 @@ class BaseBackend(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def exists(self, key):
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def clear(self):
         raise NotImplementedError
 
 
 class Redis(BaseBackend):
 
-    def __init__(self, prefix=None, **kwargs):
+    def __init__(self, prefix=None, default_ttl=600, **kwargs):
         import redis
         self._client = redis.StrictRedis(**kwargs)
         self.prefix = prefix
+        self.default_ttl = default_ttl
 
     def get(self, key):
         key = self._trans_key(key)
@@ -70,7 +75,9 @@ class Redis(BaseBackend):
 
     def set(self, key, value, ttl=None):
         key = self._trans_key(key)
-        if ttl is not None:
+        if ttl is None:
+            ttl = self.default_ttl
+        else:
             ttl = int(ttl)
         return self._client.set(
             key, pickle.dumps(value, pickle.HIGHEST_PROTOCOL),
@@ -100,6 +107,10 @@ class Redis(BaseBackend):
     def ttl(self, key):
         key = self._trans_key(key)
         return self._client.ttl(key)
+
+    def exists(self, key):
+        key = self._trans_key(key)
+        return self._client.exists(key) > 0
 
     def clear(self):
         self._client.flushdb()
@@ -202,6 +213,10 @@ class Simple(BaseBackend):
             self._cache.pop(key)
             return -2
         return int(ttl)
+
+    def exists(self, key):
+        key = self._trans_key(key)
+        return key in self._cache
 
     def clear(self):
         self._cache.clear()

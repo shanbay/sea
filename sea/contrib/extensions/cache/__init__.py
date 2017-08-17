@@ -22,7 +22,7 @@ def default_key(f, *args, **kwargs):
     keys = [norm_cache_key(v) for v in args]
     keys += sorted(
         ['{}={}'.format(k, norm_cache_key(v)) for k, v in kwargs.items()])
-    return '{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
+    return 'default.{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
 
 
 class Cache(AbstractExtension):
@@ -38,14 +38,12 @@ class Cache(AbstractExtension):
         backend_cls = getattr(backends, opts.pop('backend'))
         prefix = opts.pop('prefix', app.name)
         # default ttl: 60 * 60 * 48
-        self.default_ttl = opts.pop('default_ttl', 172800)
-        self._backend = backend_cls(prefix=prefix, **opts)
+        self._backend = backend_cls(
+            prefix=prefix, default_ttl=opts.pop('default_ttl', 172800),
+            **opts)
 
     def cached(self, ttl=None, cache_key=default_key,
                unless=None, fallbacked=None):
-        if ttl is None:
-            ttl = self.default_ttl
-
         def decorator(f):
             @functools.wraps(f)
             def wrapper(*args, **kwargs):
