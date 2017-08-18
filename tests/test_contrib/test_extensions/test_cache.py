@@ -5,7 +5,6 @@ from unittest import mock
 
 from sea.contrib.extensions import cache
 from sea.contrib.extensions.cache import backends
-from sea import create_app
 
 
 def test_default_key():
@@ -19,14 +18,14 @@ def test_default_key():
     assert key == 'default.{}.{}.{}'.format(tmp.__module__, tmp.__name__, 'hello.b=True.c=None')
 
 
-def test_cache():
+def test_cache(app):
     total = 0
     fallbacked_count = 0
 
     c = cache.Cache()
     assert c._backend is None
-    c.init_app(create_app('./tests/wd'))
-    assert isinstance(c._backend, backends.Simple)
+    c.init_app(app)
+    assert isinstance(c._backend, backends.Redis)
 
     def true_if_gte_10(num):
         return num >= 10

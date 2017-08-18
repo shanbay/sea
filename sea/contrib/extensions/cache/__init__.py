@@ -28,7 +28,8 @@ def default_key(f, *args, **kwargs):
 class Cache(AbstractExtension):
 
     PROTO_METHODS = ('get', 'get_many', 'set', 'set_many', 'delete',
-                     'delete_many', 'expire', 'expireat', 'clear')
+                     'delete_many', 'expire', 'expireat', 'clear',
+                     'ttl', 'exists')
 
     def __init__(self):
         self._backend = None
@@ -50,12 +51,12 @@ class Cache(AbstractExtension):
                 if callable(unless) and unless(*args, **kwargs):
                     return f(*args, **kwargs)
                 key = wrapper.make_cache_key(*args, **kwargs)
-                rv = self._backend.get(key)
-                if rv is None:
+                rv = self.get(key)
+                if rv is None and not self.exists(key):
                     rv = f(*args, **kwargs)
-                    self._backend.set(key, rv, ttl=wrapper.ttl)
+                    self.set(key, rv, ttl=wrapper.ttl)
                     if callable(fallbacked):
-                        fallbacked(f, rv, *args, **kwargs)
+                        fallbacked(wrapper, rv, *args, **kwargs)
                 return rv
 
             def make_cache_key(*args, **kwargs):
@@ -75,4 +76,4 @@ class Cache(AbstractExtension):
     def __getattr__(self, name):
         if name in self.PROTO_METHODS:
             return getattr(self._backend, name)
-        return super().__getattr__(name)
+        raise AttributeError

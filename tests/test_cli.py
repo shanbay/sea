@@ -14,7 +14,7 @@ def test_abscmd():
         cli.AbstractCommand.run(mock.Mock(), mock.Mock())
 
 
-def test_cmd_server():
+def test_cmd_server(app):
     sys.argv = 'sea s -b 127.0.0.1 -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
@@ -24,7 +24,7 @@ def test_cmd_server():
         mocked.return_value.run.assert_called_with()
 
 
-def test_cmd_console():
+def test_cmd_console(app):
     sys.argv = 'sea c -f wrong'.split()
     with pytest.raises(ValueError):
         cli.main()
@@ -38,7 +38,7 @@ def test_cmd_console():
         assert mocked.interact.called
 
 
-def test_cmd_new():
+def test_cmd_new(app):
     shutil.rmtree('tests/myproject', ignore_errors=True)
     sys.argv = 'sea new -f wrong'.split()
     with pytest.raises(ValueError):
@@ -77,7 +77,7 @@ def test_cmd_new():
     shutil.rmtree('tests/myproject')
 
 
-def test_cmd_job():
+def test_cmd_job(app):
     sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
     assert cli.main() == 101
     sys.argv = 'sea -w ./tests/wd i getconfig'.split()

@@ -2,7 +2,6 @@ import sea
 
 
 def test_app():
-    sea._app = None
     assert sea.current_app() is None
     app = sea.create_app('./tests/wd')
     assert sea.current_app() is app

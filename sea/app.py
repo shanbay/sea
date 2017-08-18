@@ -51,4 +51,7 @@ class Sea:
 
     def register_extension(self, name, ext):
         ext.init_app(self)
+        if name in self.extensions:
+            raise exceptions.ConfigException(
+                'extension duplicated: {}'.format(name))
         self.extensions[name] = ext
