@@ -9,7 +9,7 @@ with open('sea/__init__.py') as f:
     version = str(ast.literal_eval(_version_re.search(
         f.read()).group(1)))
 
-with open('README.md') as f:
+with open('README.rst') as f:
     readme = f.read()
 
 
