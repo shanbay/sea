@@ -10,7 +10,8 @@ def _model_cache_key(f, cls, *args, **kwargs):
 
 
 def _related_caches_key(cls, ins):
-    return 'related_caches.{}.{}.{}'.format(cls.__module__, cls.__name__, ins.id)
+    return 'related_caches.{}.{}.{}'.format(
+        cls.__module__, cls.__name__, ins.id)
 
 
 def _register_to_related_caches(f, ins, cls, *args, **kwargs):
