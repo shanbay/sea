@@ -1,2 +1,4 @@
 include LICENSE
-exclude tests*
+recursive-exclude tests *
+recursive-exclude examples *
+recursive-exclude benchmark *
