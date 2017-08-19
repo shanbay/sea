@@ -1,6 +1,5 @@
 import os
 import pytest
-import os.path
 from orator import Schema
 
 import sea

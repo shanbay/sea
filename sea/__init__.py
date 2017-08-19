@@ -6,7 +6,7 @@ from sea.app import Sea
 from sea.extensions import AbstractExtension
 from sea.utils import import_string
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 _app = None
 
 

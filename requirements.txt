@@ -1,13 +1,2 @@
 grpcio>=1.4.0,<1.5.0
-git+https://github.com/shanbay/orator.git@develop#egg=orator
-mysqlclient
-redis
-celery
-python-consul
-pytest
-pytest-cov
-flake8
-coveralls
-codeclimate-test-reporter
-coverage>=4.0,<4.4
 jinja2
