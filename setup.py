@@ -54,15 +54,11 @@ setup(
     keywords=['rpc', 'grpc'],
     packages=find_packages(exclude=['tests']),
     package_data={'sea': find_package_data('sea')},
-    test_suite="tests",
+    python_requires='>=3',
     install_requires=[
         'grpcio>=1.4.0,<1.5.0',
         'jinja2'
     ],
-    extras_require={
-        'consul': ['python-consul'],
-        'orator': ['orator']
-    },
     entry_points={
         'console_scripts': [
             'sea=sea.cli:main',
