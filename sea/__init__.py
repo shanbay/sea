@@ -6,7 +6,7 @@ from sea.app import Sea
 from sea.extensions import AbstractExtension
 from sea.utils import import_string
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 _app = None
 
 
@@ -38,8 +38,8 @@ def create_app(root_path, app_class=Sea):
     _app = app_class(root_path)
     _app.config.from_object(config)
 
-    _load_servicers(_app)
     _load_extensions(_app)
+    _load_servicers(_app)
 
     return _app
 

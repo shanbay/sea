@@ -22,13 +22,14 @@ def default_key(f, *args, **kwargs):
     keys = [norm_cache_key(v) for v in args]
     keys += sorted(
         ['{}={}'.format(k, norm_cache_key(v)) for k, v in kwargs.items()])
-    return '{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
+    return 'default.{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
 
 
 class Cache(AbstractExtension):
 
     PROTO_METHODS = ('get', 'get_many', 'set', 'set_many', 'delete',
-                     'delete_many', 'expire', 'expireat', 'clear')
+                     'delete_many', 'expire', 'expireat', 'clear',
+                     'ttl', 'exists')
 
     def __init__(self):
         self._backend = None
@@ -38,26 +39,24 @@ class Cache(AbstractExtension):
         backend_cls = getattr(backends, opts.pop('backend'))
         prefix = opts.pop('prefix', app.name)
         # default ttl: 60 * 60 * 48
-        self.default_ttl = opts.pop('default_ttl', 172800)
-        self._backend = backend_cls(prefix=prefix, **opts)
+        self._backend = backend_cls(
+            prefix=prefix, default_ttl=opts.pop('default_ttl', 172800),
+            **opts)
 
     def cached(self, ttl=None, cache_key=default_key,
                unless=None, fallbacked=None):
-        if ttl is None:
-            ttl = self.default_ttl
-
         def decorator(f):
             @functools.wraps(f)
             def wrapper(*args, **kwargs):
                 if callable(unless) and unless(*args, **kwargs):
                     return f(*args, **kwargs)
                 key = wrapper.make_cache_key(*args, **kwargs)
-                rv = self._backend.get(key)
-                if rv is None:
+                rv = self.get(key)
+                if rv is None and not self.exists(key):
                     rv = f(*args, **kwargs)
-                    self._backend.set(key, rv, ttl=wrapper.ttl)
+                    self.set(key, rv, ttl=wrapper.ttl)
                     if callable(fallbacked):
-                        fallbacked(f, rv, *args, **kwargs)
+                        fallbacked(wrapper, rv, *args, **kwargs)
                 return rv
 
             def make_cache_key(*args, **kwargs):
@@ -77,4 +76,4 @@ class Cache(AbstractExtension):
     def __getattr__(self, name):
         if name in self.PROTO_METHODS:
             return getattr(self._backend, name)
-        return super().__getattr__(name)
+        raise AttributeError

@@ -5,7 +5,7 @@ import time
 
 class BaseBackend(metaclass=abc.ABCMeta):
 
-    def _trans_key(self, key):
+    def trans_key(self, key):
         if self.prefix is None:
             return key
         return '{}.{}'.format(self.prefix, key)
@@ -47,59 +47,70 @@ class BaseBackend(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def exists(self, key):
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def clear(self):
         raise NotImplementedError
 
 
 class Redis(BaseBackend):
 
-    def __init__(self, prefix=None, **kwargs):
+    def __init__(self, prefix=None, default_ttl=600, **kwargs):
         import redis
         self._client = redis.StrictRedis(**kwargs)
         self.prefix = prefix
+        self.default_ttl = default_ttl
 
     def get(self, key):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         v = self._client.get(key)
         return v if v is None else pickle.loads(v)
 
     def get_many(self, keys):
-        keys = [self._trans_key(k) for k in keys]
+        keys = [self.trans_key(k) for k in keys]
         values = self._client.mget(keys)
         return [v if v is None else pickle.loads(v) for v in values]
 
     def set(self, key, value, ttl=None):
-        key = self._trans_key(key)
-        if ttl is not None:
+        key = self.trans_key(key)
+        if ttl is None:
+            ttl = self.default_ttl
+        else:
             ttl = int(ttl)
         return self._client.set(
             key, pickle.dumps(value, pickle.HIGHEST_PROTOCOL),
             ex=ttl)
 
     def set_many(self, mapping):
-        mapping = {self._trans_key(k): pickle.dumps(v, pickle.HIGHEST_PROTOCOL)
+        mapping = {self.trans_key(k): pickle.dumps(v, pickle.HIGHEST_PROTOCOL)
                    for k, v in mapping.items()}
         return self._client.mset(mapping)
 
     def delete(self, key):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         return self._client.delete(key)
 
     def delete_many(self, keys):
-        keys = [self._trans_key(k) for k in keys]
+        keys = [self.trans_key(k) for k in keys]
         return self._client.delete(*keys)
 
     def expire(self, key, seconds):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         return self._client.expire(key, int(seconds))
 
     def expireat(self, key, timestamp):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         return self._client.expireat(key, int(timestamp))
 
     def ttl(self, key):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         return self._client.ttl(key)
+
+    def exists(self, key):
+        key = self.trans_key(key)
+        return self._client.exists(key) > 0
 
     def clear(self):
         self._client.flushdb()
@@ -134,7 +145,7 @@ class Simple(BaseBackend):
         return len(self._cache)
 
     def get(self, key):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         exp, v = self._cache.get(key, (None, None))
         if exp is None:
             return None
@@ -147,7 +158,7 @@ class Simple(BaseBackend):
         return [self.get(k) for k in keys]
 
     def set(self, key, value, ttl=None):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         if len(self._cache) >= self.threshold \
                 and self._prune() >= self.threshold:
             return False
@@ -162,7 +173,7 @@ class Simple(BaseBackend):
         return True
 
     def delete(self, key):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         try:
             self._cache.pop(key)
             return 1
@@ -174,7 +185,7 @@ class Simple(BaseBackend):
         return sum([self.delete(k) for k in keys])
 
     def expire(self, key, seconds):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         try:
             exp, v = self._cache[key]
         except KeyError:
@@ -183,7 +194,7 @@ class Simple(BaseBackend):
         return 1
 
     def expireat(self, key, timestamp):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         try:
             exp, v = self._cache[key]
         except KeyError:
@@ -192,7 +203,7 @@ class Simple(BaseBackend):
         return 1
 
     def ttl(self, key):
-        key = self._trans_key(key)
+        key = self.trans_key(key)
         try:
             exp, v = self._cache[key]
         except KeyError:
@@ -202,6 +213,10 @@ class Simple(BaseBackend):
             self._cache.pop(key)
             return -2
         return int(ttl)
+
+    def exists(self, key):
+        key = self.trans_key(key)
+        return key in self._cache
 
     def clear(self):
         self._cache.clear()

@@ -101,7 +101,8 @@ class NewCmd(AbstractCommand):
         'git': ['gitignore'],
         'consul': [],
         'orator': ['configs/development/orator.py.tmpl',
-                   'configs/testing/orator.py.tmpl'],
+                   'configs/testing/orator.py.tmpl'
+                   'app/models.py.tmpl'],
         'cache': [],
         'celery': ['configs/development/celery.py.tmpl',
                    'configs/testing/celery.py.tmpl',

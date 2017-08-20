@@ -2,7 +2,7 @@ import pytest
 import sys
 import os.path
 
-from sea import app
+from sea import app, exceptions
 
 
 def test_sea():
@@ -32,9 +32,11 @@ def test_sea():
     servicer = _app.servicers['GreeterServicer']
     assert isinstance(servicer, tuple)
     assert servicer == (helloworld_pb2_grpc.add_GreeterServicer_to_server, GreeterServicer)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(exceptions.ConfigException):
         _app.register_servicer(GreeterServicer)
 
     _app.register_extension('consul', consul)
     ext = _app.extensions['consul']
     assert ext is consul
+    with pytest.raises(exceptions.ConfigException):
+        _app.register_extension('consul', consul)

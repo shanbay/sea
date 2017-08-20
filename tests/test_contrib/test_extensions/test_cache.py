@@ -5,7 +5,6 @@ from unittest import mock
 
 from sea.contrib.extensions import cache
 from sea.contrib.extensions.cache import backends
-from sea import create_app
 
 
 def test_default_key():
@@ -16,17 +15,17 @@ def test_default_key():
         cache.default_key(tmp, [], b=b'hello')
 
     key = cache.default_key(tmp, b'hello', b=True, c=None)
-    assert key == '{}.{}.{}'.format(tmp.__module__, tmp.__name__, 'hello.b=True.c=None')
+    assert key == 'default.{}.{}.{}'.format(tmp.__module__, tmp.__name__, 'hello.b=True.c=None')
 
 
-def test_cache():
+def test_cache(app):
     total = 0
     fallbacked_count = 0
 
     c = cache.Cache()
     assert c._backend is None
-    c.init_app(create_app('./tests/wd'))
-    assert isinstance(c._backend, backends.Simple)
+    c.init_app(app)
+    assert isinstance(c._backend, backends.Redis)
 
     def true_if_gte_10(num):
         return num >= 10
@@ -71,7 +70,7 @@ def test_cache():
 
 def test_base_backend():
     c = backends.BaseBackend
-    for m in ('get', 'get_many', 'set_many', 'delete', 'delete_many', 'ttl'):
+    for m in ('get', 'get_many', 'set_many', 'delete', 'delete_many', 'ttl', 'exists'):
         with pytest.raises(NotImplementedError):
             m = getattr(c, m)
             m(mock.Mock(), 'key')
@@ -90,9 +89,11 @@ def test_redis_backend():
     c._client.flushdb()
 
     assert c.get('key') is None
+    assert not c.exists('key')
     assert c.set_many({'ka': 'va', 'kb': 'vb'})
     assert c.get_many(['ka', 'kb', 'nokey']) == ['va', 'vb', None]
     assert c.set('key', 'value', ttl=1)
+    assert c.exists('key')
     assert c.get('key') == 'value'
     assert c._client.get('testapp.key') == pickle.dumps('value', pickle.HIGHEST_PROTOCOL)
     assert c.expireat('key', time.time() - 1) == 1
@@ -114,9 +115,11 @@ def test_redis_backend():
 def test_simple_backend():
     c = backends.Simple(threshold=3)
     assert c.get('key') is None
+    assert not c.exists('key')
     assert c.set_many({'ka': 'va', 'kb': 'vb'})
     assert c.get_many(['ka', 'kb', 'nokey']) == ['va', 'vb', None]
     assert c.set('key', 'value', ttl=1)
+    assert c.exists('key')
     assert c.get('key') == 'value'
     assert not c.set('extra', 'value')
     aminlater = time.time() + 60
