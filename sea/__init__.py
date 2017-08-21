@@ -35,7 +35,7 @@ def create_app(root_path, app_class=Sea):
     global _app
     if _app is not None:
         return _app
-    _app = app_class(root_path)
+    _app = app_class(root_path, env=env)
     _app.config.from_object(config)
 
     _load_extensions(_app)

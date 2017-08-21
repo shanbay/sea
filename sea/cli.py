@@ -48,7 +48,7 @@ class AbstractCommand(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def run(self, args):
+    def run(self, args, extra=[]):
         raise NotImplementedError
 
 
@@ -102,7 +102,8 @@ class NewCmd(AbstractCommand):
         'consul': [],
         'orator': ['configs/development/orator.py.tmpl',
                    'configs/testing/orator.py.tmpl'
-                   'app/models.py.tmpl'],
+                   'app/models.py.tmpl',
+                   'db/.keep'],
         'cache': [],
         'celery': ['configs/development/celery.py.tmpl',
                    'configs/testing/celery.py.tmpl',
@@ -134,7 +135,7 @@ class NewCmd(AbstractCommand):
                     skipped.add(os.path.join(self.TMPLPATH, f))
         return skipped
 
-    def _gen_project(self, path, skip={}, ctx={}):
+    def _gen_project(self, path, skip=set(), ctx={}):
         import shutil
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader(self.TMPLPATH))
@@ -216,4 +217,7 @@ def main():
 
     args = sys.argv[1:]
     args, extra = root.parse_known_args(args)
-    return args.handler(args, extra)
+    if hasattr(args, 'handler'):
+        return args.handler(args, extra)
+    else:
+        return root.print_help()

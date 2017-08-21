@@ -24,13 +24,14 @@ class Sea:
         'CONSUL_DC': 'consul'
     })
 
-    def __init__(self, root_path, *args, **kwargs):
+    def __init__(self, root_path, env, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if not os.path.isabs(root_path):
             root_path = os.path.abspath(root_path)
         self.root_path = root_path
         self.name = os.path.basename(root_path)
+        self.env = env
         self.config = self.config_class(root_path, self.default_config)
         self.servicers = {}
         self.extensions = {}
