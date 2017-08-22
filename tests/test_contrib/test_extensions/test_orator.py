@@ -1,6 +1,9 @@
 from unittest import mock
+import sys
+import pytest
 
 from sea.contrib.extensions import orator
+from sea.contrib.extensions.orator import cli
 
 
 def test_orator(app):
@@ -39,5 +42,75 @@ def test_model_meta(cache, table_user):
     key = User.find.make_cache_key(User, c2.id)
     assert cache.exists(key)
     assert len(children) == 2
+    with mock.patch('sea.contrib.extensions.orator.cache_model._bulk_register_to_related_caches') as mocked:
+        User.find([c1.id, c2.id])
+        assert not mocked.called
     jack.children().save_many([c1, c2])
     assert not cache.exists(key)
+
+
+def test_cli(app):
+    sys.argv = ['seaorator', '-h']
+    with pytest.raises(SystemExit):
+        cli.main()
+
+    with mock.patch('sea.contrib.extensions.orator.cli.application'):
+        sys.argv = 'seaorator help'.split()
+        cli.main()
+        assert sys.argv == 'orator help'.split()
+
+        sys.argv = 'seaorator list'.split()
+        cli.main()
+        assert sys.argv == 'orator list'.split()
+
+        sys.argv = 'seaorator migrate'.split()
+        cli.main()
+        assert sys.argv[1] == 'migrate'
+        assert '--conf' == sys.argv[2]
+        assert 'orator.py' in sys.argv[3]
+        assert '--path' == sys.argv[4]
+        assert 'db/migrations' in sys.argv[5]
+
+        sys.argv = 'seaorator db:seed'.split()
+        cli.main()
+        assert sys.argv[1] == 'db:seed'
+        assert '--conf' == sys.argv[2]
+        assert 'orator.py' in sys.argv[3]
+        assert '--path' == sys.argv[4]
+        assert 'db/seeds' in sys.argv[5]
+
+        sys.argv = 'seaorator make:migration'.split()
+        cli.main()
+        assert sys.argv[1] == 'make:migration'
+        assert '--path' == sys.argv[2]
+        assert 'db/migrations' in sys.argv[3]
+
+        sys.argv = 'seaorator make:seed'.split()
+        cli.main()
+        assert sys.argv[1] == 'make:seed'
+        assert '--path' == sys.argv[2]
+        assert 'db/seeds' in sys.argv[3]
+
+        sys.argv = 'seaorator migrate:reset'.split()
+        cli.main()
+        assert sys.argv[1] == 'migrate:reset'
+        assert '--conf' == sys.argv[2]
+        assert 'orator.py' in sys.argv[3]
+        assert '--path' == sys.argv[4]
+        assert 'db/migrations' in sys.argv[5]
+
+        sys.argv = 'seaorator migrate:rollback'.split()
+        cli.main()
+        assert sys.argv[1] == 'migrate:rollback'
+        assert '--conf' == sys.argv[2]
+        assert 'orator.py' in sys.argv[3]
+        assert '--path' == sys.argv[4]
+        assert 'db/migrations' in sys.argv[5]
+
+        sys.argv = 'seaorator migrate:status'.split()
+        cli.main()
+        assert sys.argv[1] == 'migrate:status'
+        assert '--conf' == sys.argv[2]
+        assert 'orator.py' in sys.argv[3]
+        assert '--path' == sys.argv[4]
+        assert 'db/migrations' in sys.argv[5]

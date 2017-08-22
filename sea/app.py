@@ -24,7 +24,7 @@ class Sea:
         'CONSUL_DC': 'consul'
     })
 
-    def __init__(self, root_path, env, *args, **kwargs):
+    def __init__(self, root_path, env='development', *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if not os.path.isabs(root_path):

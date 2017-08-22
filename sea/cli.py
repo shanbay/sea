@@ -217,7 +217,4 @@ def main():
 
     args = sys.argv[1:]
     args, extra = root.parse_known_args(args)
-    if hasattr(args, 'handler'):
-        return args.handler(args, extra)
-    else:
-        return root.print_help()
+    args.handler(args, extra)
