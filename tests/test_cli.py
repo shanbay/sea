@@ -4,7 +4,7 @@ import os
 import shutil
 from unittest import mock
 
-from sea import cli
+from sea import cli, current_app
 
 
 def test_abscmd():
@@ -79,15 +79,17 @@ def test_cmd_new(app):
 
 def test_cmd_job(app):
     sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
-    assert cli.main() == 101
-    sys.argv = 'sea -w ./tests/wd i getconfig'.split()
-    assert cli.main()
+    cli.main()
+    assert current_app().config.get('NUMBER') == 101
+    sys.argv = 'sea -w ./tests/wd i config_hello'.split()
+    cli.main()
+    assert current_app().config.get('ATTR') == 'hello'
 
     class EntryPoint:
         def load(self):
             @cli.jobm.job('xyz')
             def f2():
-                return "hello"
+                current_app().config['XYZ'] = 'hello'
             return f2
 
     def new_entry_iter(name):
@@ -95,4 +97,11 @@ def test_cmd_job(app):
 
     with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
         sys.argv = 'sea -w ./tests/wd i xyz'.split()
-        assert cli.main() == 'hello'
+        cli.main()
+        assert current_app().config.get('XYZ') == 'hello'
+
+
+def test_main():
+    sys.argv = 'sea -h'.split()
+    with pytest.raises(SystemExit):
+        cli.main()

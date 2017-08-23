@@ -2,14 +2,15 @@ from sea.cli import jobm
 from sea import current_app
 
 
-@jobm.job('getconfig')
-@jobm.option('-n', '--name', default='TESTING')
+@jobm.job('config_hello')
+@jobm.option('-n', '--name', default='ATTR')
 def f1(name):
     app = current_app()
-    return app.config.get(name)
+    app.config[name] = 'hello'
 
 
 @jobm.job('plusone')
 @jobm.option('-n', '--number', type=int)
 def f2(number):
-    return number + 1
+    app = current_app()
+    app.config['NUMBER'] = number + 1
