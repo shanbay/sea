@@ -1,193 +1,118 @@
 import sys
 import os
+import re
 import argparse
 from orator.commands.application import application
 import sea
 
 
-def _get_app():
-    app = sea.current_app()
-    if app is None:
-        return sea.create_app(os.getcwd())
-    return app
-
-
-def get_dbconfig():
-    app = _get_app()
-    dbconfig = os.path.join(
-        app.root_path, 'configs/{}/orator.py'.format(app.env))
-    if not os.path.exists(dbconfig):
-        dbconfig = os.path.join(
-            app.root_path, 'configs/default/orator.py')
-    return dbconfig
-
-
 class BaseCmd:
     ORATOR_CMD = None
-    ORATOR_OPT = []
 
-    def parsed(self, args, names):
+    def __init__(self, app):
+        self.app = app
+        self.argmap = {}
+        self.parser = None
+        parts = re.findall('[A-Z][^A-Z]*', self.__class__.__name__)
+        self.ORATOR_CMD = ':'.join(parts[1:]).lower()
+
+    def add_parser(self, subparsers):
+        self.parser = subparsers.add_parser(self.ORATOR_CMD)
+        if hasattr(self, 'add_arguments'):
+            self.add_arguments()
+        return self.parser
+
+    def get_dbconfig(self):
+        dbconfig = os.path.join(
+            self.app.root_path, 'configs/{}/orator.py'.format(self.app.env))
+        if not os.path.exists(dbconfig):
+            dbconfig = os.path.join(
+                self.app.root_path, 'configs/default/orator.py')
+        return dbconfig
+
+    def add_argument(self, *args, **kwargs):
+        arg = self.parser.add_argument(*args, **kwargs)
+        self.argmap[arg.dest] = arg.option_strings[-1]
+        return arg
+
+    def get_arguments(self, args):
         rv = []
-        for n in names:
-            rv += ['--{}'.format(n.replace('_', '-')), getattr(args, n)]
+        for k, v in self.argmap.items():
+            rv += [v, getattr(args, k)]
         return rv
-
-    def opt(self, subparsers):
-        raise NotImplementedError
 
     def run(self, args, extra=[]):
         sys.argv = ['orator', self.ORATOR_CMD] + \
-            self.parsed(args, self.ORATOR_OPT) + extra
+            self.get_arguments(args) + extra
         return application.run()
 
 
 class CmdHelp(BaseCmd):
-    ORATOR_CMD = 'help'
 
-    def opt(self, subparsers):
-        return subparsers.add_parser(
-            self.ORATOR_CMD, help='Displays help for a command')
+    pass
 
 
 class CmdList(BaseCmd):
-    ORATOR_CMD = 'list'
 
-    def opt(self, subparsers):
-        return subparsers.add_parser(
-            self.ORATOR_CMD, help='Lists commands')
+    pass
 
 
-class CmdMigrate(BaseCmd):
-    ORATOR_CMD = 'migrate'
-    ORATOR_OPT = ['conf', 'path', 'seed_path']
+class BaseExecCmd:
+    ARG_CONF = True
+    ARG_PATH = 'migrations'
 
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Run the database migrations')
-        p.add_argument(
-            '-c', '--conf', default=get_dbconfig(),
-            help='The config file path')
-        p.add_argument(
+    def add_arguments(self):
+        if self.ARG_CONF:
+            self.add_argument(
+                '-c', '--conf', default=self.get_dbconfig(),
+                help='The config file path')
+        self.add_argument(
             '-p', '--path',
-            default=os.path.join(root_path, 'db/migrations'),
+            default=os.path.join(self.app.root_path, 'db', self.ARG_PATH),
             help='The path of migrations files to be executed')
-        p.add_argument(
-            '--seed-path',
-            default=os.path.join(root_path, 'db/seeds'),
-            help='The path of migrations files to be executed')
-        return p
 
 
-class CmdDbSeed(BaseCmd):
-    ORATOR_CMD = 'db:seed'
-    ORATOR_OPT = ['conf', 'path']
-
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Seed the database with records')
-        p.add_argument(
-            '-c', '--conf', default=get_dbconfig(),
-            help='The config file path')
-        p.add_argument(
-            '-p', '--path',
-            default=os.path.join(root_path, 'db/seeds'),
-            help='The path to seeders files.')
-        return p
+class CmdDbSeed(BaseCmd, BaseExecCmd):
+    ARG_PATH = 'seeds'
 
 
-class CmdMakeMigration(BaseCmd):
-    ORATOR_CMD = 'make:migration'
-    ORATOR_OPT = ['path']
-
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Create a new migration file')
-        p.add_argument(
-            '-p', '--path',
-            default=os.path.join(root_path, 'db/migrations'),
-            help='The path of migrations files to be executed')
-        return p
+class CmdMakeMigration(BaseCmd, BaseExecCmd):
+    ARG_CONF = False
 
 
-class CmdMakeSeed(BaseCmd):
-    ORATOR_CMD = 'make:seed'
-    ORATOR_OPT = ['path']
-
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Create a new seeder file')
-        p.add_argument(
-            '-p', '--path',
-            default=os.path.join(root_path, 'db/seeds'),
-            help='The path to seeders files')
-        return p
+class CmdMakeSeed(BaseCmd, BaseExecCmd):
+    ARG_CONF = True
+    ARG_PATH = 'seeds'
 
 
-class CmdMigrateRest(BaseCmd):
-    ORATOR_CMD = 'migrate:reset'
-    ORATOR_OPT = ['conf', 'path']
+class CmdMigrate(BaseCmd, BaseExecCmd):
 
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Rollback all database migrations')
-        p.add_argument(
-            '-c', '--conf', default=get_dbconfig(),
-            help='The config file path')
-        p.add_argument(
-            '-p', '--path',
-            default=os.path.join(root_path, 'db/migrations'),
-            help='The path of migrations files to be executed')
-        return p
+    pass
 
 
-class CmdMigrateRollback(BaseCmd):
-    ORATOR_CMD = 'migrate:rollback'
-    ORATOR_OPT = ['conf', 'path']
+class CmdMigrateReset(BaseCmd, BaseExecCmd):
 
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Rollback the last database migration')
-        p.add_argument(
-            '-c', '--conf', default=get_dbconfig(),
-            help='The config file path')
-        p.add_argument(
-            '-p', '--path',
-            default=os.path.join(root_path, 'db/migrations'),
-            help='The path of migrations files to be executed')
-        return p
+    pass
 
 
-class CmdMigrateStatus(BaseCmd):
-    ORATOR_CMD = 'migrate:status'
-    ORATOR_OPT = ['conf', 'path']
+class CmdMigrateRollback(BaseCmd, BaseExecCmd):
 
-    def opt(self, subparsers):
-        root_path = _get_app().root_path
-        p = subparsers.add_parser(
-            self.ORATOR_CMD, help='Show a list of migrations up/down')
-        p.add_argument(
-            '-c', '--conf', default=get_dbconfig(),
-            help='The config file path')
-        p.add_argument(
-            '-p', '--path',
-            default=os.path.join(root_path, 'db/migrations'),
-            help='The path of migrations files to be executed')
-        return p
+    pass
+
+
+class CmdMigrateStatus(BaseCmd, BaseExecCmd):
+
+    pass
 
 
 def main():
+    app = sea.create_app(os.getcwd())
     root = argparse.ArgumentParser('seaorator')
     subparsers = root.add_subparsers()
     for k, v in globals().items():
         if k.startswith('Cmd') and issubclass(v, BaseCmd):
-            cmd = v()
-            cmd.opt(subparsers).set_defaults(handler=cmd.run)
+            cmd = v(app)
+            cmd.add_parser(subparsers).set_defaults(handler=cmd.run)
     args = sys.argv[1:]
     args, extra = root.parse_known_args(args)
     args.handler(args, extra)
