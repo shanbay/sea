@@ -19,8 +19,9 @@ class JobManager:
     def __init__(self):
         self.jobs = {}
 
-    def job(self, name):
+    def job(self, name, *args, **kwargs):
         def wrapper(func):
+            func.job = JobOption(*args, **kwargs)
             self.jobs[name] = func
             return func
         return wrapper
@@ -43,12 +44,19 @@ jobm = JobManager()
 
 class AbstractCommand(metaclass=abc.ABCMeta):
 
+    APP_REQUIRED = True
+    app = None
+
+    def __init__(self):
+        if self.APP_REQUIRED:
+            self.app = create_app(os.getcwd())
+
     @abc.abstractmethod
     def opt(self, subparsers):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def run(self, args, extra=[]):
+    def run(self, args):
         raise NotImplementedError
 
 
@@ -61,11 +69,8 @@ class ServerCmd(AbstractCommand):
             help='published host which others can connect through')
         return p
 
-    def run(self, args, extra=[]):
-        if extra:
-            raise ValueError
-        app = create_app(args.workdir)
-        s = Server(app, args.host)
+    def run(self, args):
+        s = Server(self.app, args.host)
         return s.run()
 
 
@@ -75,16 +80,13 @@ class ConsoleCmd(AbstractCommand):
             'console', aliases=['c'], help='Run Console')
         return p
 
-    def run(self, args, extra=[]):
-        if extra:
-            raise ValueError
+    def run(self, args):
         banner = """
         [Sea Console]:
         the following vars are included:
         `app` (the current app)
         """
-        app = create_app(args.workdir)
-        ctx = {'app': app}
+        ctx = {'app': self.app}
         try:
             from IPython import embed
             return embed(banner1=banner, user_ns=ctx)
@@ -95,6 +97,7 @@ class ConsoleCmd(AbstractCommand):
 
 class NewCmd(AbstractCommand):
 
+    APP_REQUIRED = False
     PACKAGE_DIR = os.path.dirname(__file__)
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
@@ -157,9 +160,7 @@ class NewCmd(AbstractCommand):
 
                     print('created: {}'.format(dst))
 
-    def run(self, args, extra=[]):
-        if extra:
-            raise ValueError
+    def run(self, args):
         path = os.path.join(os.getcwd(), args.project)
         args.project = os.path.basename(path)
         return self._gen_project(
@@ -167,48 +168,8 @@ class NewCmd(AbstractCommand):
                     ctx=vars(args))
 
 
-class JobCmd(AbstractCommand):
-
-    def _load_plugin_jobs(self):
-        import pkg_resources
-        for ep in pkg_resources.iter_entry_points('sea.jobs'):
-            ep.load()
-        return True
-
-    def _load_app_jobs(self, app):
-        root = os.path.join(app.root_path, 'jobs')
-        for m in os.listdir(root):
-            if m != '__init__.py' and \
-                    m.endswith('.py') and \
-                    os.path.isfile(os.path.join(root, m)):
-                import_string('jobs.{}'.format(m[:-3]))
-        return True
-
-    def opt(self, subparsers):
-        p = subparsers.add_parser(
-            'invoke', aliases=['i'], help='Invoke Sea jobs')
-        p.add_argument(
-            'job', help='job name')
-        return p
-
-    def run(self, args, extra=[]):
-        app = create_app(args.workdir)
-        self._load_plugin_jobs()
-        self._load_app_jobs(app)
-        global jobm
-        func = jobm[args.job]
-        opts = getattr(func, 'opts', [])
-        parser = argparse.ArgumentParser('seajob')
-        for opt in opts:
-            parser.add_argument(*opt.args, **opt.kwargs)
-        return func(**vars(parser.parse_args(extra)))
-
-
 def main():
     root = argparse.ArgumentParser('sea')
-    root.add_argument(
-        '-w', '--workdir', default=os.getcwd(),
-        help='set work dir')
     subparsers = root.add_subparsers()
     for k, v in globals().items():
         if k.endswith('Cmd') and issubclass(v, AbstractCommand):
@@ -216,5 +177,31 @@ def main():
             cmd.opt(subparsers).set_defaults(handler=cmd.run)
 
     args = sys.argv[1:]
-    args, extra = root.parse_known_args(args)
-    args.handler(args, extra)
+    args = root.parse_args(args)
+    args.handler(args)
+
+
+def jobmain():
+    rootp = argparse.ArgumentParser('seak')
+    subparsers = rootp.add_subparsers()
+    app = create_app(os.getcwd())
+    import pkg_resources
+    for ep in pkg_resources.iter_entry_points('sea.jobs'):
+        ep.load()
+    jobsroot = os.path.join(app.root_path, 'jobs')
+    for m in os.listdir(jobsroot):
+        if m.endswith('.py') and os.path.isfile(os.path.join(jobsroot, m)):
+            import_string('jobs.{}'.format(m[:-3]))
+
+    for name, handler in jobm.jobs.items():
+        job = handler.job
+        opts = getattr(handler, 'opts', [])
+        p = subparsers.add_parser(name, *job.args, **job.kwargs)
+        for opt in opts:
+            p.add_argument(*opt.args, **opt.kwargs)
+        p.set_defaults(handler=handler)
+
+    args = sys.argv[1:]
+    kwargs = vars(rootp.parse_args(args))
+    handler = kwargs.pop('handler')
+    handler(**kwargs)

@@ -15,20 +15,14 @@ def test_abscmd():
 
 
 def test_cmd_server(app):
-    sys.argv = 'sea s -b 127.0.0.1 -f wrong'.split()
-    with pytest.raises(ValueError):
-        cli.main()
-    sys.argv = 'sea -w ./tests/wd s -b 127.0.0.1'.split()
+    sys.argv = 'sea s -b 127.0.0.1'.split()
     with mock.patch('sea.cli.Server', autospec=True) as mocked:
         cli.main()
         mocked.return_value.run.assert_called_with()
 
 
 def test_cmd_console(app):
-    sys.argv = 'sea c -f wrong'.split()
-    with pytest.raises(ValueError):
-        cli.main()
-    sys.argv = 'sea -w ./tests/wd c'.split()
+    sys.argv = 'sea c'.split()
     mocked = mock.MagicMock()
     with mock.patch.dict('sys.modules', {'IPython': mocked, 'code': mocked}):
         cli.main()
@@ -40,9 +34,6 @@ def test_cmd_console(app):
 
 def test_cmd_new(app):
     shutil.rmtree('tests/myproject', ignore_errors=True)
-    sys.argv = 'sea new -f wrong'.split()
-    with pytest.raises(ValueError):
-        cli.main()
     sys.argv = ('sea new tests/myproject'
                 ' --skip-git --skip-consul --skip-orator').split()
     cli.main()
@@ -78,11 +69,11 @@ def test_cmd_new(app):
 
 
 def test_cmd_job(app):
-    sys.argv = 'sea -w ./tests/wd i plusone -n 100'.split()
-    cli.main()
+    sys.argv = 'seak plusone -n 100'.split()
+    cli.jobmain()
     assert current_app().config.get('NUMBER') == 101
-    sys.argv = 'sea -w ./tests/wd i config_hello'.split()
-    cli.main()
+    sys.argv = 'seak config_hello'.split()
+    cli.jobmain()
     assert current_app().config.get('ATTR') == 'hello'
 
     class EntryPoint:
@@ -96,8 +87,8 @@ def test_cmd_job(app):
         return [EntryPoint()]
 
     with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
-        sys.argv = 'sea -w ./tests/wd i xyz'.split()
-        cli.main()
+        sys.argv = 'seak xyz'.split()
+        cli.jobmain()
         assert current_app().config.get('XYZ') == 'hello'
 
 
