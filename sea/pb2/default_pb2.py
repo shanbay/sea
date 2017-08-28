@@ -19,15 +19,15 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='default.proto',
   package='sea',
   syntax='proto3',
-  serialized_pb=_b('\n\rdefault.proto\x12\x03sea\"\n\n\x08\x45mptyResB#\n\x0f\x63om.shanbay.seaB\x08SeaProtoP\x01\xa2\x02\x03SEAb\x06proto3')
+  serialized_pb=_b('\n\rdefault.proto\x12\x03sea\"\x07\n\x05\x45mptyb\x06proto3')
 )
 
 
 
 
-_EMPTYRES = _descriptor.Descriptor(
-  name='EmptyRes',
-  full_name='sea.EmptyRes',
+_EMPTY = _descriptor.Descriptor(
+  name='Empty',
+  full_name='sea.Empty',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -45,20 +45,28 @@ _EMPTYRES = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=22,
-  serialized_end=32,
+  serialized_end=29,
 )
 
-DESCRIPTOR.message_types_by_name['EmptyRes'] = _EMPTYRES
+DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-EmptyRes = _reflection.GeneratedProtocolMessageType('EmptyRes', (_message.Message,), dict(
-  DESCRIPTOR = _EMPTYRES,
+Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
+  DESCRIPTOR = _EMPTY,
   __module__ = 'default_pb2'
-  # @@protoc_insertion_point(class_scope:sea.EmptyRes)
+  # @@protoc_insertion_point(class_scope:sea.Empty)
   ))
-_sym_db.RegisterMessage(EmptyRes)
+_sym_db.RegisterMessage(Empty)
 
 
-DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\017com.shanbay.seaB\010SeaProtoP\001\242\002\003SEA'))
+try:
+  # THESE ELEMENTS WILL BE DEPRECATED.
+  # Please use the generated *_pb2_grpc.py files instead.
+  import grpc
+  from grpc.beta import implementations as beta_implementations
+  from grpc.beta import interfaces as beta_interfaces
+  from grpc.framework.common import cardinality
+  from grpc.framework.interfaces.face import utilities as face_utilities
+except ImportError:
+  pass
 # @@protoc_insertion_point(module_scope)

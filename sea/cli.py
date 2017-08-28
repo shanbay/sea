@@ -2,10 +2,15 @@ import sys
 import os
 import argparse
 import abc
+import pkg_resources
 
 from sea import create_app
 from sea.server import Server
 from sea.utils import import_string
+
+
+class JobException(RuntimeError):
+    pass
 
 
 class JobOption:
@@ -17,12 +22,12 @@ class JobOption:
 class JobManager:
 
     def __init__(self):
-        self.jobs = {}
+        self._jobs = {}
 
     def job(self, name, *args, **kwargs):
         def wrapper(func):
             func.job = JobOption(*args, **kwargs)
-            self.jobs[name] = func
+            self._jobs[name] = func
             return func
         return wrapper
 
@@ -35,8 +40,9 @@ class JobManager:
             return func
         return wrapper
 
-    def __getitem__(self, name):
-        return self.jobs[name]
+    @property
+    def jobs(self):
+        return self._jobs
 
 
 jobm = JobManager()
@@ -71,7 +77,8 @@ class ServerCmd(AbstractCommand):
 
     def run(self, args):
         s = Server(self.app, args.host)
-        return s.run()
+        s.run()
+        return 0
 
 
 class ConsoleCmd(AbstractCommand):
@@ -89,10 +96,36 @@ class ConsoleCmd(AbstractCommand):
         ctx = {'app': self.app}
         try:
             from IPython import embed
-            return embed(banner1=banner, user_ns=ctx)
+            embed(banner1=banner, user_ns=ctx)
         except ImportError:
             import code
-            return code.interact(banner, local=ctx)
+            code.interact(banner, local=ctx)
+        return 0
+
+
+class GenerateCmd(AbstractCommand):
+    def opt(self, subparsers):
+        p = subparsers.add_parser(
+            'generate', aliases=['g'], help='Generate')
+        p.add_argument(
+            '-I', '--proto_path', required=True, default=os.getcwd(),
+            help="the dir in which we'll search the proto files")
+        p.add_argument(
+            'protos', nargs='+',
+            help='the proto files which will be compiled.'
+            'the paths are related to the path defined in "-I"')
+        return p
+
+    def run(self, args):
+        from grpc_tools import protoc
+        proto_out = os.path.join(self.app.root_path, 'protos')
+        cmd = [
+            'grpc_tools.protoc',
+            '--proto_path', args.proto_path,
+            '--python_out', proto_out,
+            '--grpc_python_out', proto_out
+        ] + [os.path.join(args.proto_path, f) for f in args.protos]
+        return protoc.main(cmd)
 
 
 class NewCmd(AbstractCommand):
@@ -163,9 +196,10 @@ class NewCmd(AbstractCommand):
     def run(self, args):
         path = os.path.join(os.getcwd(), args.project)
         args.project = os.path.basename(path)
-        return self._gen_project(
-                    path, skip=self._build_skip_files(args),
-                    ctx=vars(args))
+        self._gen_project(
+                path, skip=self._build_skip_files(args),
+                ctx=vars(args))
+        return 0
 
 
 def main():
@@ -178,14 +212,13 @@ def main():
 
     args = sys.argv[1:]
     args = root.parse_args(args)
-    args.handler(args)
+    return args.handler(args)
 
 
 def jobmain():
     rootp = argparse.ArgumentParser('seak')
     subparsers = rootp.add_subparsers()
     app = create_app(os.getcwd())
-    import pkg_resources
     for ep in pkg_resources.iter_entry_points('sea.jobs'):
         ep.load()
     jobsroot = os.path.join(app.root_path, 'jobs')
@@ -204,4 +237,8 @@ def jobmain():
     args = sys.argv[1:]
     kwargs = vars(rootp.parse_args(args))
     handler = kwargs.pop('handler')
-    handler(**kwargs)
+    try:
+        handler(**kwargs)
+        return 0
+    except JobException as e:
+        return e

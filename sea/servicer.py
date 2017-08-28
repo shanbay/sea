@@ -21,7 +21,7 @@ def wrap_handler(default_msg_class, func):
 class ServicerMeta(type):
     def __new__(cls, name, bases, kws):
         _kws = {}
-        default_msg_class = kws.pop('DEFAULT_MSG_CLASS', default_pb2.EmptyRes)
+        default_msg_class = kws.pop('DEFAULT_MSG_CLASS', default_pb2.Empty)
         for k, v in kws.items():
             if isinstance(v, FunctionType):
                 v = wrap_handler(default_msg_class, v)

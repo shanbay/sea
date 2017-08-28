@@ -17,7 +17,7 @@ def test_abscmd():
 def test_cmd_server(app):
     sys.argv = 'sea s -b 127.0.0.1'.split()
     with mock.patch('sea.cli.Server', autospec=True) as mocked:
-        cli.main()
+        assert cli.main() == 0
         mocked.return_value.run.assert_called_with()
 
 
@@ -25,18 +25,34 @@ def test_cmd_console(app):
     sys.argv = 'sea c'.split()
     mocked = mock.MagicMock()
     with mock.patch.dict('sys.modules', {'IPython': mocked, 'code': mocked}):
-        cli.main()
+        assert cli.main() == 0
         assert mocked.embed.called
         mocked.embed.side_effect = ImportError
-        cli.main()
+        assert cli.main() == 0
         assert mocked.interact.called
 
 
-def test_cmd_new(app):
+def test_generate(app):
+    sys.argv = 'sea g -I /path/to/protos hello.proto test.proto'.split()
+    with mock.patch('grpc_tools.protoc.main', return_value=0) as mocked:
+        assert cli.main() == 0
+        proto_out = os.path.join(app.root_path, 'protos')
+        cmd = [
+            'grpc_tools.protoc',
+            '--proto_path', '/path/to/protos',
+            '--python_out', proto_out,
+            '--grpc_python_out', proto_out,
+            '/path/to/protos/hello.proto',
+            '/path/to/protos/test.proto'
+        ]
+        mocked.assert_called_with(cmd)
+
+
+def test_cmd_new():
     shutil.rmtree('tests/myproject', ignore_errors=True)
     sys.argv = ('sea new tests/myproject'
                 ' --skip-git --skip-consul --skip-orator').split()
-    cli.main()
+    assert cli.main() == 0
     correct_code = """\
     import myproject_pb2
     import myproject_pb2_grpc
@@ -70,10 +86,10 @@ def test_cmd_new(app):
 
 def test_cmd_job(app):
     sys.argv = 'seak plusone -n 100'.split()
-    cli.jobmain()
+    assert cli.jobmain() == 0
     assert current_app().config.get('NUMBER') == 101
     sys.argv = 'seak config_hello'.split()
-    cli.jobmain()
+    assert cli.jobmain() == 0
     assert current_app().config.get('ATTR') == 'hello'
 
     class EntryPoint:
@@ -88,7 +104,7 @@ def test_cmd_job(app):
 
     with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
         sys.argv = 'seak xyz'.split()
-        cli.jobmain()
+        assert cli.jobmain() == 0
         assert current_app().config.get('XYZ') == 'hello'
 
 
