@@ -2,6 +2,7 @@ import grpc
 
 from sea.servicer import ServicerMeta
 from sea import exceptions
+from sea.pb2 import default_pb2
 
 
 class HelloContext():
@@ -19,8 +20,6 @@ class HelloContext():
 
 class HelloServicer(metaclass=ServicerMeta):
 
-    DEFAULT_MSG_CLASS = dict
-
     def return_error(self, request, context):
         raise exceptions.BadRequestException('error')
 
@@ -28,11 +27,11 @@ class HelloServicer(metaclass=ServicerMeta):
         return 'Got it!'
 
 
-def test_meta_servicer():
+def test_meta_servicer(app):
     servicer = HelloServicer()
     context = HelloContext()
     ret = servicer.return_error(None, context)
-    assert ret == {}
+    assert isinstance(ret, default_pb2.Empty)
     assert context.code is grpc.StatusCode.INVALID_ARGUMENT
     assert context.details == 'error'
 

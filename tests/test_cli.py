@@ -89,8 +89,7 @@ def test_cmd_job(app):
     assert cli.jobmain() == 0
     assert current_app().config.get('NUMBER') == 101
     sys.argv = 'seak config_hello'.split()
-    assert cli.jobmain() == 0
-    assert current_app().config.get('ATTR') == 'hello'
+    assert isinstance(cli.jobmain(), cli.JobException)
 
     class EntryPoint:
         def load(self):

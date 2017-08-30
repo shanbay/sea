@@ -24,19 +24,20 @@ def test_sea():
     assert _app.debug
     assert _app.testing
 
-    from app.servicers import GreeterServicer, helloworld_pb2_grpc
-    from app.extensions import consul
+    from app import servicers, extensions
 
-    _app.register_servicer(GreeterServicer)
+    _app.load_servicers_in_module(servicers)
     assert 'GreeterServicer' in _app.servicers
     servicer = _app.servicers['GreeterServicer']
     assert isinstance(servicer, tuple)
-    assert servicer == (helloworld_pb2_grpc.add_GreeterServicer_to_server, GreeterServicer)
+    assert servicer == (
+        servicers.helloworld_pb2_grpc.add_GreeterServicer_to_server,
+        servicers.GreeterServicer)
     with pytest.raises(exceptions.ConfigException):
-        _app.register_servicer(GreeterServicer)
+        _app.register_servicer(servicers.GreeterServicer)
 
-    _app.register_extension('consul', consul)
+    _app.load_extensions_in_module(extensions)
     ext = _app.extensions['consul']
-    assert ext is consul
+    assert ext is extensions.consul
     with pytest.raises(exceptions.ConfigException):
-        _app.register_extension('consul', consul)
+        _app.register_extension('consul', extensions.consul)
