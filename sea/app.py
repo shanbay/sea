@@ -4,7 +4,9 @@ import os.path
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict
 from sea.register import ConsulRegister
+from sea.utils import import_string
 from sea import exceptions
+from sea.extensions import AbstractExtension
 
 
 class Sea:
@@ -21,7 +23,10 @@ class Sea:
         'REGISTER_CLIENT': 'consul',
         'CONSUL_HOST': '127.0.0.1',
         'CONSUL_PORT': 8500,
-        'CONSUL_DC': 'consul'
+        'CONSUL_DC': 'consul',
+        'MIDDLEWARES': [
+            'sea.middleware.RpcErrorMiddleware'
+        ]
     })
 
     def __init__(self, root_path, env='development', *args, **kwargs):
@@ -35,6 +40,7 @@ class Sea:
         self.config = self.config_class(root_path, self.default_config)
         self.servicers = {}
         self.extensions = {}
+        self.middlewares = []
 
     def register_servicer(self, servicer):
         name = servicer.__name__
@@ -56,3 +62,19 @@ class Sea:
             raise exceptions.ConfigException(
                 'extension duplicated: {}'.format(name))
         self.extensions[name] = ext
+
+    def load_middlewares(self):
+        for mn in self.config.get('MIDDLEWARES'):
+            m = import_string(mn)
+            self.middlewares.insert(0, m)
+
+    def load_extensions_in_module(self, module):
+        for _ext_name in dir(module):
+            _ext = getattr(module, _ext_name)
+            if isinstance(_ext, AbstractExtension):
+                self.register_extension(_ext_name, _ext)
+
+    def load_servicers_in_module(self, module):
+        for _, _servicer in inspect.getmembers(module, inspect.isclass):
+            if _servicer.__name__.endswith('Servicer'):
+                self.register_servicer(_servicer)

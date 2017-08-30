@@ -1,12 +1,11 @@
-from sea.cli import jobm
+from sea.cli import jobm, JobException
 from sea import current_app
 
 
 @jobm.job('config_hello')
 @jobm.option('-n', '--name', default='ATTR')
 def f1(name):
-    app = current_app()
-    app.config[name] = 'hello'
+    raise JobException(name)
 
 
 @jobm.job('plusone')
