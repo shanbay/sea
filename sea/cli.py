@@ -50,13 +50,6 @@ jobm = JobManager()
 
 class AbstractCommand(metaclass=abc.ABCMeta):
 
-    APP_REQUIRED = True
-    app = None
-
-    def __init__(self):
-        if self.APP_REQUIRED:
-            self.app = create_app(os.getcwd())
-
     @abc.abstractmethod
     def opt(self, subparsers):
         raise NotImplementedError
@@ -76,7 +69,7 @@ class ServerCmd(AbstractCommand):
         return p
 
     def run(self, args):
-        s = Server(self.app, args.host)
+        s = Server(create_app(os.getcwd()), args.host)
         s.run()
         return 0
 
@@ -93,7 +86,7 @@ class ConsoleCmd(AbstractCommand):
         the following vars are included:
         `app` (the current app)
         """
-        ctx = {'app': self.app}
+        ctx = {'app': create_app(os.getcwd())}
         try:
             from IPython import embed
             embed(banner1=banner, user_ns=ctx)
@@ -118,7 +111,7 @@ class GenerateCmd(AbstractCommand):
 
     def run(self, args):
         from grpc_tools import protoc
-        proto_out = os.path.join(self.app.root_path, 'protos')
+        proto_out = os.path.join(create_app(os.getcwd()).root_path, 'protos')
         cmd = [
             'grpc_tools.protoc',
             '--proto_path', args.proto_path,
@@ -130,7 +123,6 @@ class GenerateCmd(AbstractCommand):
 
 class NewCmd(AbstractCommand):
 
-    APP_REQUIRED = False
     PACKAGE_DIR = os.path.dirname(__file__)
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
