@@ -4,7 +4,7 @@ import sys
 from sea.app import Sea
 from sea.utils import import_string
 
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 _app = None
 
 
