@@ -27,4 +27,5 @@ Installation
 **This will allow you to keep up to date with development on GitHub:**
 
 .. code-block:: sh
+
     pip install -U git+https://github.com/shanbay/sea.git
