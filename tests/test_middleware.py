@@ -25,10 +25,10 @@ def handler(servicer, request, context):
     return context
 
 
-def test_base_middleware():
-    h = FakeInMiddleware(handler)
-    h = FakeOutMiddleware(h)
-    h = BaseMiddleware(h)
+def test_base_middleware(app):
+    h = FakeInMiddleware(app, handler, handler)
+    h = FakeOutMiddleware(app, h, handler)
+    h = BaseMiddleware(app, h, handler)
     ret = h(None, None, {'msg': ''})
     assert ret['msg'].strip().split('\n') == [
         'Out.before_handler',

@@ -1,10 +1,14 @@
+import datetime
+
 from sea import exceptions
 from sea.pb2 import default_pb2
 
 
 class BaseMiddleware:
-    def __init__(self, func):
-        self.handler = func
+    def __init__(self, app, handler, origin_handler):
+        self.app = app
+        self.handler = handler
+        self.origin_handler = origin_handler
 
     def __call__(self, servicer, request, context):
         request, context = self.before_handler(servicer, request, context)
@@ -26,3 +30,20 @@ class RpcErrorMiddleware(BaseMiddleware):
             context.set_code(e.code)
             context.set_details(e.details)
             return default_pb2.Empty()
+
+
+class ServiceLogMiddleware(BaseMiddleware):
+    def __call__(self, servicer, request, context):
+        start_at = datetime.datetime.now(self.app.tz)
+        response = self.handler(servicer, request, context)
+        finish_at = datetime.datetime.now(self.app.tz)
+        delta = finish_at - start_at
+        self.app.logger.info(
+            '[{}] {}.{} Called. Processed in {}s'.format(
+                start_at.isoformat(),
+                servicer.__class__.__name__,
+                self.origin_handler.__name__,
+                delta.total_seconds()
+            )
+        )
+        return response

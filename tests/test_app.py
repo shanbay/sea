@@ -1,6 +1,7 @@
 import pytest
 import sys
 import os.path
+from unittest import mock
 
 from sea import app, exceptions
 
@@ -19,6 +20,7 @@ def test_sea():
     class C(object):
         DEBUG = True
         TESTING = True
+        TEST_KEY = 'foo'
 
     _app.config.from_object(C)
     assert _app.debug
@@ -41,3 +43,7 @@ def test_sea():
     assert ext is extensions.consul
     with pytest.raises(exceptions.ConfigException):
         _app.register_extension('consul', extensions.consul)
+
+    with mock.patch('sys.stderr') as mocked:
+        _app.logger.debug('test')
+        assert len(mocked.method_calls) > 0

@@ -1,13 +1,17 @@
 import signal
 import time
+import logging
 from concurrent import futures
 import grpc
+
+from sea.utils import import_string
 
 
 class Server:
 
     def __init__(self, app, publish_host):
         self.app = app
+        self.setup_logger()
         self.workers = self.app.config.get('GRPC_WORKERS')
         self.host = self.app.config.get('GRPC_HOST')
         self.port = self.app.config.get('GRPC_PORT')
@@ -18,7 +22,8 @@ class Server:
         self.server.add_insecure_port(
             '{}:{}'.format(self.host, self.port))
         regconf = self.app.config.get_namespace('REGISTER_')
-        self.register = regconf['class'](
+        regclass = import_string(regconf['class'])
+        self.register = regclass(
             self.app.extensions[regconf['client']])
         self._stopped = False
 
@@ -31,6 +36,15 @@ class Server:
         while not self._stopped:
             time.sleep(1)
         return True
+
+    def setup_logger(self):
+        fmt = self.app.config['GRPC_LOG_FORMAT']
+        lvl = self.app.config['GRPC_LOG_LEVEL']
+        h = self.app.config['GRPC_LOG_HANDLER']
+        h.setFormatter(logging.Formatter(fmt))
+        logger = logging.getLogger('sea')
+        logger.setLevel(lvl)
+        logger.addHandler(h)
 
     def register_signal(self):
         signal.signal(signal.SIGINT, self._stop_handler)

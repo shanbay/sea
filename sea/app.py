@@ -1,11 +1,10 @@
 import inspect
+import logging
 import os.path
 
+from sea import exceptions, utils
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict
-from sea.register import ConsulRegister
-from sea.utils import import_string
-from sea import exceptions
 from sea.extensions import AbstractExtension
 
 
@@ -13,13 +12,18 @@ class Sea:
     config_class = Config
     debug = ConfigAttribute('DEBUG')
     testing = ConfigAttribute('TESTING')
+    tz = ConfigAttribute('TIMEZONE')
     default_config = ImmutableDict({
         'DEBUG': False,
         'TESTING': False,
+        'TIMEZONE': utils.offset2tz(),
         'GRPC_WORKERS': 3,
         'GRPC_HOST': '[::]',
         'GRPC_PORT': 6000,
-        'REGISTER_CLASS': ConsulRegister,
+        'GRPC_LOG_LEVEL': 'INFO',
+        'GRPC_LOG_HANDLER': logging.StreamHandler(),
+        'GRPC_LOG_FORMAT': '[%(asctime)s %(levelname)s in %(module)s] %(message)s',  # NOQA
+        'REGISTER_CLASS': 'sea.register.ConsulRegister',
         'REGISTER_CLIENT': 'consul',
         'CONSUL_HOST': '127.0.0.1',
         'CONSUL_PORT': 8500,
@@ -41,6 +45,17 @@ class Sea:
         self.servicers = {}
         self.extensions = {}
         self.middlewares = []
+
+    @utils.cached_property
+    def logger(self):
+        logger = logging.getLogger('sea.app')
+        if self.debug and logger.level == logging.NOTSET:
+            logger.setLevel(logging.DEBUG)
+        if not utils.logger_has_level_handler(logger):
+            h = logging.StreamHandler()
+            h.setFormatter(logging.Formatter('%(message)s'))
+            logger.addHandler(h)
+        return logger
 
     def register_servicer(self, servicer):
         name = servicer.__name__
@@ -65,7 +80,7 @@ class Sea:
 
     def load_middlewares(self):
         for mn in self.config.get('MIDDLEWARES'):
-            m = import_string(mn)
+            m = utils.import_string(mn)
             self.middlewares.insert(0, m)
 
     def load_extensions_in_module(self, module):
