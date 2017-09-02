@@ -69,7 +69,8 @@ class ServerCmd(AbstractCommand):
         return p
 
     def run(self, args):
-        s = Server(create_app(os.getcwd()), args.host)
+        app = create_app(os.getcwd())
+        s = Server(app, args.host)
         s.run()
         return 0
 

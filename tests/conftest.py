@@ -1,5 +1,8 @@
 import os
 import pytest
+import logging
+from io import StringIO
+
 from orator import Schema
 
 import sea
@@ -9,12 +12,23 @@ from sea.contrib.extensions.cache import Cache
 os.environ.setdefault('SEA_ENV', 'testing')
 
 
+@pytest.fixture(scope='session')
+def logstream():
+    return StringIO()
+
+
 @pytest.fixture(scope='module')
-def app():
+def app(logstream):
+    logger = logging.getLogger('sea')
+    h = logging.StreamHandler(logstream)
+    logger.addHandler(h)
     app = sea.create_app(
         os.path.join(
             os.path.dirname(__file__), 'wd'))
     yield app
+    logger.removeHandler(h)
+    logstream.truncate(0)
+    logstream.seek(0)
     sea._app = None
 
 
@@ -24,6 +38,7 @@ def db(app):
     app.register_extension('db', db)
     yield db
     app.extensions.pop('db')
+
 
 @pytest.fixture
 def cache(app):

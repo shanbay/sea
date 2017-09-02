@@ -1,7 +1,5 @@
 import json
-import os.path
 
-from sea.app import Sea
 from sea.config import ConfigAttribute, Config
 
 
@@ -13,20 +11,21 @@ def test_config_from_class():
     class Test(Base):
         TESTING = True
 
-    path = os.path.join(os.path.dirname(__file__), '..')
-    app = Sea(os.path.abspath(path))
-    app.config.from_object(Test)
+    config = Config('.', {'TESTING': False})
 
-    assert app.testing
-    assert app.config['TEST_KEY'] == 'foo'
-    assert 'TestConfig' not in app.config
-    d = app.config.get_namespace('TEST_')
+    assert config['TESTING'] is False
+    config.from_object(Test)
+    assert config['TESTING'] is True
+
+    assert config['TEST_KEY'] == 'foo'
+    assert 'TestConfig' not in config
+    d = config.get_namespace('TEST_')
     assert 'key' in d
     assert 'value' in d
-    d = app.config.get_namespace(
+    d = config.get_namespace(
         'TEST_', lowercase=False, trim_namespace=False)
     assert 'TEST_KEY' in d
-    s = repr(app.config)
+    s = repr(config)
     assert '<Config' in s
 
 

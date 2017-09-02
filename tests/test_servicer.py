@@ -27,7 +27,10 @@ class HelloServicer(metaclass=ServicerMeta):
         return 'Got it!'
 
 
-def test_meta_servicer(app):
+def test_meta_servicer(app, logstream):
+    logstream.truncate(0)
+    logstream.seek(0)
+
     servicer = HelloServicer()
     context = HelloContext()
     ret = servicer.return_error(None, context)
@@ -35,5 +38,12 @@ def test_meta_servicer(app):
     assert context.code is grpc.StatusCode.INVALID_ARGUMENT
     assert context.details == 'error'
 
+    p = logstream.tell()
+    assert p > 0
+    content = logstream.getvalue()
+    assert 'HelloServicer.return_error' in content
+
     ret = servicer.return_normal(None, context)
     assert ret == 'Got it!'
+
+    assert logstream.tell() > p
