@@ -1,17 +1,16 @@
 import sys
 import os
+
 from celery.__main__ import main as celerymain
 
 import sea
 
 
-app = sea.create_app(os.getcwd())
-celery = app.extensions['celery']
-
-
 def main():
+    sea.create_app(os.getcwd())
+
     args = sys.argv[1:]
     args = ['celery'] + args + \
-        ['-A', 'sea.contrib.extensions.celery.cli:celery']
+        ['-A', 'app.extensions:celeryapp']
     sys.argv = args
-    sys.exit(celerymain())
+    return celerymain()
