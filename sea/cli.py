@@ -134,6 +134,7 @@ class NewCmd(AbstractCommand):
                    'app/models.py.tmpl',
                    'db/.keep'],
         'cache': [],
+        'sentry': [],
         'celery': ['configs/development/celery.py.tmpl',
                    'configs/testing/celery.py.tmpl',
                    'app/tasks.py.tmpl'],
@@ -154,6 +155,8 @@ class NewCmd(AbstractCommand):
             '--skip-celery', action='store_true', help='skip celery')
         p.add_argument(
             '--skip-consul', action='store_true', help='skip consul')
+        p.add_argument(
+            '--skip-sentry', action='store_true', help='skip sentry')
         return p
 
     def _build_skip_files(self, args):
