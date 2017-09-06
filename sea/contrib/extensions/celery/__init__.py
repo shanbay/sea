@@ -1,5 +1,6 @@
-from sea.extensions import AbstractExtension
 import celery
+
+from sea.extensions import AbstractExtension
 
 
 class Celery(celery.Celery, AbstractExtension):

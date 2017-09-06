@@ -10,6 +10,9 @@ from sea.contrib.extensions.cache import Cache
 {%- if not skip_celery -%}
 from sea.contrib.extensions.celery import Celery
 {% endif %}
+{%- if not skip_sentry -%}
+from sea.contrib.extensions.sentry import Sentry
+{% endif %}
 
 {% if not skip_consul -%}
 consul = Consul()
@@ -23,3 +26,6 @@ cache = Cache()
 {%- if not skip_celery -%}
 celeryapp = Celery()
 {% endif %}
+{% if not skip_sentry -%}
+sentry = Sentry()
+{% endif -%}

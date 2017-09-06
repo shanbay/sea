@@ -9,8 +9,13 @@ CACHE_PORT = 6379
 CACHE_PASSWORD = 'abcdef'
 {%- endif %}
 
+{% if not skip_sentry -%}
+SENTRY_DSN = None
+{%- endif %}
+
 TESTING = False
 DEBUG = True
+
 MIDDLEWARES = [
     'sea.middleware.ServiceLogMiddleware',
     'sea.middleware.RpcErrorMiddleware'

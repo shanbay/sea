@@ -75,6 +75,7 @@ def test_cmd_new():
     correct_code = """\
     redis
     celery
+    raven
     pytest
     """
     with open('./tests/myproject/requirements.txt', 'r') as f:

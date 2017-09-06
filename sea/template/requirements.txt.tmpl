@@ -11,4 +11,7 @@ python-consul
 {%- if not skip_celery -%}
 celery
 {% endif -%}
+{%- if not skip_sentry -%}
+raven
+{% endif -%}
 pytest

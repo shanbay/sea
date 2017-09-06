@@ -37,6 +37,12 @@ def test_cached_property():
 
 
 def test_logger_has_level_handler():
+    # reset root logger
+    root = logging.getLogger()
+    root.handlers = []
+    root.filters = []
+    root.setLevel(logging.ERROR)
+
     l1 = logging.getLogger('testapp')
     l1.setLevel(logging.ERROR)
     l2 = logging.getLogger('testapp.sub')

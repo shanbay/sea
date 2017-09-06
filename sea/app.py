@@ -79,7 +79,9 @@ class Sea:
         self.extensions[name] = ext
 
     def load_middlewares(self):
-        for mn in self.config.get('MIDDLEWARES'):
+        mids = ['sea.middleware.GuardMiddleware'] + \
+            self.config.get('MIDDLEWARES')
+        for mn in mids:
             m = utils.import_string(mn)
             self.middlewares.insert(0, m)
 
