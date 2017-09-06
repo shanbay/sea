@@ -1,5 +1,6 @@
-from sea.extensions import AbstractExtension
 import consul
+
+from sea.extensions import AbstractExtension
 
 
 class Consul(AbstractExtension):

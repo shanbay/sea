@@ -42,7 +42,7 @@ class Server:
         lvl = self.app.config['GRPC_LOG_LEVEL']
         h = self.app.config['GRPC_LOG_HANDLER']
         h.setFormatter(logging.Formatter(fmt))
-        logger = logging.getLogger('sea')
+        logger = logging.getLogger()
         logger.setLevel(lvl)
         logger.addHandler(h)
 

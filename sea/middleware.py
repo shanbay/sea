@@ -1,4 +1,5 @@
 import datetime
+import grpc
 
 from sea import exceptions
 from sea.pb2 import default_pb2
@@ -20,6 +21,18 @@ class BaseMiddleware:
 
     def after_handler(self, servicer, response):
         return response
+
+
+class GuardMiddleware(BaseMiddleware):
+    def __call__(self, servicer, request, context):
+        try:
+            return self.handler(servicer, request, context)
+        except Exception as e:
+            self.app.logger.exception(
+                str(e), exc_info=True)
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details('Internal Error Occured')
+            return default_pb2.Empty()
 
 
 class RpcErrorMiddleware(BaseMiddleware):

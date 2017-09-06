@@ -1,4 +1,6 @@
-from sea.middleware import BaseMiddleware
+from unittest import mock
+
+from sea.middleware import BaseMiddleware, GuardMiddleware
 
 
 class FakeInMiddleware(BaseMiddleware):
@@ -22,6 +24,8 @@ class FakeOutMiddleware(BaseMiddleware):
 
 
 def handler(servicer, request, context):
+    if request is not None:
+        raise ValueError
     return context
 
 
@@ -29,6 +33,7 @@ def test_base_middleware(app):
     h = FakeInMiddleware(app, handler, handler)
     h = FakeOutMiddleware(app, h, handler)
     h = BaseMiddleware(app, h, handler)
+    h = GuardMiddleware(app, h, handler)
     ret = h(None, None, {'msg': ''})
     assert ret['msg'].strip().split('\n') == [
         'Out.before_handler',
@@ -36,3 +41,7 @@ def test_base_middleware(app):
         'In.after_handler',
         'Out.after_handler'
         ]
+
+    ctx = mock.MagicMock()
+    ret = h(None, 1, ctx)
+    assert ctx.set_code.called
