@@ -53,10 +53,10 @@ create ``protos/helloworld.proto`` like this::
     // The response message containing the greetings
     message HelloReply {
       string message = 1;
-    }
 
 
-run this command ``sea generate -I ./protos helloworld.proto``, protos dir will be added two files::
+run this command ``sea generate -I . helloworld.proto``. first argument is the dir containing proto file,
+second argument is the proto file name. After this command,  protos dir will be added two files::
 
     protos
     ├── helloworld_pb2_grpc.py
