@@ -8,6 +8,11 @@ from sea.utils import import_string
 
 
 class Server:
+    """sea server implements
+
+    :param app: application instance
+    :param publish_host: publish host
+    """
 
     def __init__(self, app, publish_host):
         self.app = app
@@ -28,6 +33,8 @@ class Server:
         self._stopped = False
 
     def run(self):
+        """run the server
+        """
         for name, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), self.server)
         self.register.register(self.app.name, self.publish_host, self.port)
