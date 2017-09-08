@@ -26,9 +26,12 @@ def test_sea():
     assert _app.debug
     assert _app.testing
 
-    from app import servicers, extensions
+    with mock.patch('sea._app') as mocked:
+        mocked = type('Sea', (object,), {'middlewares': []})
+        from app import servicers, extensions
 
     _app.load_servicers_in_module(servicers)
+
     assert 'GreeterServicer' in _app.servicers
     servicer = _app.servicers['GreeterServicer']
     assert isinstance(servicer, tuple)

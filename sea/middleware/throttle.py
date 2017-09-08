@@ -1,23 +1,20 @@
-from sea.datatypes import ExpiredDict
+from sea.datatypes import KeyExpiredDict
 from .base import BaseMiddleware
 from sea.pb2 import default_pb2
-from threading import Lock
-
-lock = Lock()
+from sea.utils import Singleton
 
 
-class ThrottleMiddleware(BaseMiddleware):
+class ThrottleMiddleware(BaseMiddleware, metaclass=Singleton):
 
-    _instance = None
-
-    def initialize(self, app, handler, origin_handler):
+    def __init__(self, app, handler, origin_handler):
         try:
             config = app.config['THROTTLE']
-            self.storage = ExpiredDict(config['store_max_len'])
+            self.storage = KeyExpiredDict(config['store_max_len'])
             self.limit = config['limit']
             self.duration = config['duration']
         except KeyError:
             raise Exception("You must config throttle before use")
+        super().__init__(app, handler, origin_handler)
 
     def _enalbe_pass(self, key):
         result = self.storage.get(key)
@@ -38,10 +35,3 @@ class ThrottleMiddleware(BaseMiddleware):
         if self._enalbe_pass(address):
             return self.handler(servicer, request, context)
         return default_pb2.Empty()
-
-    def __new__(cls, *args, **kwargs):
-        with lock:
-            if not cls._instance:
-                cls._instance = super().__new__(cls)
-                cls._instance.initialize(*args, **kwargs)
-        return cls._instance

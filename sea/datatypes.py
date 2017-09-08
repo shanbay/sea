@@ -68,31 +68,7 @@ class ConstantsObject(ImmutableDict):
         return self[name]
 
 
-class ExpiredDict:
-    """
-    >>> s = LocalStorage(2)
-    >>> s.set('foo', 'bar', 5)
-    >>> print(s['foo'])
-    bar
-    >>> import time
-    >>> time.sleep(5)
-    >>> s['foo']
-    >>> s['hoge']
-    >>> s.get('hoge')
-    >>> s['hoge'] = 2
-    >>> s['hoge']
-    2
-    >>> s.incr('hoge')
-    >>> s['hoge']
-    3
-    >>> s['a'] = 1
-    >>> s['b'] = 2
-    >>> s['hoge']
-    >>> s['a']
-    1
-    >>> s['c'] = 3
-    >>> s['b']
-    """
+class KeyExpiredDict:
 
     def __init__(self, max_len=1000):
         super().__init__()
@@ -150,8 +126,3 @@ class ExpiredDict:
             self.expired_map[key] = expired_time
         else:
             raise KeyError("key doesn't exist")
-
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod(verbose=False)
