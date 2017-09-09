@@ -9,6 +9,11 @@ from sea.extensions import AbstractExtension
 
 
 class Sea:
+    """The Sea object implements grpc application
+
+    :param root_path: the root path
+    :param env: the env default is 'development'
+    """
     config_class = Config
     debug = ConfigAttribute('DEBUG')
     testing = ConfigAttribute('TESTING')
@@ -58,6 +63,10 @@ class Sea:
         return logger
 
     def register_servicer(self, servicer):
+        """register serviser
+
+        :param servicer: servicer
+        """
         name = servicer.__name__
         if name in self.servicers:
             raise exceptions.ConfigException(
@@ -72,6 +81,11 @@ class Sea:
                 return getattr(m, 'add_{}_to_server'.format(b.__name__))
 
     def register_extension(self, name, ext):
+        """register extension
+
+        :param name: extension name
+        :param ext: extension object
+        """
         ext.init_app(self)
         if name in self.extensions:
             raise exceptions.ConfigException(
