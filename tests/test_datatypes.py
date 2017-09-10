@@ -77,3 +77,26 @@ class TestConstantsObject:
         data = {'foo': 1, 'bar': 2, 'baz': 3}
         d = datatypes.ConstantsObject(data)
         assert d.foo == 1
+
+
+class TestKeyExpiredDict:
+
+    def test_basic(self):
+        s = datatypes.KeyExpiredDict(2)
+        s.set('foo', 'bar', 2)
+        assert s['foo'] == 'bar'
+        import time
+        time.sleep(2)
+        assert s['foo'] is None
+        assert s['hoge'] is None
+        assert s.get('hoge') is None
+        s['hoge'] = 2
+        assert s['hoge'] == 2
+        s.incr('hoge')
+        assert s['hoge'] == 3
+        s['a'] = 1
+        s['b'] = 2
+        assert s['hoge'] is None
+        assert s['a'] == 1
+        s['c'] = 3
+        assert s['b'] is None

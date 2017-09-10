@@ -54,3 +54,13 @@ def logger_has_level_handler(logger):
 
 def offset2tz(offset_in_hour=0):
     return datetime.timezone(datetime.timedelta(hours=offset_in_hour))
+
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
