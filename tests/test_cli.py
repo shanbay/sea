@@ -54,15 +54,15 @@ def test_cmd_new():
                 ' --skip-git --skip-consul --skip-orator').split()
     assert cli.main() == 0
     correct_code = """\
-    import myproject_pb2
-    import myproject_pb2_grpc
+    # import myproject_pb2
+    # import myproject_pb2_grpc
 
-    from sea.servicer import ServicerMeta
+    # from sea.servicer import ServicerMeta
 
 
-    class MyprojectServicer(myproject_pb2_grpc.MyprojectServicer, metaclass=ServicerMeta):
+    # class MyprojectServicer(myproject_pb2_grpc.MyprojectServicer, metaclass=ServicerMeta):
 
-        pass
+    #     pass
     """
     with open('./tests/myproject/app/servicers.py', 'r') as f:
         content = f.read()

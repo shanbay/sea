@@ -36,6 +36,15 @@ def test_cached_property():
     assert ins.cached_count == 0
 
 
+def test_singleton():
+    class A(metaclass=utils.Singleton):
+        pass
+
+    s1 = A()
+    s2 = A()
+    assert s1 is s2
+
+
 def test_logger_has_level_handler():
     # reset root logger
     root = logging.getLogger()
