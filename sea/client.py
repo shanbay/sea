@@ -32,7 +32,7 @@ class Client:
 
     example:
     from helloworld_pb2_grpc import GreeterStub
-    helloworld_client = Client(app, 'helloworld', GreeterStub)
+    client = Client(app, 'helloworld', GreeterStub)
     res, err = client.SayHello(helloworld_pb2.HelloRequest(name='you'))
     """
 
