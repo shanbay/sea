@@ -1,6 +1,7 @@
 import abc
 import pickle
 import time
+from threading import RLock
 
 
 class BaseBackend(metaclass=abc.ABCMeta):
@@ -124,6 +125,7 @@ class Simple(BaseBackend):
         self.threshold = threshold
         self.default_ttl = default_ttl
         self.prefix = prefix
+        self.lock = RLock()
 
     def _ttl2expire(self, ttl):
         if ttl is None:
@@ -159,17 +161,25 @@ class Simple(BaseBackend):
 
     def set(self, key, value, ttl=None):
         key = self.trans_key(key)
-        if len(self._cache) >= self.threshold \
-                and self._prune() >= self.threshold:
-            return False
-        self._cache[key] = (
-            self._ttl2expire(ttl), pickle.dumps(
-                value, pickle.HIGHEST_PROTOCOL))
+        with self.lock:
+            if len(self._cache) >= self.threshold \
+                    and self._prune() >= self.threshold:
+                return False
+            self._cache[key] = (
+                self._ttl2expire(ttl), pickle.dumps(
+                    value, pickle.HIGHEST_PROTOCOL))
         return True
 
     def set_many(self, mapping):
-        for k, v in mapping.items():
-            self.set(k, v)
+        count = len(mapping.keys())
+        with self.lock:
+            if len(self._cache) + count >= self.threshold \
+                    and self._prune() + count >= self.threshold:
+                return False
+            for k, v in mapping.items():
+                self._cache[self.trans_key(k)] = (
+                    self._ttl2expire(None), pickle.dumps(
+                        v, pickle.HIGHEST_PROTOCOL))
         return True
 
     def delete(self, key):
@@ -182,7 +192,8 @@ class Simple(BaseBackend):
         return 0
 
     def delete_many(self, keys):
-        return sum([self.delete(k) for k in keys])
+        with self.lock:
+            return sum([self.delete(k) for k in keys])
 
     def expire(self, key, seconds):
         key = self.trans_key(key)
