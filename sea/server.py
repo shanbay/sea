@@ -63,4 +63,4 @@ class Server:
         self.server.stop(0)
         self._stopped = True
         for name in self.app.servicers.keys():
-            self.register.deregister(name, self.publish_host, self.port)
+            self.register.deregister(name)
