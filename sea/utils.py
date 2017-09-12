@@ -38,6 +38,16 @@ class cached_property:
         return res
 
 
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
 def logger_has_level_handler(logger):
     """Check if there is a handler in the logging chain that will handle the
     given logger's :meth:`effective level <~logging.Logger.getEffectiveLevel>`.

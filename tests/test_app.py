@@ -25,8 +25,12 @@ def test_sea():
     _app.config.from_object(C)
     assert _app.debug
     assert _app.testing
+    _app.load_middlewares()
 
-    from app import servicers, extensions
+    assert len(_app.middlewares) == 2
+
+    with mock.patch('sea._app', new=_app):
+        from app import servicers, extensions
 
     _app.load_servicers_in_module(servicers)
     assert 'GreeterServicer' in _app.servicers
