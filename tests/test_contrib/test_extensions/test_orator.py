@@ -68,14 +68,14 @@ def test_cli(app):
             cli.main()
             assert sys.argv[1] == 'migrate'
             argv = ' '.join(sys.argv)
-            assert '--conf ./configs/default/orator.py' in argv
+            assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
 
             sys.argv = 'seaorator db:seed'.split()
             cli.main()
             assert sys.argv[1] == 'db:seed'
             argv = ' '.join(sys.argv)
-            assert '--conf ./configs/default/orator.py' in argv
+            assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/seeds' in argv
 
             sys.argv = 'seaorator make:migration'.split()
@@ -94,19 +94,19 @@ def test_cli(app):
             cli.main()
             assert sys.argv[1] == 'migrate:reset'
             argv = ' '.join(sys.argv)
-            assert '--conf ./configs/default/orator.py' in argv
+            assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
 
             sys.argv = 'seaorator migrate:rollback'.split()
             cli.main()
             assert sys.argv[1] == 'migrate:rollback'
             argv = ' '.join(sys.argv)
-            assert '--conf ./configs/default/orator.py' in argv
+            assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
 
             sys.argv = 'seaorator migrate:status'.split()
             cli.main()
             assert sys.argv[1] == 'migrate:status'
             argv = ' '.join(sys.argv)
-            assert '--conf ./configs/default/orator.py' in argv
+            assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv

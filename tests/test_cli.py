@@ -24,12 +24,9 @@ def test_cmd_server(app):
 def test_cmd_console(app):
     sys.argv = 'sea c'.split()
     mocked = mock.MagicMock()
-    with mock.patch.dict('sys.modules', {'IPython': mocked, 'code': mocked}):
+    with mock.patch.dict('sys.modules', {'IPython': mocked}):
         assert cli.main() == 0
         assert mocked.embed.called
-        mocked.embed.side_effect = ImportError
-        assert cli.main() == 0
-        assert mocked.interact.called
 
 
 def test_generate(app):
