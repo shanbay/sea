@@ -90,10 +90,11 @@ class ConsoleCmd(AbstractCommand):
         ctx = {'app': create_app(os.getcwd())}
         try:
             from IPython import embed
-            embed(banner1=banner, user_ns=ctx)
+            h, kwargs = embed, dict(banner1=banner, user_ns=ctx)
         except ImportError:
             import code
-            code.interact(banner, local=ctx)
+            h, kwargs = code.interact, dict(banner=banner, local=ctx)
+        h(**kwargs)
         return 0
 
 

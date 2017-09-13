@@ -64,7 +64,7 @@ class BaseExecCmd:
     def add_arguments(self):
         if self.ARG_CONF:
             self.add_argument(
-                '-c', '--conf', default=self.get_dbconfig(),
+                '-c', '--config', default=self.get_dbconfig(),
                 help='The config file path')
         self.add_argument(
             '-p', '--path',
@@ -81,7 +81,6 @@ class CmdMakeMigration(BaseCmd, BaseExecCmd):
 
 
 class CmdMakeSeed(BaseCmd, BaseExecCmd):
-    ARG_CONF = True
     ARG_PATH = 'seeds'
 
 
