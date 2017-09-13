@@ -207,8 +207,10 @@ def main():
             cmd.opt(subparsers).set_defaults(handler=cmd.run)
 
     args = sys.argv[1:]
-    args = root.parse_args(args)
-    return args.handler(args)
+    if len(args) > 0:
+        args = root.parse_args(args)
+        return args.handler(args)
+    root.print_help()
 
 
 def jobmain():
