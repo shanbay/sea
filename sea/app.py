@@ -22,6 +22,7 @@ class Sea:
         'DEBUG': False,
         'TESTING': False,
         'TIMEZONE': utils.offset2tz(),
+        'TIMEOUT': 2,
         'GRPC_WORKERS': 3,
         'GRPC_HOST': '[::]',
         'GRPC_PORT': 6000,

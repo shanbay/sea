@@ -1,5 +1,10 @@
 import sys
 import datetime
+from google.protobuf.json_format import (
+    MessageToDict,
+    MessageToJson,
+    ParseDict
+)
 
 
 def import_string(import_name):
@@ -64,3 +69,28 @@ def logger_has_level_handler(logger):
 
 def offset2tz(offset_in_hour=0):
     return datetime.timezone(datetime.timedelta(hours=offset_in_hour))
+
+
+def protobuf2json(message,
+                  including_default_value_fields=False,
+                  preserving_proto_field_name=False,
+                  indent=4,
+                  sort_keys=False):
+    return MessageToJson(
+        message, including_default_value_fields=including_default_value_fields,
+        preserving_proto_field_name=preserving_proto_field_name,
+        indent=indent, sort_keys=sort_keys
+    )
+
+
+def protobuf2dict(message,
+                including_default_value_fields=False,
+                preserving_proto_field_name=False):
+    return MessageToDict(
+        message, including_default_value_fields=including_default_value_fields,
+        preserving_proto_field_name=preserving_proto_field_name
+    )
+
+
+def dict2protobuf(d, message, ignore_unknown_fields=False):
+    return ParseDict(d, message, ignore_unknown_fields=ignore_unknown_fields)

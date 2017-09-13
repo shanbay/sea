@@ -12,7 +12,7 @@ class ConsulRegister:
             name, address=publish_host, port=port,
             check=Check.tcp(publish_host, port, "10s"))
 
-    def deregister(self, name, publish_host, port):
+    def deregister(self, name):
         return self.client.agent.service.deregister(name)
 
     def service_url(self, name):
