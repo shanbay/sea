@@ -21,7 +21,7 @@ class Sea:
     default_config = ImmutableDict({
         'DEBUG': False,
         'TESTING': False,
-        'TIMEZONE': utils.offset2tz(),
+        'TIMEZONE': 'UTC',
         'GRPC_WORKERS': 3,
         'GRPC_HOST': '[::]',
         'GRPC_PORT': 6000,

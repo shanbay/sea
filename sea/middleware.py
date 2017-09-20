@@ -1,4 +1,4 @@
-import datetime
+import pendulum
 import grpc
 
 from sea import exceptions
@@ -47,9 +47,9 @@ class RpcErrorMiddleware(BaseMiddleware):
 
 class ServiceLogMiddleware(BaseMiddleware):
     def __call__(self, servicer, request, context):
-        start_at = datetime.datetime.now(self.app.tz)
+        start_at = pendulum.now(self.app.tz)
         response = self.handler(servicer, request, context)
-        finish_at = datetime.datetime.now(self.app.tz)
+        finish_at = pendulum.now(self.app.tz)
         delta = finish_at - start_at
         self.app.logger.info(
             '[{}] {}.{} Called. Processed in {}s'.format(
