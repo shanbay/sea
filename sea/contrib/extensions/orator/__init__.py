@@ -1,5 +1,8 @@
-from sea.extensions import AbstractExtension
 import orator
+import pendulum
+
+from sea.extensions import AbstractExtension
+from sea import current_app
 
 
 class Orator(AbstractExtension):
@@ -14,3 +17,12 @@ class Orator(AbstractExtension):
 
     def __getattr__(self, name):
         return getattr(self._dbmanager, name)
+
+
+class Model(orator.Model):
+
+    def as_datetime(self, value):
+        rt = super().as_datetime(value)
+        if isinstance(rt, pendulum.pendulum.Pendulum):
+            rt = rt.in_timezone(current_app().tz)
+        return rt

@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 
 def import_string(import_name):
@@ -60,7 +59,3 @@ def logger_has_level_handler(logger):
         current = current.parent
 
     return False
-
-
-def offset2tz(offset_in_hour=0):
-    return datetime.timezone(datetime.timedelta(hours=offset_in_hour))
