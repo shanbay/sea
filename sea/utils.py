@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 
 def import_string(import_name):
