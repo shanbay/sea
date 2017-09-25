@@ -1,7 +1,7 @@
 from types import FunctionType
 from functools import wraps
 
-from sea import current_app
+from sea import current_app, exceptions
 
 
 def wrap_handler(handler):
@@ -25,3 +25,21 @@ class ServicerMeta(type):
                 v = wrap_handler(v)
             _kws[k] = v
         return super().__new__(cls, name, bases, _kws)
+
+
+def params_required(*keys):
+    def wrapper(handler):
+        @wraps(handler)
+        def wrapped(self, request, context):
+            params = {k: getattr(request, k, None) for k in keys}
+            missed = [k for k, v in params.items() if v is None]
+            if missed:
+                raise exceptions.BadRequestException(
+                    'params missed: {}'.format(missed))
+            return handler(self, request, context)
+        return wrapped
+    return wrapper
+
+
+def extract_params(request, keys):
+    return {k: getattr(request, k) for k in keys}
