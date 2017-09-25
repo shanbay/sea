@@ -1,4 +1,5 @@
 import grpc
+import json
 
 
 class ConfigException(RuntimeError):
@@ -11,6 +12,11 @@ class RpcException(Exception):
     details = None
 
     def __init__(self, message, *args, **kwargs):
+        if isinstance(message, (list, dict)):
+            message = json.dumps(
+                message, default=str, ensure_ascii=False)
+        if not isinstance(message, str):
+            message = str(message)
         self.details = message
         super().__init__(message, *args, **kwargs)
 
