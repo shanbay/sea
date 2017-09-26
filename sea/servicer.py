@@ -1,7 +1,7 @@
 from types import FunctionType
 from functools import wraps
 
-from sea import current_app, exceptions
+from sea import current_app
 
 
 def wrap_handler(handler):
