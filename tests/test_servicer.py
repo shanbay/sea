@@ -1,6 +1,6 @@
 import grpc
 
-from sea.servicer import ServicerMeta, params_required, extract_params
+from sea.servicer import ServicerMeta, msg2dict
 from sea import exceptions
 from sea.pb2 import default_pb2
 
@@ -27,33 +27,15 @@ def test_meta_servicer(app, logstream):
         def return_normal(self, request, context):
             return 'Got it!'
 
-        @params_required('username', 'password')
-        def need_params(self, request, context):
-            return 'Yeah'
-
     logstream.truncate(0)
     logstream.seek(0)
 
     servicer = HelloServicer()
-
-    request = app
     context = HelloContext()
-    ret = servicer.return_error(request, context)
+    ret = servicer.return_error(None, context)
     assert isinstance(ret, default_pb2.Empty)
     assert context.code is grpc.StatusCode.INVALID_ARGUMENT
     assert context.details == 'error'
-
-    request = app
-    request.password = 'password'
-    context = HelloContext()
-    ret = servicer.need_params(request, context)
-    assert isinstance(ret, default_pb2.Empty)
-    assert context.code is grpc.StatusCode.INVALID_ARGUMENT
-    assert 'username' in context.details
-    assert 'password' not in context.details
-    request.username = 'username'
-    ret = servicer.need_params(request, context)
-    assert ret == 'Yeah'
 
     p = logstream.tell()
     assert p > 0
@@ -66,8 +48,8 @@ def test_meta_servicer(app, logstream):
     assert logstream.tell() > p
 
 
-def test_extract_params(app):
-    o = app
-    o.x = 1
-    o.y = 2
-    assert extract_params(o, ['x', 'y']) == {'x': 1, 'y': 2}
+def test_msg2dict(app):
+    app.name = 'v-name'
+    app.msg = 'v-msg'
+    ret = msg2dict(app, ['name', 'msg', 'tz'])
+    assert ret == {'name': 'v-name', 'msg': 'v-msg', 'tz': 'UTC'}
