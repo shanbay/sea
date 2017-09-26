@@ -27,5 +27,13 @@ class ServicerMeta(type):
         return super().__new__(cls, name, bases, _kws)
 
 
-def msg2dict(msg, keys):
-    return {k: getattr(msg, k) for k in keys}
+def msg2dict(msg, keys=None):
+    if keys is not None:
+        return {k: getattr(msg, k) for k in keys}
+
+    return {k.name: v
+            for k, v in msg.ListFields()}
+
+
+def stream2dict(stream):
+    yield from map(msg2dict, stream)
