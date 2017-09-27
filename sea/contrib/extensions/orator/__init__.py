@@ -11,8 +11,8 @@ class Orator(AbstractExtension):
         self._dbmanager = None
 
     def init_app(self, app):
-        conf_m = app.config.get('ORATOR')
-        self._dbmanager = orator.DatabaseManager(conf_m.DATABASES)
+        self._dbmanager = orator.DatabaseManager(
+            app.config.get('DATABASES'))
         orator.Model.set_connection_resolver(self._dbmanager)
 
     def __getattr__(self, name):

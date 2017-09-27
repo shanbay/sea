@@ -1,5 +1,5 @@
-{% if not skip_orator -%}from . import orator as ORATOR{%- endif %}
-{% if not skip_celery -%}from . import celery as CELERY{%- endif %}
+{% if not skip_orator -%}from .orator import *{%- endif %}
+{% if not skip_celery -%}from .celery import *{%- endif %}
 {% if not skip_cache -%}
 CACHE_BACKEND = 'Redis'
 CACHE_PREFIX = '{{ project }}'
