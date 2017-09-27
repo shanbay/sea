@@ -1,5 +1,5 @@
-from . import celery as CELERY
-from . import orator as ORATOR
+from .orator import *
+from .celery import *
 
 CACHE_BACKEND = 'Redis'
 
