@@ -35,7 +35,7 @@ class Cache(AbstractExtension):
         self._backend = None
 
     def init_app(self, app):
-        opts = app.config.get_namespace('CACHE_')
+        opts = app.config.get_namespace('CACHE_').copy()
         backend_cls = getattr(backends, opts.pop('backend'))
         prefix = opts.pop('prefix', app.name)
         # default ttl: 60 * 60 * 48

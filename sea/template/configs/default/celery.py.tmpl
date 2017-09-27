@@ -1,6 +1,6 @@
-broker_url = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
 
-task_queues = {
+CELERY_TASK_QUEUES = {
     '{{ project }}.direct': {
         'exchange': '{{ project }}-exchange',
         'exchange_type': 'direct',
@@ -8,12 +8,12 @@ task_queues = {
     },
 }
 
-task_default_queue = '{{ project }}.celery'
+CELERY_TASK_DEFAULT_QUEUE = '{{ project }}.celery'
 
-task_routes = {
+CELERY_TASK_ROUTES = {
     'app.tasks.*': {
-        'queue': task_default_queue,
+        'queue': CELERY_TASK_DEFAULT_QUEUE,
     },
 }
 
-imports = ['app.tasks']
+CELERY_IMPORTS = ['app.tasks']

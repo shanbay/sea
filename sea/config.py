@@ -1,3 +1,6 @@
+from sea.datatypes import ConstantsObject
+
+
 class ConfigAttribute(object):
     """Makes an attribute forward to the config"""
 
@@ -40,7 +43,7 @@ class Config(dict):
             if lowercase:
                 key = key.lower()
             rv[key] = v
-        return rv
+        return ConstantsObject(rv)
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))
