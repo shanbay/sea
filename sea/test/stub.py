@@ -32,4 +32,3 @@ class Stub():
 
     def __getattr__(self, handler):
         return _handler_wrapper(getattr(self.servicer, handler))
-
