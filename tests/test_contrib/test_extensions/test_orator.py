@@ -16,7 +16,7 @@ def test_orator(app):
         mocked.assert_called_once_with()
 
 
-def test_model_meta(cache, table_user):
+def test_model_meta(cache, db):
     from app.models import User
 
     assert hasattr(User, 'find_by')
@@ -37,16 +37,20 @@ def test_model_meta(cache, table_user):
 
     c1 = User.create(username='c1', age=5)
     c2 = User.create(username='c2', age=2)
+    k1 = User.find.make_cache_key(User, c1.id)
+    k2 = User.find.make_cache_key(User, c2.id)
     User.find(c1.id)
+    assert cache.exists(k1)
+    assert not cache.exists(k2)
     children = User.find([c1.id, c2.id])
-    key = User.find.make_cache_key(User, c2.id)
-    assert cache.exists(key)
+    assert cache.exists(k2)
     assert len(children) == 2
     with mock.patch('sea.contrib.extensions.orator.cache_model._bulk_register_to_related_caches') as mocked:
         User.find([c1.id, c2.id])
         assert not mocked.called
     jack.children().save_many([c1, c2])
-    assert not cache.exists(key)
+    assert not cache.exists(k1)
+    assert not cache.exists(k2)
 
 
 def test_cli(app):
