@@ -17,17 +17,14 @@ def test_sea():
     assert _app.extensions == {}
     assert _app.servicers == {}
 
-    class C(object):
-        DEBUG = True
-        TESTING = True
-        TEST_KEY = 'foo'
+    from configs import testing
 
-    _app.config.from_object(C)
+    _app.config.from_object(testing)
     assert _app.debug
     assert _app.testing
     _app.load_middlewares()
 
-    assert len(_app.middlewares) == 2
+    assert len(_app.middlewares) == 3
 
     with mock.patch('sea._app', new=_app):
         from app import servicers, extensions

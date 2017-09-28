@@ -1,8 +1,8 @@
 from orator.orm import model
 
 from sea import current_app
-from sea import exceptions
-from sea.contrib.extensions.cache import default_key, backends
+from sea.utils import import_string
+from sea.contrib.extensions.cache import default_key
 
 
 def _model_cache_key(f, cls, *args, **kwargs):
@@ -53,10 +53,7 @@ def _id_is_list(cls, id, **kwargs):
 
 class ModelMeta(model.MetaModel):
     def __new__(mcls, name, bases, kws):
-        cache = current_app().extensions['cache']
-        if not isinstance(cache._backend, backends.Redis):
-            raise exceptions.ConfigException('Only Support Redis Backend')
-
+        cache = import_string('app.extensions:cache')
         max_find_many_cache = kws.get('__max_find_many_cache__', 10)
 
         @classmethod
