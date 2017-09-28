@@ -102,3 +102,4 @@ ENV/
 .mypy_cache/
 *.db
 *.sqlite3
+*.sql
