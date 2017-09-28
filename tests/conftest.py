@@ -6,8 +6,6 @@ from io import StringIO
 from orator import Schema
 
 import sea
-from sea.contrib.extensions.orator import Orator
-from sea.contrib.extensions.cache import Cache
 
 os.environ.setdefault('SEA_ENV', 'testing')
 
@@ -34,20 +32,15 @@ def app(logstream):
 
 @pytest.fixture(scope='module')
 def db(app):
-    db = Orator()
-    app.register_extension('db', db)
-    yield db
-    app.extensions.pop('db')
+    return app.extensions['db']
 
 
 @pytest.fixture
 def cache(app):
-    cache = Cache()
-    app.register_extension('cache', cache)
+    cache = app.extensions['cache']
     cache.clear()
     yield cache
     cache.clear()
-    app.extensions.pop('cache')
 
 
 @pytest.fixture

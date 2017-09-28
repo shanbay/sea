@@ -2,6 +2,6 @@ DATABASES = {
     'default': 'db',
     'db': {
         'driver': 'sqlite',
-        'database': ':memory:'
+        'database': 'tests/sea.db'
     }
 }
