@@ -17,18 +17,17 @@ class Context():
         return self.metadata
 
 
-def _handler_wrapper(handler):
-    def wrapped(msg, metadata=None):
-        ctx = Context()
-        ctx.initial_metadata(metadata)
-        return handler(msg, ctx)
-    return wrapped
-
-
 class Stub():
 
     def __init__(self, servicer=None):
         self.servicer = servicer
 
     def __getattr__(self, handler):
-        return _handler_wrapper(getattr(self.servicer, handler))
+        return self._handler_wrapper(getattr(self.servicer, handler))
+
+    def _handler_wrapper(self, handler):
+        def wrapped(msg, metadata=None):
+            self.ctx = Context()
+            self.ctx.initial_metadata(metadata)
+            return handler(msg, self.ctx)
+        return wrapped
