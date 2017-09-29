@@ -25,11 +25,11 @@ def _register_to_related_caches(f, id, cls, *args, **kwargs):
     return True
 
 
-def _register_to_related_caches_find(f, ins, cls, *args, **kwargs):
+def _find_register(f, ins, cls, *args, **kwargs):
     return _register_to_related_caches(f, args[0], cls, *args, **kwargs)
 
 
-def _register_to_related_caches_find_by(f, ins, cls, *args, **kwargs):
+def _find_by_register(f, ins, cls, *args, **kwargs):
     if ins is None:
         return True
     return _register_to_related_caches(f, ins.id, cls, *args, **kwargs)
@@ -69,7 +69,7 @@ class ModelMeta(model.MetaModel):
         @classmethod
         @cache.cached(
             cache_key=_model_cache_key,
-            fallbacked=_register_to_related_caches_find,
+            fallbacked=_find_register,
             unless=_id_is_list, cache_none=True)
         def find(cls, id, columns=None):
             if isinstance(id, list) and id and len(id) <= max_find_many_cache:
@@ -96,7 +96,7 @@ class ModelMeta(model.MetaModel):
         @classmethod
         @cache.cached(
             cache_key=_model_cache_key,
-            fallbacked=_register_to_related_caches_find_by)
+            fallbacked=_find_by_register)
         def find_by(cls, name, val, columns=None):
             return cls.where(name, '=', val).first(columns)
 
