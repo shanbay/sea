@@ -20,7 +20,22 @@ sea 命令
 seak 命令
 ^^^^^^^^^
 
+seak 命令用于执行任务，首先你需要在 jobs 目录中事先定义好任务::
 
+    from sea.cli import jobm, JobException
+    from sea import current_app
+
+
+    @jobm.job('plusone')
+    @jobm.option('-n', '--number', type=int)
+    def f2(number):
+        app = current_app()
+        app.config['NUMBER'] = number + 1
+
+``@jobm.job`` 中的参数是任务名称
+``@jobm.option()`` 用于添加参数
+
+在 terminal 中 执行 ``seak plusone -n 100`` 即可执行此任务
 
 seaorator 命令
 ^^^^^^^^^^^^^^

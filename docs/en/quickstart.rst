@@ -53,6 +53,7 @@ create ``protos/helloworld.proto`` like this::
     // The response message containing the greetings
     message HelloReply {
       string message = 1;
+    }
 
 
 run this command ``sea generate -I . helloworld.proto``. first argument is the dir containing proto file,
@@ -60,8 +61,7 @@ second argument is the proto file name. After this command,  protos dir will be 
 
     protos
     ├── helloworld_pb2_grpc.py
-    ├── helloworld_pb2.py
-    └── helloworld.proto
+    └── helloworld_pb2.py
 
 overwrite ``app/servicer.py`` like following::
 
@@ -94,7 +94,7 @@ Then create the client::
 
 
     if __name__ == '__main__':
-    run()
+      run()
 
 run this script. if successful, you will see::
 
