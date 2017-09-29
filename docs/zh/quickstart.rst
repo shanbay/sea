@@ -1,11 +1,11 @@
 QuickStart
 ==========
 
-let's create a project named helloworld::
+让我们来创建第一个项目 helloworld::
 
     sea new helloworld
 
-It will generate following driectories and files automaticlly::
+这条命令会自动生成以下目录及文件::
 
     .
     ├── app
@@ -32,8 +32,7 @@ It will generate following driectories and files automaticlly::
     └── tests
         └── __init__.py
 
-
-create ``protos/helloworld.proto`` like this::
+创建 ``protos/helloworld.proto`` 文件::
 
     syntax = "proto3";
 
@@ -53,17 +52,16 @@ create ``protos/helloworld.proto`` like this::
     // The response message containing the greetings
     message HelloReply {
       string message = 1;
+    }
 
-
-run this command ``sea generate -I . helloworld.proto``. first argument is the dir containing proto file,
-second argument is the proto file name. After this command,  protos dir will be added two files::
+运行 ``sea generate -I . helloworld.proto`` 命令后, ``protos`` 目录下会生成 proto 文件对应的 Python 版本
+这条命令的第一个参数是 proto 文件所在的目录，第二个参数是 proto 文件的名字::
 
     protos
     ├── helloworld_pb2_grpc.py
-    ├── helloworld_pb2.py
-    └── helloworld.proto
+    └── helloworld_pb2.py
 
-overwrite ``app/servicer.py`` like following::
+使用下面的内容重写 ``app/servicer.py``::
 
     import helloworld_pb2
     import helloworld_pb2_grpc
@@ -76,9 +74,9 @@ overwrite ``app/servicer.py`` like following::
         def SayHello(self, request, context):
             return helloworld_pb2.HelloReply(message='Hello, %s!' % request.name)
 
-run ``sea server --host address``, host argument is your publish host, in order for the client to find you
+运行 ``sea server --host 127.0.0.1``，``host`` 参数是你的发布端口，client 可以通过此端口来找到你。这样 server 就已经运行起来了
 
-Then create the client::
+然后创建 client::
 
     import grpc
 
@@ -94,8 +92,8 @@ Then create the client::
 
 
     if __name__ == '__main__':
-    run()
+      run()
 
-run this script. if successful, you will see::
+运行这段代码，你会发现成功地收到 server 端的 echo
 
     Greeter client received: Hello, you!
