@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>configuation &#8212; sea 0.3 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="command" href="command.html" />
+    <link rel="prev" title="introduction" href="introduction.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="configuation">
+<h1>configuation<a class="headerlink" href="#configuation" title="Permalink to this headline">¶</a></h1>
+<p>sea 支持多种环境配置，<code class="docutils literal"><span class="pre">default</span></code> <code class="docutils literal"><span class="pre">development</span></code> <code class="docutils literal"><span class="pre">testing</span></code> 等。你需要将他们置于工程根目录的 <code class="docutils literal"><span class="pre">configs</span></code> 目录下，如下面这样:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">configs</span>
+<span class="o">|--</span> <span class="n">default</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="n">celery</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="n">orator</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|--</span> <span class="n">development</span>
+<span class="o">|</span>   <span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="o">|--</span> <span class="n">testing</span>
+    <span class="o">|--</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>sea 在启动时会根据环境变量 <code class="docutils literal"><span class="pre">SEA_ENV</span></code> 来决定使用哪份配置文件，就像这样 <code class="docutils literal"><span class="pre">SEA_ENV=testing</span> <span class="pre">sea</span> <span class="pre">server</span></code>。此环境变量的值应当为 <code class="docutils literal"><span class="pre">configs</span></code> 下的某一目录名称。默认是使用 <code class="docutils literal"><span class="pre">development</span></code> 配置。</p>
+<p>配置应当以变量的形式给出，变量名需大写 比如 <code class="docutils literal"><span class="pre">CACHE_BACKEND</span> <span class="pre">=</span> <span class="pre">redis</span></code></p>
+<p>sea 会将所有的配置构建成 <code class="docutils literal"><span class="pre">sea.config.Config</span></code> 类的对象，你可以通过 <code class="docutils literal"><span class="pre">Config</span></code> 类的实例的 <code class="docutils literal"><span class="pre">get_namespace</span></code> 方法获取以某一命名空间开头的配置变量</p>
+<p>例如在 sea 的 redis 扩展中就是这样获取配置的:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Redis</span><span class="p">(</span><span class="n">AbstractExtension</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">init_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_namespace</span><span class="p">(</span><span class="s1">&#39;REDIS_&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pool</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">ConnectionPool</span><span class="p">(</span><span class="o">**</span><span class="n">opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span><span class="n">connection_pool</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pool</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="basic">
+<h2>Basic<a class="headerlink" href="#basic" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>DEBUG: <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code> 是否显示调试信息</li>
+<li>TESTING:</li>
+<li>TIMEZONE: 时区 如 <code class="docutils literal"><span class="pre">UTC</span></code></li>
+</ul>
+</div>
+<div class="section" id="cache">
+<h2>Cache<a class="headerlink" href="#cache" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>CACHE_BACKEND: 某种缓存系统 如 <code class="docutils literal"><span class="pre">Redis</span></code></li>
+<li>CACHE_PREFIX: 缓存 Key 前缀</li>
+<li>CACHE_HOST: 主机名</li>
+<li>CACHE_DB: 数据库</li>
+<li>CACHE_PORT: 端口号</li>
+<li>CACHE_PASSWORD: 连接密码</li>
+</ul>
+</div>
+<div class="section" id="grpc">
+<h2>gRPC<a class="headerlink" href="#grpc" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>GRPC_WORKERS: workers 数量</li>
+<li>GRPC_HOST:</li>
+<li>GRPC_PORT: grpc server 监听端口</li>
+<li>GRPC_LOG_LEVEL: grpc 日志级别</li>
+<li>GRPC_LOG_HANDLER: <code class="docutils literal"><span class="pre">logging.StreamHandler()</span></code></li>
+<li>GRPC_LOG_FORMAT: 日志格式 如 <code class="docutils literal"><span class="pre">'[%(asctime)s</span> <span class="pre">%(levelname)s</span> <span class="pre">in</span> <span class="pre">%(module)s]</span> <span class="pre">%(message)s'</span></code></li>
+</ul>
+</div>
+<div class="section" id="celery">
+<h2>Celery<a class="headerlink" href="#celery" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">CELERY_BROKER_URL: 如 <code class="docutils literal"><span class="pre">redis://localhost:6379/1</span></code></p>
+</li>
+<li><p class="first">CELERY_TASK_QUEUES:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;demo.direct&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;exchange&#39;</span><span class="p">:</span> <span class="s1">&#39;demo-exchange&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exchange_type&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;routing_key&#39;</span><span class="p">:</span> <span class="s1">&#39;demo.direct&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">CELERY_TASK_DEFAULT_QUEUE: 如 ‘demo.celery’</p>
+</li>
+<li><p class="first">CELERY_TASK_ROUTES:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;app.tasks.*&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;queue&#39;</span><span class="p">:</span> <span class="n">CELERY_TASK_DEFAULT_QUEUE</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">CELERY_IMPORTS = [‘app.tasks’]</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">sea</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">QuickStart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Turtorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">introduction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">configuation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="command.html">command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="servicer.html">servicer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="application.html">application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exception.html">exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extension.html">extenstion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="middleware.html">middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test.html">test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">utilities</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Turtorial</a><ul>
+      <li>Previous: <a href="introduction.html" title="previous chapter">introduction</a></li>
+      <li>Next: <a href="command.html" title="next chapter">command</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, shanbay.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/tutorial/config.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

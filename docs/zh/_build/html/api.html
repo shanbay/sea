@@ -1,0 +1,192 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API &#8212; sea 0.3 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="utilities" href="tutorial/utilities.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sea-object">
+<h2>Sea Object<a class="headerlink" href="#sea-object" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sea.app.Sea">
+<em class="property">class </em><code class="descclassname">sea.app.</code><code class="descname">Sea</code><span class="sig-paren">(</span><em>root_path</em>, <em>env='development'</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sea/app.html#Sea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sea.app.Sea" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Sea object implements grpc application</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root_path</strong> – the root path</li>
+<li><strong>env</strong> – the env default is ‘development’</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sea.app.Sea.register_extension">
+<code class="descname">register_extension</code><span class="sig-paren">(</span><em>name</em>, <em>ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sea/app.html#Sea.register_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sea.app.Sea.register_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>register extension</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – extension name</li>
+<li><strong>ext</strong> – extension object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sea.app.Sea.register_servicer">
+<code class="descname">register_servicer</code><span class="sig-paren">(</span><em>servicer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sea/app.html#Sea.register_servicer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sea.app.Sea.register_servicer" title="Permalink to this definition">¶</a></dt>
+<dd><p>register serviser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>servicer</strong> – servicer</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="server-object">
+<h2>Server Object<a class="headerlink" href="#server-object" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sea.server.Server">
+<em class="property">class </em><code class="descclassname">sea.server.</code><code class="descname">Server</code><span class="sig-paren">(</span><em>app</em>, <em>publish_host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sea/server.html#Server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sea.server.Server" title="Permalink to this definition">¶</a></dt>
+<dd><p>sea server implements</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>app</strong> – application instance</li>
+<li><strong>publish_host</strong> – publish host</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="sea.server.Server.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sea/server.html#Server.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sea.server.Server.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>run the server</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">sea</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">QuickStart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/index.html">Turtorial</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sea-object">Sea Object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server-object">Server Object</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial/utilities.html" title="previous chapter">utilities</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, shanbay.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

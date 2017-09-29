@@ -1,0 +1,214 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>sea.app &#8212; sea 0.3 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sea.app</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">from</span> <span class="nn">sea</span> <span class="k">import</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">sea.config</span> <span class="k">import</span> <span class="n">Config</span><span class="p">,</span> <span class="n">ConfigAttribute</span>
+<span class="kn">from</span> <span class="nn">sea.datatypes</span> <span class="k">import</span> <span class="n">ImmutableDict</span>
+<span class="kn">from</span> <span class="nn">sea.extensions</span> <span class="k">import</span> <span class="n">AbstractExtension</span>
+
+
+<div class="viewcode-block" id="Sea"><a class="viewcode-back" href="../../api.html#sea.app.Sea">[docs]</a><span class="k">class</span> <span class="nc">Sea</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The Sea object implements grpc application</span>
+
+<span class="sd">    :param root_path: the root path</span>
+<span class="sd">    :param env: the env default is &#39;development&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_class</span> <span class="o">=</span> <span class="n">Config</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="n">ConfigAttribute</span><span class="p">(</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+    <span class="n">testing</span> <span class="o">=</span> <span class="n">ConfigAttribute</span><span class="p">(</span><span class="s1">&#39;TESTING&#39;</span><span class="p">)</span>
+    <span class="n">tz</span> <span class="o">=</span> <span class="n">ConfigAttribute</span><span class="p">(</span><span class="s1">&#39;TIMEZONE&#39;</span><span class="p">)</span>
+    <span class="n">default_config</span> <span class="o">=</span> <span class="n">ImmutableDict</span><span class="p">({</span>
+        <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;TESTING&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;TIMEZONE&#39;</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">offset2tz</span><span class="p">(),</span>
+        <span class="s1">&#39;GRPC_WORKERS&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;GRPC_HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;[::]&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GRPC_PORT&#39;</span><span class="p">:</span> <span class="mi">6000</span><span class="p">,</span>
+        <span class="s1">&#39;GRPC_LOG_LEVEL&#39;</span><span class="p">:</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GRPC_LOG_HANDLER&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(),</span>
+        <span class="s1">&#39;GRPC_LOG_FORMAT&#39;</span><span class="p">:</span> <span class="s1">&#39;[</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1"> in </span><span class="si">%(module)s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># NOQA</span>
+        <span class="s1">&#39;REGISTER_CLASS&#39;</span><span class="p">:</span> <span class="s1">&#39;sea.register.ConsulRegister&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;REGISTER_CLIENT&#39;</span><span class="p">:</span> <span class="s1">&#39;consul&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;CONSUL_HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;CONSUL_PORT&#39;</span><span class="p">:</span> <span class="mi">8500</span><span class="p">,</span>
+        <span class="s1">&#39;CONSUL_DC&#39;</span><span class="p">:</span> <span class="s1">&#39;consul&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;MIDDLEWARES&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s1">&#39;sea.middleware.RpcErrorMiddleware&#39;</span>
+        <span class="p">]</span>
+    <span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_path</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="s1">&#39;development&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">root_path</span><span class="p">):</span>
+            <span class="n">root_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">root_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_path</span> <span class="o">=</span> <span class="n">root_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">root_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_class</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servicers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@utils</span><span class="o">.</span><span class="n">cached_property</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;sea.app&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="ow">and</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">utils</span><span class="o">.</span><span class="n">logger_has_level_handler</span><span class="p">(</span><span class="n">logger</span><span class="p">):</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">logger</span>
+
+<div class="viewcode-block" id="Sea.register_servicer"><a class="viewcode-back" href="../../api.html#sea.app.Sea.register_servicer">[docs]</a>    <span class="k">def</span> <span class="nf">register_servicer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">servicer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;register serviser</span>
+
+<span class="sd">        :param servicer: servicer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">servicer</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">servicers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ConfigException</span><span class="p">(</span>
+                <span class="s1">&#39;servicer duplicated: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">add_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_servicer_add_func</span><span class="p">(</span><span class="n">servicer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servicers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">add_func</span><span class="p">,</span> <span class="n">servicer</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_servicer_add_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">servicer</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">servicer</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Servicer&#39;</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmodule</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;add_</span><span class="si">{}</span><span class="s1">_to_server&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Sea.register_extension"><a class="viewcode-back" href="../../api.html#sea.app.Sea.register_extension">[docs]</a>    <span class="k">def</span> <span class="nf">register_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;register extension</span>
+
+<span class="sd">        :param name: extension name</span>
+<span class="sd">        :param ext: extension object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ext</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ConfigException</span><span class="p">(</span>
+                <span class="s1">&#39;extension duplicated: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span></div>
+
+    <span class="k">def</span> <span class="nf">load_middlewares</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sea.middleware.GuardMiddleware&#39;</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MIDDLEWARES&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">mn</span> <span class="ow">in</span> <span class="n">mids</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">import_string</span><span class="p">(</span><span class="n">mn</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_extensions_in_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_ext_name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+            <span class="n">_ext</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">_ext_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_ext</span><span class="p">,</span> <span class="n">AbstractExtension</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">register_extension</span><span class="p">(</span><span class="n">_ext_name</span><span class="p">,</span> <span class="n">_ext</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_servicers_in_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_servicer</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_servicer</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Servicer&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">register_servicer</span><span class="p">(</span><span class="n">_servicer</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">sea</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">QuickStart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/index.html">Turtorial</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, shanbay.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
