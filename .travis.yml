@@ -11,6 +11,7 @@ script:
   - flake8 sea --exclude=*_pb2.py
   - pytest tests
   - sphinx-build -q -E -n -W -b html ./docs/zh/ ./docs/zh/_build/html
+  - sphinx-build -q -E -n -W -b html ./docs/en/ ./docs/en/_build/html
 after_success:
   - CODECLIMATE_REPO_TOKEN=19c5e18e184070a726bb6fc703e321e526ca638df16f9623654044bcccdb1a9d codeclimate-test-reporter
   - coveralls
