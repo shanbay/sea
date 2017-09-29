@@ -82,6 +82,7 @@ class CmdMakeMigration(BaseCmd, BaseExecCmd):
 
 class CmdMakeSeed(BaseCmd, BaseExecCmd):
     ARG_PATH = 'seeds'
+    ARG_CONF = False
 
 
 class CmdMigrate(BaseCmd, BaseExecCmd):
