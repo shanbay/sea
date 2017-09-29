@@ -25,6 +25,10 @@ def default_key(f, *args, **kwargs):
     return 'default.{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
 
 
+class CacheNone:
+    pass
+
+
 class Cache(AbstractExtension):
 
     PROTO_METHODS = ('get', 'get_many', 'set', 'set_many', 'delete',
@@ -44,7 +48,7 @@ class Cache(AbstractExtension):
             **opts)
 
     def cached(self, ttl=None, cache_key=default_key,
-               unless=None, fallbacked=None):
+               unless=None, fallbacked=None, cache_none=False):
         def decorator(f):
             @functools.wraps(f)
             def wrapper(*args, **kwargs):
@@ -52,11 +56,16 @@ class Cache(AbstractExtension):
                     return f(*args, **kwargs)
                 key = wrapper.make_cache_key(*args, **kwargs)
                 rv = self.get(key)
-                if rv is None and not self.exists(key):
+                if rv is None:
                     rv = f(*args, **kwargs)
-                    self.set(key, rv, ttl=wrapper.ttl)
+                    if cache_none and rv is None:
+                        rv = CacheNone
+                    if rv is not None:
+                        self.set(key, rv, ttl=wrapper.ttl)
                     if callable(fallbacked):
                         fallbacked(wrapper, rv, *args, **kwargs)
+                if cache_none and rv is CacheNone:
+                    return None
                 return rv
 
             def make_cache_key(*args, **kwargs):

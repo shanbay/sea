@@ -52,6 +52,9 @@ def test_model_meta(cache, db):
     assert not cache.exists(k1)
     assert not cache.exists(k2)
 
+    assert User.find(1000) is None
+    assert len(User.find([c1.id, 2000])) == 1
+
 
 def test_cli(app):
     sys.argv = ['seaorator', '-h']
