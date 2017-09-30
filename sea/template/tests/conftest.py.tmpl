@@ -1,0 +1,14 @@
+import pytest
+import os
+
+import sea
+from sea.test.fixtures import *
+
+
+os.environ.setdefault('SEA_ENV', 'testing')
+_app = sea.create_app(os.getcwd())
+
+
+@pytest.fixture(scope='session')
+def app():
+    return _app
