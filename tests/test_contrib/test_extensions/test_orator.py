@@ -2,6 +2,7 @@ from unittest import mock
 import sys
 import pytest
 
+from orator.exceptions.orm import ModelNotFound
 from sea.contrib.extensions import orator
 from sea.contrib.extensions.orator import cli
 
@@ -34,6 +35,13 @@ def test_model_meta(cache, db):
     jane.husband().associate(jack)
     jane.save()
     assert not cache.exists(key)
+
+    assert User.find_or_fail(jack.id).username == jack.username
+    with pytest.raises(ModelNotFound):
+        User.find_or_fail(0)
+    assert User.find_by_or_fail('username', jack.username).id == jack.id
+    with pytest.raises(ModelNotFound):
+        User.find_by_or_fail('username', 'no')
 
     c1 = User.create(username='c1', age=5)
     c2 = User.create(username='c2', age=2)
