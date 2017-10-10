@@ -3,8 +3,7 @@ import grpc
 from sea.pb2 import default_pb2
 from sea.middleware import BaseMiddleware
 from orator.exceptions.orm import (
-    ModelNotFound, RelatedClassNotFound,
-    ValidationError, MassAssignmentError)
+    ModelNotFound, RelatedClassNotFound, ValidationError)
 
 
 class OratorExceptionMiddleware(BaseMiddleware):

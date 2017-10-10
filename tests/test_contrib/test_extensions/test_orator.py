@@ -1,10 +1,14 @@
 from unittest import mock
 import sys
 import pytest
+from grpc import StatusCode
 
-from orator.exceptions.orm import ModelNotFound
+from orator.exceptions.orm import (ModelNotFound, RelatedClassNotFound,
+                                   ValidationError)
 from sea.contrib.extensions import orator
 from sea.contrib.extensions.orator import cli
+from sea.contrib.extensions.orator.middleware import OratorExceptionMiddleware
+from sea.test.stub import Context
 
 
 def test_orator(app):
@@ -125,3 +129,32 @@ def test_cli(app):
             argv = ' '.join(sys.argv)
             assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
+
+
+def orator_handler(servicer, request, context):
+    if request == 0:
+        class NotFound(object):
+            def __init__(self):
+                self.__name__ = 'not_found'
+        raise ModelNotFound(NotFound())
+    if request == 1:
+        raise RelatedClassNotFound('father')
+    if request == 2:
+        raise ValidationError({'general': [1, 2], 'name': 'invalid'})
+    return context
+
+
+def test_orator_exception_middleware(app):
+    h = OratorExceptionMiddleware(app, orator_handler, orator_handler)
+
+    ctx = Context()
+    h(None, 0, ctx)
+    assert ctx.code == StatusCode.NOT_FOUND
+
+    ctx = Context()
+    h(None, 1, ctx)
+    assert ctx.code == StatusCode.NOT_FOUND
+
+    ctx = Context()
+    h(None, 2, ctx)
+    assert ctx.code == StatusCode.INVALID_ARGUMENT
