@@ -3,6 +3,7 @@ from orator.orm import model
 from sea import current_app
 from sea.utils import import_string
 from sea.contrib.extensions.cache import default_key, CacheNone
+from orator.exceptions.orm import ModelNotFound
 
 
 def _model_cache_key(f, cls, *args, **kwargs):
@@ -30,7 +31,7 @@ def _find_register(f, ins, cls, *args, **kwargs):
 
 
 def _find_by_register(f, ins, cls, *args, **kwargs):
-    if ins is None:
+    if ins is None or ins is CacheNone:
         return True
     return _register_to_related_caches(f, ins.id, cls, *args, **kwargs)
 
@@ -57,7 +58,7 @@ def _clear_related_caches(instance):
     return True
 
 
-def _id_is_list(cls, id, **kwargs):
+def _id_is_list(cls, id, *args, **kwargs):
     return isinstance(id, list)
 
 
@@ -94,15 +95,37 @@ class ModelMeta(model.MetaModel):
             return super(cls, cls).find(id, columns)
 
         @classmethod
+        def find_or_fail(cls, id, columns=None):
+            result = cls.find(id, columns)
+            if isinstance(id, list):
+                if len(result) == len(set(id)):
+                    return result
+            elif result and result is not CacheNone:
+                return result
+
+            raise ModelNotFound(cls)
+
+        @classmethod
         @cache.cached(
             cache_key=_model_cache_key,
-            fallbacked=_find_by_register)
+            fallbacked=_find_by_register, cache_none=True)
         def find_by(cls, name, val, columns=None):
             return cls.where(name, '=', val).first(columns)
 
+        @classmethod
+        def find_by_or_fail(cls, name, val, columns=None):
+            result = cls.find_by(name, val, columns)
+
+            if result and result is not CacheNone:
+                return result
+
+            raise ModelNotFound(cls)
+
         kws.update({
             'find': find,
-            'find_by': find_by
+            'find_by': find_by,
+            'find_or_fail': find_or_fail,
+            'find_by_or_fail': find_by_or_fail
         })
         return super().__new__(mcls, name, bases, kws)
 
