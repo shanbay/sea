@@ -131,20 +131,18 @@ def test_cli(app):
             assert '--path ./db/migrations' in argv
 
 
-def orator_handler(servicer, request, context):
-    if request == 0:
-        class NotFound(object):
-            def __init__(self):
-                self.__name__ = 'not_found'
-        raise ModelNotFound(NotFound())
-    if request == 1:
-        raise RelatedClassNotFound('father')
-    if request == 2:
-        raise ValidationError({'general': [1, 2], 'name': 'invalid'})
-    return context
-
-
 def test_orator_exception_middleware(app):
+    from app.models import User
+
+    def orator_handler(servicer, request, context):
+        if request == 0:
+            raise ModelNotFound(User)
+        if request == 1:
+            raise RelatedClassNotFound('father')
+        if request == 2:
+            raise ValidationError({'general': [1, 2], 'name': 'invalid'})
+        return context
+
     h = OratorExceptionMiddleware(app, orator_handler, orator_handler)
 
     ctx = Context()
