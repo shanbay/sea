@@ -1,5 +1,5 @@
 -r requirements.txt
-sorator
+git+https://github.com/shanbay/sorator
 mysqlclient
 redis
 celery
