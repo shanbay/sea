@@ -1,6 +1,7 @@
 import functools
 import logging
 
+from sea import current_app
 from sea.extensions import AbstractExtension
 from . import backends
 
@@ -10,6 +11,8 @@ DEFAULT_KEY_TYPES = (str, int, float, bool)
 
 
 def norm_cache_key(v):
+    if isinstance(v, type):
+        return v.__name__
     if isinstance(v, bytes):
         return v.decode()
     if v is None or isinstance(v, DEFAULT_KEY_TYPES):
@@ -47,42 +50,59 @@ class Cache(AbstractExtension):
             prefix=prefix, default_ttl=opts.pop('default_ttl', 172800),
             **opts)
 
-    def cached(self, ttl=None, cache_key=default_key,
-               unless=None, fallbacked=None, cache_none=False):
-        def decorator(f):
-            @functools.wraps(f)
-            def wrapper(*args, **kwargs):
-                if callable(unless) and unless(*args, **kwargs):
-                    return f(*args, **kwargs)
-                key = wrapper.make_cache_key(*args, **kwargs)
-                rv = self.get(key)
-                if rv is None:
-                    rv = f(*args, **kwargs)
-                    if cache_none and rv is None:
-                        rv = CacheNone
-                    if rv is not None:
-                        self.set(key, rv, ttl=wrapper.ttl)
-                    if callable(fallbacked):
-                        fallbacked(wrapper, rv, *args, **kwargs)
-                if cache_none and rv is CacheNone:
-                    return None
-                return rv
-
-            def make_cache_key(*args, **kwargs):
-                if callable(cache_key):
-                    key = cache_key(f, *args, **kwargs)
-                else:
-                    key = cache_key
-                return key
-
-            wrapper.uncached = f
-            wrapper.ttl = ttl
-            wrapper.make_cache_key = make_cache_key
-
-            return wrapper
-        return decorator
-
     def __getattr__(self, name):
         if name in self.PROTO_METHODS:
             return getattr(self._backend, name)
         raise AttributeError
+
+
+class cached:
+    def __init__(self, func=None, ttl=None, cache_key=default_key,
+                 unless=None, fallbacked=None, cache_none=False):
+        self.ttl = ttl
+        self.cache_key = cache_key
+        self.unless = unless
+        self.fallbacked = fallbacked
+        self.cache_none = cache_none
+        if func is not None:
+            func = self.decorator(func)
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        if self.func is None:
+            f = args[0]
+            return self.decorator(f)
+        return self.func(*args, **kwargs)
+
+    def decorator(self, f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            if callable(self.unless) and self.unless(*args, **kwargs):
+                return f(*args, **kwargs)
+            cache = current_app().extensions['cache']
+            key = wrapper.make_cache_key(*args, **kwargs)
+            rv = cache.get(key)
+            if rv is None:
+                rv = f(*args, **kwargs)
+                if self.cache_none and rv is None:
+                    rv = CacheNone
+                if rv is not None:
+                    cache.set(key, rv, ttl=wrapper.ttl)
+                if callable(self.fallbacked):
+                    self.fallbacked(wrapper, rv, *args, **kwargs)
+            if self.cache_none and rv is CacheNone:
+                return None
+            return rv
+
+        def make_cache_key(*args, **kwargs):
+            if callable(self.cache_key):
+                key = self.cache_key(f, *args, **kwargs)
+            else:
+                key = self.cache_key
+            return key
+
+        wrapper.uncached = f
+        wrapper.ttl = self.ttl
+        wrapper.make_cache_key = make_cache_key
+
+        return wrapper

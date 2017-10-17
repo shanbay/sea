@@ -73,11 +73,10 @@ def test_cmd_new():
     redis
     celery
     raven
-    pytest
     """
     with open('./tests/myproject/requirements.txt', 'r') as f:
         content = f.read()
-    assert content == dedent(correct_code).rstrip()
+    assert content == dedent(correct_code)
 
     shutil.rmtree('tests/myproject')
 
