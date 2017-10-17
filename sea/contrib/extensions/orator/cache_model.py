@@ -1,13 +1,8 @@
 from orator.orm import model
 
 from sea import current_app
-from sea.utils import import_string
-from sea.contrib.extensions.cache import default_key, CacheNone
+from sea.contrib.extensions import cache as cache_ext
 from orator.exceptions.orm import ModelNotFound
-
-
-def _model_cache_key(f, cls, *args, **kwargs):
-    return default_key(cls, *args, **kwargs)
 
 
 def _related_caches_key(cls, id):
@@ -31,7 +26,7 @@ def _find_register(f, ins, cls, *args, **kwargs):
 
 
 def _find_by_register(f, ins, cls, *args, **kwargs):
-    if ins is None or ins is CacheNone:
+    if ins is None or ins is cache_ext.CacheNone:
         return True
     return _register_to_related_caches(f, ins.id, cls, *args, **kwargs)
 
@@ -64,17 +59,15 @@ def _id_is_list(cls, id, *args, **kwargs):
 
 class ModelMeta(model.MetaModel):
     def __new__(mcls, name, bases, kws):
-        cache = import_string('app.extensions:cache')
         max_find_many_cache = kws.get('__max_find_many_cache__', 10)
 
         @classmethod
-        @cache.cached(
-            cache_key=_model_cache_key,
-            fallbacked=_find_register,
-            unless=_id_is_list, cache_none=True)
+        @cache_ext.cached(
+            fallbacked=_find_register, unless=_id_is_list, cache_none=True)
         def find(cls, id, columns=None):
             if isinstance(id, list) and id and len(id) <= max_find_many_cache:
-                keymap = {i: _model_cache_key(None, cls, i) for i in id}
+                cache = current_app().extensions['cache']
+                keymap = {i: find.__func__.make_cache_key(cls, i) for i in id}
                 rv = cache.get_many(keymap.values())
                 models = dict(zip(id, rv))
                 missids = [
@@ -82,7 +75,7 @@ class ModelMeta(model.MetaModel):
                     if m is None]
                 models = {
                     k: m for k, m in models.items()
-                    if not (m is CacheNone or m is None)}
+                    if not (m is cache_ext.CacheNone or m is None)}
                 if not missids:
                     return cls().new_collection(models.values())
                 missed = super(cls, cls).find(missids, columns)
@@ -100,15 +93,13 @@ class ModelMeta(model.MetaModel):
             if isinstance(id, list):
                 if len(result) == len(set(id)):
                     return result
-            elif result and result is not CacheNone:
+            elif result is not None:
                 return result
 
             raise ModelNotFound(cls)
 
         @classmethod
-        @cache.cached(
-            cache_key=_model_cache_key,
-            fallbacked=_find_by_register, cache_none=True)
+        @cache_ext.cached(fallbacked=_find_by_register, cache_none=True)
         def find_by(cls, name, val, columns=None):
             return cls.where(name, '=', val).first(columns)
 
@@ -116,7 +107,7 @@ class ModelMeta(model.MetaModel):
         def find_by_or_fail(cls, name, val, columns=None):
             result = cls.find_by(name, val, columns)
 
-            if result and result is not CacheNone:
+            if result is not None:
                 return result
 
             raise ModelNotFound(cls)

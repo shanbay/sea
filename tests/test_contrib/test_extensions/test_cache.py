@@ -19,13 +19,16 @@ def test_default_key():
 
 
 def test_cache(app):
-    total = 0
-    fallbacked_count = 0
 
     c = cache.Cache()
     assert c._backend is None
     c.init_app(app)
     assert isinstance(c._backend, backends.Redis)
+
+
+def test_cached(app):
+    total = 0
+    fallbacked_count = 0
 
     def true_if_gte_10(num):
         return num >= 10
@@ -35,7 +38,7 @@ def test_cache(app):
         fallbacked_count += 1
         return fallbacked_count
 
-    @c.cached(unless=true_if_gte_10, fallbacked=fallbacked)
+    @cache.cached(unless=true_if_gte_10, fallbacked=fallbacked)
     def incr1(num):
         nonlocal total
         total += num
@@ -50,11 +53,13 @@ def test_cache(app):
     assert rt == 11
     assert fallbacked_count == 1
 
-    @c.cached(cache_key='testkey')
+    @cache.cached(cache_key='testkey')
     def incr2(num):
         global total
         total += num
         return total
+
+    c = app.extensions['cache']
 
     with mock.patch.object(c._backend, 'get', return_value=100) as mocked:
         incr2(10)
