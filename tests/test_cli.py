@@ -84,7 +84,7 @@ def test_cmd_new():
 def test_cmd_job(app):
     sys.argv = 'seak plusone -n 100'.split()
     assert cli.jobmain() == 0
-    assert current_app().config.get('NUMBER') == 101
+    assert current_app.config.get('NUMBER') == 101
     sys.argv = 'seak config_hello'.split()
     assert isinstance(cli.jobmain(), cli.JobException)
 
@@ -92,7 +92,7 @@ def test_cmd_job(app):
         def load(self):
             @cli.jobm.job('xyz')
             def f2():
-                current_app().config['XYZ'] = 'hello'
+                current_app.config['XYZ'] = 'hello'
             return f2
 
     def new_entry_iter(name):
@@ -101,7 +101,7 @@ def test_cmd_job(app):
     with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
         sys.argv = 'seak xyz'.split()
         assert cli.jobmain() == 0
-        assert current_app().config.get('XYZ') == 'hello'
+        assert current_app.config.get('XYZ') == 'hello'
 
 
 def test_main():

@@ -3,6 +3,7 @@ import sys
 
 from sea.app import Sea
 from sea.utils import import_string
+from sea.local import Proxy
 
 __version__ = '0.6.2'
 _app = None
@@ -28,6 +29,4 @@ def create_app(root_path, app_class=Sea):
     return _app
 
 
-def current_app():
-    global _app
-    return _app
+current_app = Proxy(lambda :_app)
