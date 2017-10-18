@@ -54,18 +54,18 @@ def test_model_meta(cache, db):
     User.find(c1.id)
     assert cache.exists(k1)
     assert not cache.exists(k2)
-    children = User.find_many([c1.id, c2.id])
+    children = User.find([c1.id, c2.id])
     assert cache.exists(k2)
     assert len(children) == 2
     with mock.patch('sea.contrib.extensions.orator.cache_model._bulk_register_to_related_caches') as mocked:
-        User.find_many([c1.id, c2.id])
+        User.find([c1.id, c2.id])
         assert not mocked.called
     jack.children().save_many([c1, c2])
     assert not cache.exists(k1)
     assert not cache.exists(k2)
 
     assert User.find(1000) is None
-    assert len(User.find_many([c1.id, 2000])) == 1
+    assert len(User.find([c1.id, 2000])) == 1
 
 
 def test_cli(app):
