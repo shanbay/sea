@@ -69,10 +69,10 @@ class cached:
         self.func = func
 
     def __call__(self, *args, **kwargs):
-        if self.func is None:
-            f = args[0]
-            return self.decorator(f)
-        return self.func(*args, **kwargs)
+        if self.func is not None:
+            return self.func(*args, **kwargs)
+        f = args[0]
+        return self.decorator(f)
 
     def decorator(self, f):
         @functools.wraps(f)
@@ -106,3 +106,6 @@ class cached:
         wrapper.make_cache_key = make_cache_key
 
         return wrapper
+
+    def __getattr__(self, name):
+        return getattr(self.func, name)
