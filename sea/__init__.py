@@ -28,6 +28,4 @@ def create_app(root_path, app_class=Sea):
     return _app
 
 
-def current_app():
-    global _app
-    return _app
+current_app = _app
