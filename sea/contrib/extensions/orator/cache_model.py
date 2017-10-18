@@ -9,7 +9,7 @@ def _related_caches_key(cls, id):
 
 
 def _register_to_related_caches(f, id, cls, *args, **kwargs):
-    cache = current_app().extensions['cache']
+    cache = current_app.extensions['cache']
     key = cache._backend.trans_key(_related_caches_key(cls, id))
     redis = cache._backend._client
     cached_key = cache._backend.trans_key(
@@ -30,7 +30,7 @@ def _find_by_register(f, ins, cls, *args, **kwargs):
 
 
 def _bulk_register_to_related_caches(cls, key_model_map):
-    cache = current_app().extensions['cache']
+    cache = current_app.extensions['cache']
     redis = cache._backend._client
     for cached_key, ins in key_model_map.items():
         key = cache._backend.trans_key(_related_caches_key(cls, ins.id))
@@ -41,7 +41,7 @@ def _bulk_register_to_related_caches(cls, key_model_map):
 
 
 def _clear_related_caches(instance):
-    cache = current_app().extensions['cache']
+    cache = current_app.extensions['cache']
     key = cache._backend.trans_key(
         _related_caches_key(instance.__class__, instance.id))
     redis = cache._backend._client
@@ -64,7 +64,7 @@ class ModelMeta(model.MetaModel):
             fallbacked=_find_register, unless=_id_is_list, cache_none=True)
         def find(cls, id, columns=None):
             if isinstance(id, list) and id and len(id) <= max_find_many_cache:
-                cache = current_app().extensions['cache']
+                cache = current_app.extensions['cache']
                 keymap = {i: find.__func__.make_cache_key(cls, i) for i in id}
                 rv = cache.get_many(keymap.values())
                 models = dict(zip(id, rv))
