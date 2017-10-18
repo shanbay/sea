@@ -11,5 +11,5 @@ def f1(name):
 @jobm.job('plusone')
 @jobm.option('-n', '--number', type=int)
 def f2(number):
-    app = current_app()
+    app = current_app
     app.config['NUMBER'] = number + 1

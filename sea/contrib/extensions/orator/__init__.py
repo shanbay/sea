@@ -24,5 +24,5 @@ class Model(orator.Model):
     def as_datetime(self, value):
         rt = super().as_datetime(value)
         if isinstance(rt, pendulum.pendulum.Pendulum):
-            rt = rt.in_timezone(current_app().tz)
+            rt = rt.in_timezone(current_app.tz)
         return rt
