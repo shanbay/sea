@@ -1,8 +1,6 @@
 from orator.orm import model
-
 from sea import current_app
 from sea.contrib.extensions import cache as cache_ext
-from orator.exceptions.orm import ModelNotFound
 
 
 def _related_caches_key(cls, id):
@@ -88,35 +86,13 @@ class ModelMeta(model.MetaModel):
             return super(cls, cls).find(id, columns)
 
         @classmethod
-        def find_or_fail(cls, id, columns=None):
-            result = cls.find(id, columns)
-            if isinstance(id, list):
-                if len(result) == len(set(id)):
-                    return result
-            elif result is not None:
-                return result
-
-            raise ModelNotFound(cls)
-
-        @classmethod
         @cache_ext.cached(fallbacked=_find_by_register, cache_none=True)
         def find_by(cls, name, val, columns=None):
-            return cls.where(name, '=', val).first(columns)
-
-        @classmethod
-        def find_by_or_fail(cls, name, val, columns=None):
-            result = cls.find_by(name, val, columns)
-
-            if result is not None:
-                return result
-
-            raise ModelNotFound(cls)
+            return super(cls, cls).find_by(name, val, columns)
 
         kws.update({
             'find': find,
             'find_by': find_by,
-            'find_or_fail': find_or_fail,
-            'find_by_or_fail': find_by_or_fail
         })
         return super().__new__(mcls, name, bases, kws)
 
