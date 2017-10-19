@@ -6,7 +6,7 @@ from sea.test.fixtures import *
 
 
 os.environ.setdefault('SEA_ENV', 'testing')
-_app = sea.create_app(os.getcwd())
+_app = sea.create_app()
 
 
 @pytest.fixture(scope='session')

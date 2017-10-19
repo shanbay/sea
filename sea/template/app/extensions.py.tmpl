@@ -1,6 +1,3 @@
-{%- if not skip_consul -%}
-from sea.contrib.extensions.consul import Consul
-{% endif -%}
 {%- if not skip_orator -%}
 from sea.contrib.extensions.orator import Orator
 {% endif %}
@@ -14,9 +11,6 @@ from sea.contrib.extensions.celery import Celery
 from sea.contrib.extensions.sentry import Sentry
 {% endif %}
 
-{% if not skip_consul -%}
-consul = Consul()
-{% endif -%}
 {%- if not skip_orator -%}
 db = Orator()
 {% endif %}

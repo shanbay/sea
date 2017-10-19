@@ -6,16 +6,14 @@ from unittest import mock
 from sea import app, exceptions
 
 
-def test_sea():
+def test_baseapp():
     root_path = './tests/wd'
     sys.path.append(root_path)
     sys.path.append(os.path.join(root_path, 'protos'))
 
-    _app = app.Sea(root_path)
+    _app = app.BaseApp(root_path, env='testing')
     assert not _app.debug
     assert not _app.testing
-    assert _app.extensions == {}
-    assert _app.servicers == {}
 
     from configs import testing
 
@@ -29,6 +27,11 @@ def test_sea():
     with mock.patch('sea._app', new=_app):
         from app import servicers, extensions
 
+    with pytest.raises(exceptions.ConfigException):
+        _app._register_servicer(servicers.GreeterServicer)
+        _app._register_servicer(servicers.GreeterServicer)
+
+    _app._servicers = {}
     _app.load_servicers_in_module(servicers)
     assert 'GreeterServicer' in _app.servicers
     servicer = _app.servicers['GreeterServicer']
@@ -36,14 +39,14 @@ def test_sea():
     assert servicer == (
         servicers.helloworld_pb2_grpc.add_GreeterServicer_to_server,
         servicers.GreeterServicer)
-    with pytest.raises(exceptions.ConfigException):
-        _app.register_servicer(servicers.GreeterServicer)
 
-    _app.load_extensions_in_module(extensions)
-    ext = _app.extensions['consul']
-    assert ext is extensions.consul
     with pytest.raises(exceptions.ConfigException):
-        _app.register_extension('consul', extensions.consul)
+        _app._register_extension('db', extensions.db)
+        _app._register_extension('db', extensions.db)
+    _app._extensions = {}
+    _app.load_extensions_in_module(extensions)
+    ext = _app.extensions.db
+    assert ext is extensions.db
 
     with mock.patch('sys.stderr') as mocked:
         _app.logger.debug('test')

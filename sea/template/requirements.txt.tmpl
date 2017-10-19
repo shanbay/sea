@@ -5,9 +5,6 @@ mysqlclient
 {%- if not skip_cache -%}
 redis
 {% endif -%}
-{%- if not skip_consul -%}
-python-consul
-{% endif -%}
 {%- if not skip_celery -%}
 celery
 {% endif -%}

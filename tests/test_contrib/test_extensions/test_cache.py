@@ -59,7 +59,7 @@ def test_cached(app):
         total += num
         return total
 
-    c = app.extensions['cache']
+    c = app.extensions.cache
 
     with mock.patch.object(c._backend, 'get', return_value=100) as mocked:
         incr2(10)

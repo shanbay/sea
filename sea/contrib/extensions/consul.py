@@ -4,6 +4,9 @@ from sea.extensions import AbstractExtension
 
 
 class Consul(AbstractExtension):
+    '''
+    pip install python-consul
+    '''
 
     def __init__(self):
         self._client = None

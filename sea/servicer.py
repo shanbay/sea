@@ -5,10 +5,9 @@ from sea import current_app
 
 
 def wrap_handler(handler):
-    app = current_app
     h = handler
-    for m in app.middlewares:
-        h = m(app, h, handler)
+    for m in current_app.middlewares:
+        h = m(current_app, h, handler)
 
     @wraps(handler)
     def wrapped(self, request, context):

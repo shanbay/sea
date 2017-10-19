@@ -3,8 +3,11 @@ import time
 import logging
 from concurrent import futures
 import grpc
+import blinker
 
-from sea.utils import import_string
+
+started = blinker.signal('server_started')
+stopped = blinker.signal('server_stopped')
 
 
 class Server:
@@ -26,22 +29,17 @@ class Server:
                 max_workers=self.workers))
         self.server.add_insecure_port(
             '{}:{}'.format(self.host, self.port))
-        regconf = self.app.config.get_namespace('REGISTER_')
-        regclass = import_string(regconf['class'])
-        self.register = regclass(
-            self.app.extensions[regconf['client']])
         self._stopped = False
 
     def run(self):
         """run the server
         """
-        for name, (add_func, servicer) in self.app.servicers.items():
-            add_func(servicer(), self.server)
-        self.register.register(self.app.name, self.publish_host, self.port)
         self.server.start()
+        started.send(self)
         self.register_signal()
         while not self._stopped:
             time.sleep(1)
+        stopped.send(self)
         return True
 
     def setup_logger(self):
@@ -62,5 +60,3 @@ class Server:
     def _stop_handler(self, signum, frame):
         self.server.stop(0)
         self._stopped = True
-        for name in self.app.servicers.keys():
-            self.register.deregister(name, self.publish_host, self.port)
