@@ -53,7 +53,7 @@ def test_msg2dict(app):
     app.name = 'v-name'
     app.msg = 'v-msg'
     ret = msg2dict(app, ['name', 'msg', 'tz'])
-    assert ret == {'name': 'v-name', 'msg': 'v-msg', 'tz': 'UTC'}
+    assert ret == {'name': 'v-name', 'msg': 'v-msg', 'tz': 'Asia/Shanghai'}
 
     request = helloworld_pb2.HelloRequest(name="value")
     ret = msg2dict(request)

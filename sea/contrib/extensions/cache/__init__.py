@@ -79,7 +79,7 @@ class cached:
         def wrapper(*args, **kwargs):
             if callable(self.unless) and self.unless(*args, **kwargs):
                 return f(*args, **kwargs)
-            cache = current_app.extensions['cache']
+            cache = current_app.extensions.cache
             key = wrapper.make_cache_key(*args, **kwargs)
             rv = cache.get(key)
             if rv is None:

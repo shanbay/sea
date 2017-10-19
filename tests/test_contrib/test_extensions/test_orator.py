@@ -21,12 +21,13 @@ def test_orator(app):
         mocked.assert_called_once_with()
 
 
-def test_model_meta(cache, db):
+def test_model_meta(app, cache, db):
     from app.models import User
 
     assert hasattr(User, 'find_by')
 
     jack = User.create(username='jack', age=35)
+    assert jack.created_at.timezone_name == app.tz
     key = User.find_by.make_cache_key(User, 'username', 'jack')
     assert not cache.exists(key)
     assert User.find_by('username', 'jack').id == jack.id

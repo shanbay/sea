@@ -48,7 +48,7 @@ def test_generate(app):
 def test_cmd_new():
     shutil.rmtree('tests/myproject', ignore_errors=True)
     sys.argv = ('sea new tests/myproject'
-                ' --skip-git --skip-consul --skip-orator').split()
+                ' --skip-git --skip-orator').split()
     assert cli.main() == 0
     correct_code = """\
     # import myproject_pb2

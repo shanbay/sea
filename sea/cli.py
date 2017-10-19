@@ -69,7 +69,7 @@ class ServerCmd(AbstractCommand):
         return p
 
     def run(self, args):
-        app = create_app(os.getcwd())
+        app = create_app()
         s = Server(app, args.host)
         s.run()
         return 0
@@ -87,7 +87,7 @@ class ConsoleCmd(AbstractCommand):
         the following vars are included:
         `app` (the current app)
         """
-        ctx = {'app': create_app(os.getcwd())}
+        ctx = {'app': create_app()}
         try:
             from IPython import embed
             h, kwargs = embed, dict(banner1=banner, user_ns=ctx)
@@ -113,7 +113,7 @@ class GenerateCmd(AbstractCommand):
 
     def run(self, args):
         from grpc_tools import protoc
-        proto_out = os.path.join(create_app(os.getcwd()).root_path, 'protos')
+        proto_out = os.path.join(create_app().root_path, 'protos')
         cmd = [
             'grpc_tools.protoc',
             '--proto_path', args.proto_path,
@@ -129,7 +129,6 @@ class NewCmd(AbstractCommand):
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
         'git': ['gitignore'],
-        'consul': [],
         'orator': ['configs/development/orator.py.tmpl',
                    'configs/testing/orator.py.tmpl'
                    'app/models.py.tmpl',
@@ -154,8 +153,6 @@ class NewCmd(AbstractCommand):
             '--skip-cache', action='store_true', help='skip cache')
         p.add_argument(
             '--skip-celery', action='store_true', help='skip celery')
-        p.add_argument(
-            '--skip-consul', action='store_true', help='skip consul')
         p.add_argument(
             '--skip-sentry', action='store_true', help='skip sentry')
         return p
@@ -217,7 +214,7 @@ def main():
 def jobmain():
     rootp = argparse.ArgumentParser('seak')
     subparsers = rootp.add_subparsers()
-    app = create_app(os.getcwd())
+    app = create_app()
     for ep in pkg_resources.iter_entry_points('sea.jobs'):
         ep.load()
     jobsroot = os.path.join(app.root_path, 'jobs')
