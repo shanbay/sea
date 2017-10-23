@@ -4,7 +4,7 @@ import os
 from io import StringIO
 
 import sea
-from sea.test.fixtures import *
+from sea.test.fixtures import *  # noqa
 
 
 @pytest.fixture

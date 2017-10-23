@@ -70,6 +70,7 @@ def test_cmd_new():
     assert os.path.exists('./tests/myproject/app/tasks.py')
 
     correct_code = """\
+    sea
     redis
     celery
     raven
