@@ -1,13 +1,6 @@
 {% if not skip_orator -%}from .orator import *{%- endif %}
 {% if not skip_celery -%}from .celery import *{%- endif %}
-{% if not skip_cache -%}
-CACHE_BACKEND = 'Redis'
-CACHE_PREFIX = '{{ project }}'
-CACHE_HOST = 'localhost'
-CACHE_DB = 0
-CACHE_PORT = 6379
-CACHE_PASSWORD = 'abcdef'
-{%- endif %}
+{% if not skip_cache -%}from .cache import *{%- endif %}
 
 {% if not skip_sentry -%}
 SENTRY_DSN = None

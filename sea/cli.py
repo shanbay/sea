@@ -129,14 +129,12 @@ class NewCmd(AbstractCommand):
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
         'git': ['gitignore'],
-        'orator': ['configs/development/orator.py.tmpl',
-                   'configs/testing/orator.py.tmpl'
+        'orator': ['configs/default/orator.py.tmpl',
                    'app/models.py.tmpl',
                    'db/.keep'],
-        'cache': [],
+        'cache': ['configs/default/cache.py.tmpl'],
         'sentry': [],
-        'celery': ['configs/development/celery.py.tmpl',
-                   'configs/testing/celery.py.tmpl',
+        'celery': ['configs/default/celery.py.tmpl',
                    'app/tasks.py.tmpl'],
     }
 

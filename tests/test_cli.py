@@ -66,7 +66,7 @@ def test_cmd_new():
 
     from textwrap import dedent
     assert content == dedent(correct_code).rstrip()
-    assert not os.path.exists('./tests/myproject/condfigs/development/orator.py')
+    assert not os.path.exists('./tests/myproject/condfigs/default/orator.py')
     assert os.path.exists('./tests/myproject/app/tasks.py')
 
     correct_code = """\
