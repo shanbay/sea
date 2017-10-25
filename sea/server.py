@@ -34,6 +34,8 @@ class Server:
     def run(self):
         """run the server
         """
+        for name, (add_func, servicer) in self.app.servicers.items():
+            add_func(servicer(), self.server)
         self.server.start()
         started.send(self)
         self.register_signal()
