@@ -3,7 +3,6 @@ import os
 import argparse
 import pkg_resources
 
-from sea import create_app
 from sea.utils import import_string
 
 
@@ -22,10 +21,9 @@ class JobManager:
     def __init__(self):
         self._jobs = {}
 
-    def job(self, name, inapp=True, proxy=False, *args, **kwargs):
+    def job(self, name, proxy=False, *args, **kwargs):
         def wrapper(func):
             func.parser = JobOption(*args, **kwargs)
-            func.inapp = inapp
             func.proxy = proxy
             self._jobs[name] = func
             return func
@@ -82,8 +80,6 @@ def _run(root):
     known, argv = root.parse_known_args(args)
     kwargs = vars(known)
     handler = kwargs.pop('handler')
-    if handler.inapp:
-        create_app()
     try:
         if handler.proxy:
             handler(**kwargs, argv=argv)
