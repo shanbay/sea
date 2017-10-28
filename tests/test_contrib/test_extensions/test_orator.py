@@ -5,8 +5,8 @@ from grpc import StatusCode
 
 from orator.exceptions.orm import (ModelNotFound, RelatedClassNotFound,
                                    ValidationError)
+from sea import cli
 from sea.contrib.extensions import orator
-from sea.contrib.extensions.orator import cli
 from sea.contrib.extensions.orator.middleware import OratorExceptionMiddleware
 from sea.test.stub import Context
 
@@ -70,61 +70,61 @@ def test_model_meta(app, cache, db):
 
 
 def test_cli(app):
-    sys.argv = ['seaorator', '-h']
+    sys.argv = ['sea', 'orator', '-h']
     with pytest.raises(SystemExit):
         cli.main()
 
-    with mock.patch('sea.contrib.extensions.orator.cli.application'):
+    with mock.patch('sea.contrib.extensions.orator.cmd.application'):
         with mock.patch.object(app, 'root_path', new='.'):
-            sys.argv = 'seaorator help'.split()
+            sys.argv = 'sea orator help'.split()
             cli.main()
             assert sys.argv == 'orator help'.split()
 
-            sys.argv = 'seaorator list'.split()
+            sys.argv = 'sea orator list'.split()
             cli.main()
             assert sys.argv == 'orator list'.split()
 
-            sys.argv = 'seaorator migrate'.split()
+            sys.argv = 'sea orator migrate'.split()
             cli.main()
             assert sys.argv[1] == 'migrate'
             argv = ' '.join(sys.argv)
             assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
 
-            sys.argv = 'seaorator db:seed'.split()
+            sys.argv = 'sea orator db:seed'.split()
             cli.main()
             assert sys.argv[1] == 'db:seed'
             argv = ' '.join(sys.argv)
             assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/seeds' in argv
 
-            sys.argv = 'seaorator make:migration'.split()
+            sys.argv = 'sea orator make:migration'.split()
             cli.main()
             assert sys.argv[1] == 'make:migration'
             argv = ' '.join(sys.argv)
             assert '--path ./db/migrations' in argv
 
-            sys.argv = 'seaorator make:seed'.split()
+            sys.argv = 'sea orator make:seed'.split()
             cli.main()
             assert sys.argv[1] == 'make:seed'
             argv = ' '.join(sys.argv)
             assert '--path ./db/seeds' in argv
 
-            sys.argv = 'seaorator migrate:reset'.split()
+            sys.argv = 'sea orator migrate:reset'.split()
             cli.main()
             assert sys.argv[1] == 'migrate:reset'
             argv = ' '.join(sys.argv)
             assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
 
-            sys.argv = 'seaorator migrate:rollback'.split()
+            sys.argv = 'sea orator migrate:rollback'.split()
             cli.main()
             assert sys.argv[1] == 'migrate:rollback'
             argv = ' '.join(sys.argv)
             assert '--config ./configs/default/orator.py' in argv
             assert '--path ./db/migrations' in argv
 
-            sys.argv = 'seaorator migrate:status'.split()
+            sys.argv = 'sea orator migrate:status'.split()
             cli.main()
             assert sys.argv[1] == 'migrate:status'
             argv = ' '.join(sys.argv)

@@ -4,19 +4,12 @@ import os
 import shutil
 from unittest import mock
 
-from sea import cli, current_app
-
-
-def test_abscmd():
-    with pytest.raises(NotImplementedError):
-        cli.AbstractCommand.opt(mock.Mock(), mock.Mock())
-    with pytest.raises(NotImplementedError):
-        cli.AbstractCommand.run(mock.Mock(), mock.Mock())
+from sea import cli
 
 
 def test_cmd_server(app):
     sys.argv = 'sea s -b 127.0.0.1'.split()
-    with mock.patch('sea.cli.Server', autospec=True) as mocked:
+    with mock.patch('sea.cmds.Server', autospec=True) as mocked:
         assert cli.main() == 0
         mocked.return_value.run.assert_called_with()
 
@@ -29,7 +22,7 @@ def test_cmd_console(app):
         assert mocked.embed.called
 
 
-def test_generate(app):
+def test_cmd_generate(app):
     sys.argv = 'sea g -I /path/to/protos hello.proto test.proto'.split()
     with mock.patch('grpc_tools.protoc.main', return_value=0) as mocked:
         assert cli.main() == 0
@@ -83,26 +76,27 @@ def test_cmd_new():
 
 
 def test_cmd_job(app):
-    sys.argv = 'seak plusone -n 100'.split()
-    assert cli.jobmain() == 0
-    assert current_app.config.get('NUMBER') == 101
-    sys.argv = 'seak config_hello'.split()
-    assert isinstance(cli.jobmain(), cli.JobException)
+    with mock.patch('os.getcwd', return_value=app.root_path):
+        sys.argv = 'sea plusone -n 100'.split()
+        assert cli.main() == 0
+        assert app.config.get('NUMBER') == 101
+        sys.argv = 'sea config_hello'.split()
+        assert isinstance(cli.main(), cli.JobException)
 
     class EntryPoint:
         def load(self):
             @cli.jobm.job('xyz')
             def f2():
-                current_app.config['XYZ'] = 'hello'
+                app.config['XYZ'] = 'hello'
             return f2
 
     def new_entry_iter(name):
         return [EntryPoint()]
 
     with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
-        sys.argv = 'seak xyz'.split()
-        assert cli.jobmain() == 0
-        assert current_app.config.get('XYZ') == 'hello'
+        sys.argv = 'sea xyz'.split()
+        assert cli.main() == 0
+        assert app.config.get('XYZ') == 'hello'
 
 
 def test_main():
