@@ -47,10 +47,7 @@ class JobManager:
 jobm = JobManager()
 
 
-def main():
-    root = argparse.ArgumentParser('sea')
-    subparsers = root.add_subparsers()
-
+def _load_jobs():
     path = os.getcwd()
     sys.path.append(path)
 
@@ -62,17 +59,15 @@ def main():
         ep.load()
 
     # load app jobs
-    try:
+    appjobs = os.path.join(path, 'jobs')
+    if os.path.exists(appjobs):
         import_string('jobs')
-    except ImportError:
-        pass
-    else:
-        appjobs = os.path.join(path, 'jobs')
         for m in os.listdir(appjobs):
             if m != '__init__.py' and m.endswith('.py'):
                 import_string('jobs.{}'.format(m[:-3]))
 
-    # build parser
+
+def _build_parser(subparsers):
     for name, handler in jobm.jobs.items():
         parser = handler.parser
         opts = getattr(handler, 'opts', [])
@@ -81,13 +76,15 @@ def main():
             p.add_argument(*opt.args, **opt.kwargs)
         p.set_defaults(handler=handler)
 
+
+def _run(root):
     args = sys.argv[1:]
     known, argv = root.parse_known_args(args)
     kwargs = vars(known)
     handler = kwargs.pop('handler')
+    if handler.inapp:
+        create_app()
     try:
-        if handler.inapp:
-            create_app(path)
         if handler.proxy:
             handler(**kwargs, argv=argv)
         else:
@@ -95,3 +92,14 @@ def main():
         return 0
     except JobException as e:
         return e
+
+
+def main():
+    root = argparse.ArgumentParser('sea')
+    subparsers = root.add_subparsers()
+
+    _load_jobs()
+
+    _build_parser(subparsers)
+
+    return _run(root)

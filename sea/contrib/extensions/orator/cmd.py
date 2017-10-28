@@ -4,7 +4,7 @@ import re
 import argparse
 from orator.commands.application import application
 
-import sea
+from sea import current_app
 from sea.cli import jobm
 
 
@@ -25,10 +25,11 @@ class BaseCmd:
 
     def get_dbconfig(self):
         dbconfig = os.path.join(
-            sea.current_app.root_path, 'configs/{}/orator.py'.format(sea.current_app.env))
+            current_app.root_path,
+            'configs/{}/orator.py'.format(current_app.env))
         if not os.path.exists(dbconfig):
             dbconfig = os.path.join(
-                sea.current_app.root_path, 'configs/default/orator.py')
+                current_app.root_path, 'configs/default/orator.py')
         return dbconfig
 
     def add_argument(self, *args, **kwargs):
@@ -69,7 +70,7 @@ class BaseExecCmd:
                 help='The config file path')
         self.add_argument(
             '-p', '--path',
-            default=os.path.join(sea.current_app.root_path, 'db', self.ARG_PATH),
+            default=os.path.join(current_app.root_path, 'db', self.ARG_PATH),
             help='The path of migrations files to be executed')
 
 
