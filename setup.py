@@ -63,10 +63,11 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'sea=sea.cli:main',
-            'seak=sea.cli:jobmain',
-            'seaorator=sea.contrib.extensions.orator.cli:main',
-            'seacelery=sea.contrib.extensions.celery.cli:main'
-            ]
+            'sea=sea.cli:main'
+        ],
+        'sea.jobs': [
+            'celery=sea.contrib.extensions.celery.cmd:main',
+            'orator=sea.contrib.extensions.orator.cmd:main'
+        ]
     }
 )

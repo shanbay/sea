@@ -3,14 +3,15 @@ import os
 import re
 import argparse
 from orator.commands.application import application
-import sea
+
+from sea import current_app
+from sea.cli import jobm
 
 
 class BaseCmd:
     ORATOR_CMD = None
 
-    def __init__(self, app):
-        self.app = app
+    def __init__(self):
         self.argmap = {}
         self.parser = None
         parts = re.findall('[A-Z][^A-Z]*', self.__class__.__name__)
@@ -24,10 +25,11 @@ class BaseCmd:
 
     def get_dbconfig(self):
         dbconfig = os.path.join(
-            self.app.root_path, 'configs/{}/orator.py'.format(self.app.env))
+            current_app.root_path,
+            'configs/{}/orator.py'.format(current_app.env))
         if not os.path.exists(dbconfig):
             dbconfig = os.path.join(
-                self.app.root_path, 'configs/default/orator.py')
+                current_app.root_path, 'configs/default/orator.py')
         return dbconfig
 
     def add_argument(self, *args, **kwargs):
@@ -68,7 +70,7 @@ class BaseExecCmd:
                 help='The config file path')
         self.add_argument(
             '-p', '--path',
-            default=os.path.join(self.app.root_path, 'db', self.ARG_PATH),
+            default=os.path.join(current_app.root_path, 'db', self.ARG_PATH),
             help='The path of migrations files to be executed')
 
 
@@ -105,14 +107,13 @@ class CmdMigrateStatus(BaseCmd, BaseExecCmd):
     pass
 
 
-def main():
-    app = sea.create_app(os.getcwd())
-    root = argparse.ArgumentParser('seaorator')
+@jobm.job('orator', proxy=True, help='invoke orator cmds')
+def main(argv):
+    root = argparse.ArgumentParser('orator')
     subparsers = root.add_subparsers()
     for k, v in globals().items():
         if k.startswith('Cmd') and issubclass(v, BaseCmd):
-            cmd = v(app)
+            cmd = v()
             cmd.add_parser(subparsers).set_defaults(handler=cmd.run)
-    args = sys.argv[1:]
-    args, extra = root.parse_known_args(args)
+    args, extra = root.parse_known_args(argv)
     args.handler(args, extra)
