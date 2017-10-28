@@ -1,14 +1,1 @@
-import pytest
-import os
-
-import sea
 from sea.test.fixtures import *  # noqa
-
-
-os.environ.setdefault('SEA_ENV', 'testing')
-_app = sea.create_app()
-
-
-@pytest.fixture(scope='session')
-def app():
-    return _app

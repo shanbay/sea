@@ -4,11 +4,15 @@ import sys
 from sea.utils import import_string
 from sea.local import Proxy
 
-__version__ = '0.9.0'
+__version__ = '0.9.2'
 _app = None
 
 
 def create_app(root_path=None):
+    global _app
+    if _app is not None:
+        return _app
+
     if root_path is None:
         root_path = os.getcwd()
     sys.path.append(root_path)
@@ -16,10 +20,6 @@ def create_app(root_path=None):
 
     env = os.environ.get('SEA_ENV', 'development')
     config = import_string('configs.{}'.format(env))
-
-    global _app
-    if _app is not None:
-        return _app
 
     app_class = import_string('app:App')
     _app = app_class(root_path, env=env)
@@ -34,4 +34,4 @@ def create_app(root_path=None):
     return _app
 
 
-current_app = Proxy(lambda: _app)
+current_app = Proxy(create_app)
