@@ -4,6 +4,7 @@ import argparse
 import pkg_resources
 
 from sea.utils import import_string
+from sea import create_app
 
 
 class JobException(RuntimeError):
@@ -21,10 +22,13 @@ class JobManager:
     def __init__(self):
         self._jobs = {}
 
-    def job(self, name, proxy=False, *args, **kwargs):
+    def job(self, name, inapp=True, env='development', proxy=False,
+            *args, **kwargs):
         def wrapper(func):
             func.parser = JobOption(*args, **kwargs)
             func.proxy = proxy
+            func.inapp = inapp
+            func.env = env
             self._jobs[name] = func
             return func
         return wrapper
@@ -80,6 +84,9 @@ def _run(root):
     known, argv = root.parse_known_args(args)
     kwargs = vars(known)
     handler = kwargs.pop('handler')
+    os.environ.setdefault('SEA_ENV', handler.env)
+    if handler.inapp:
+        create_app()
     try:
         if handler.proxy:
             handler(**kwargs, argv=argv)

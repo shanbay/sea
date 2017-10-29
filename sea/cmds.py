@@ -1,7 +1,7 @@
 import os
 
 from sea.cli import jobm, JobException
-from sea import current_app, create_app
+from sea import current_app
 from sea.server import Server
 
 
@@ -50,15 +50,13 @@ def generate(proto_path, protos):
     return protoc.main(cmd)
 
 
-@jobm.job('test', proxy=True, help='run test')
+@jobm.job('test', env='testing', proxy=True, help='run test')
 def runtest(argv):
     import pytest
-    os.environ.setdefault('SEA_ENV', 'testing')
-    create_app()
     return pytest.main(argv)
 
 
-@jobm.job('new', aliases=['n'], help='Create Sea Project')
+@jobm.job('new', aliases=['n'], inapp=False, help='Create Sea Project')
 @jobm.option('project', help='project name')
 @jobm.option('--skip-git', action='store_true',
              help='skip add git files and run git init')
