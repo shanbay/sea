@@ -1,6 +1,9 @@
+import grpc
+
+
 class Context():
     def __init__(self):
-        self.code = None
+        self.code = grpc.StatusCode.OK
         self.details = None
         self.metadata = None
 

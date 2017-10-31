@@ -1,3 +1,5 @@
+import grpc
+
 from sea.exceptions import BadRequestException
 from sea.test.stub import Context, Stub
 from sea.servicer import ServicerMeta
@@ -19,6 +21,7 @@ def test_stub(app):
     assert stub.ctx.invocation_metadata() == data
     res = stub.return_normal(None)
     assert res is None
+    assert stub.ctx.code == grpc.StatusCode.OK
     assert stub.ctx.invocation_metadata() is None
 
     res = stub.return_error(None)
