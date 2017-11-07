@@ -78,7 +78,7 @@ def test_cmd_new():
 def test_cmd_job(app):
     with mock.patch('os.getcwd', return_value=app.root_path):
         sys.argv = 'sea plusone -n 100'.split()
-        assert cli.main() == 0
+        assert cli.main() is None
         assert app.config.get('NUMBER') == 101
         sys.argv = 'sea config_hello'.split()
         assert isinstance(cli.main(), cli.JobException)
@@ -95,7 +95,7 @@ def test_cmd_job(app):
 
     with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter):
         sys.argv = 'sea xyz'.split()
-        assert cli.main() == 0
+        assert cli.main() is None
         assert app.config.get('XYZ') == 'hello'
 
 

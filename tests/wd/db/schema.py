@@ -5,8 +5,8 @@ class InitDb(Migration):
 
     def up(self):
         with self.schema.create('users') as table:
-            table.increments('id')
-            table.string('username' 255)
+            table.big_increments('id')
+            table.string('username', 255)
             table.integer('age').unsigned().default(1)
             table.timestamp('created_at')
             table.timestamp('updated_at')
