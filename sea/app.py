@@ -25,7 +25,7 @@ class BaseApp:
         'GRPC_WORKERS': 3,
         'GRPC_HOST': '[::]',
         'GRPC_PORT': 6000,
-        'GRPC_LOG_LEVEL': 'INFO',
+        'GRPC_LOG_LEVEL': 'WARNING',
         'GRPC_LOG_HANDLER': logging.StreamHandler(),
         'GRPC_LOG_FORMAT': '[%(asctime)s %(levelname)s in %(module)s] %(message)s',  # NOQA
         'MIDDLEWARES': [
