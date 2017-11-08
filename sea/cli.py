@@ -89,10 +89,8 @@ def _run(root):
         create_app()
     try:
         if handler.proxy:
-            handler(**kwargs, argv=argv)
-        else:
-            handler(**kwargs)
-        return 0
+            return handler(**kwargs, argv=argv)
+        return handler(**kwargs)
     except JobException as e:
         return e
 

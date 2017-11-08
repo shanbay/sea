@@ -50,10 +50,17 @@ def generate(proto_path, protos):
     return protoc.main(cmd)
 
 
-@jobm.job('test', env='testing', proxy=True, help='run test')
+@jobm.job('test', env='testing', inapp=False, proxy=True, help='run test')
 def runtest(argv):
     import pytest
-    return pytest.main(argv)
+    from sea import create_app
+
+    class AppPlugin:
+
+        def pytest_load_initial_conftests(early_config, parser, args):
+            create_app()
+
+    return pytest.main(argv, plugins=[AppPlugin])
 
 
 @jobm.job('new', aliases=['n'], inapp=False, help='Create Sea Project')
