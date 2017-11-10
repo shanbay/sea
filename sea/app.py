@@ -44,7 +44,7 @@ class BaseApp:
         self._extensions = {}
         self._middlewares = []
 
-    @utils.cached_property
+    @utils.cached_property_ts
     def logger(self):
         logger = logging.getLogger('sea.app')
         if self.debug and logger.level == logging.NOTSET:
@@ -55,19 +55,19 @@ class BaseApp:
             logger.addHandler(h)
         return logger
 
-    @utils.cached_property
+    @utils.cached_property_ts
     def servicers(self):
         rv = ConstantsObject(self._servicers)
         del self._servicers
         return rv
 
-    @utils.cached_property
+    @utils.cached_property_ts
     def extensions(self):
         rv = ConstantsObject(self._extensions)
         del self._extensions
         return rv
 
-    @utils.cached_property
+    @utils.cached_property_ts
     def middlewares(self):
         rv = tuple(self._middlewares)
         del self._middlewares

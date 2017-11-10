@@ -1,4 +1,5 @@
 import sys
+from threading import Lock
 
 
 def import_string(import_name):
@@ -20,6 +21,7 @@ def import_string(import_name):
 
 
 class cached_property:
+
     def __init__(self, func, name=None):
         self.func = func
         self.__doc__ = getattr(func, '__doc__')
@@ -30,6 +32,21 @@ class cached_property:
             return self
         res = instance.__dict__[self.name] = self.func(instance)
         return res
+
+
+class cached_property_ts(cached_property):
+    """ thread safe cached property """
+
+    def __init__(self, func, name=None):
+        super().__init__(func, name)
+        self.lock = Lock()
+
+    def __get__(self, instance, cls=None):
+        with self.lock:
+            try:
+                return instance.__dict__[self.name]
+            except KeyError:
+                return super().__get__(instance, cls)
 
 
 class Singleton(type):
