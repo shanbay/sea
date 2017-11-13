@@ -103,3 +103,7 @@ def test_main():
     sys.argv = 'sea -h'.split()
     with pytest.raises(SystemExit):
         cli.main()
+    # no arguments scenes
+    sys.argv = ['sea']
+    with pytest.raises(SystemExit):
+        cli.main()

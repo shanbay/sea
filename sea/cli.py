@@ -80,7 +80,8 @@ def _build_parser(subparsers):
 
 
 def _run(root):
-    args = sys.argv[1:]
+    # show help message when user run sea command directly
+    args = sys.argv[1:] or ['--help']
     known, argv = root.parse_known_args(args)
     kwargs = vars(known)
     handler = kwargs.pop('handler')
