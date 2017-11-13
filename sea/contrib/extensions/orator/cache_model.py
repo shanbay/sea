@@ -5,9 +5,7 @@ from sea.contrib.extensions.cache import default_key
 
 
 def _related_caches_key(cls, id):
-    return '{}.related_caches.{}.{}.{}'.format(cls.__cache_version__,
-                                               cls.__module__,
-                                               cls.__name__, id)
+    return 'related_caches.{}.{}.{}'.format(cls.__module__, cls.__name__, id)
 
 
 def _model_caches_key(cache_version):
