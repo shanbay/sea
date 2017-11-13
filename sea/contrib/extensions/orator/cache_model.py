@@ -1,11 +1,21 @@
 from orator.orm import model
 from sea import current_app
 from sea.contrib.extensions import cache as cache_ext
+from sea.contrib.extensions.cache import default_key
 
 
 def _related_caches_key(cls, id):
-    return 'related_caches.{}.{}.{}'.format(
-        cls.__module__, cls.__name__, id)
+    return '{}.related_caches.{}.{}.{}'.format(cls.__cache_version__,
+                                               cls.__module__,
+                                               cls.__name__, id)
+
+
+def _model_caches_key(cache_version):
+
+    def wrapper(f, *args, **kwargs):
+        return '{}.{}'.format(cache_version, default_key(f, *args, **kwargs))
+
+    return wrapper
 
 
 def _register_to_related_caches(f, id, cls, *args, **kwargs):
@@ -56,12 +66,16 @@ def _id_is_list(cls, id, *args, **kwargs):
 
 
 class ModelMeta(model.MetaModel):
+
     def __new__(mcls, name, bases, kws):
         max_find_many_cache = kws.get('__max_find_many_cache__', 10)
 
+        cache_version = kws.get('__cache_version__', '1.0')
+
         @classmethod
-        @cache_ext.cached(
-            fallbacked=_find_register, unless=_id_is_list, cache_none=True)
+        @cache_ext.cached(fallbacked=_find_register,
+                          cache_key=_model_caches_key(cache_version),
+                          unless=_id_is_list, cache_none=True)
         def find(cls, id, columns=None):
             if isinstance(id, list) and id and len(id) <= max_find_many_cache:
                 cache = current_app.extensions.cache
@@ -86,13 +100,16 @@ class ModelMeta(model.MetaModel):
             return super(cls, cls).find(id, columns)
 
         @classmethod
-        @cache_ext.cached(fallbacked=_find_by_register, cache_none=True)
+        @cache_ext.cached(fallbacked=_find_by_register,
+                          cache_key=_model_caches_key(cache_version),
+                          cache_none=True)
         def find_by(cls, name, val, columns=None):
             return super(cls, cls).find_by(name, val, columns)
 
         kws.update({
             'find': find,
             'find_by': find_by,
+            '__cache_version__': cache_version,
         })
         return super().__new__(mcls, name, bases, kws)
 
