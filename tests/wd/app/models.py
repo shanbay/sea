@@ -5,6 +5,7 @@ from sea.contrib.extensions.orator import Model, cache_model
 class User(Model, metaclass=cache_model.ModelMeta):
 
     __fillable__ = ('username', 'age')
+    __cache_version__ = '1.1'
 
     @belongs_to
     def husband(self):
