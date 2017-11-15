@@ -14,16 +14,14 @@ class Server:
     """sea server implements
 
     :param app: application instance
-    :param publish_host: publish host
     """
 
-    def __init__(self, app, publish_host):
+    def __init__(self, app):
         self.app = app
         self.setup_logger()
         self.workers = self.app.config.get('GRPC_WORKERS')
         self.host = self.app.config.get('GRPC_HOST')
         self.port = self.app.config.get('GRPC_PORT')
-        self.publish_host = publish_host
         self.server = grpc.server(
             futures.ThreadPoolExecutor(
                 max_workers=self.workers))

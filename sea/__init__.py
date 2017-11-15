@@ -4,7 +4,7 @@ import sys
 from sea.utils import import_string
 from sea.local import Proxy
 
-__version__ = '0.9.7'
+__version__ = '0.9.8'
 _app = None
 
 
