@@ -16,16 +16,4 @@ shanbay rpc framework
 .. image:: http://img.shields.io/:license-mit-blue.svg?style=flat-square
     :target: http://shanbay.mit-license.org
 
-Installation
-=============
-
-
-.. code-block:: sh
-
-    pip install sea
-
-**This will allow you to keep up to date with development on GitHub:**
-
-.. code-block:: sh
-
-    pip install -U git+https://github.com/shanbay/sea.git
+`HomePage && Docs <https://shanbay.github.io/sea>`_
