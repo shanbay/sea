@@ -14,7 +14,7 @@ with open(os.path.join(_root, 'sea/__init__.py')) as f:
 with open(os.path.join(_root, 'requirements.txt')) as f:
     requirements = f.readlines()
 
-with open(os.path.join(_root, 'README.rst')) as f:
+with open(os.path.join(_root, 'README.md')) as f:
     readme = f.read()
 
 
