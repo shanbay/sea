@@ -8,7 +8,7 @@ from sea import cli
 
 
 def test_cmd_server(app):
-    sys.argv = 'sea s -b 127.0.0.1'.split()
+    sys.argv = 'sea s'.split()
     with mock.patch('sea.cmds.Server', autospec=True) as mocked:
         assert cli.main() == 0
         mocked.return_value.run.assert_called_with()

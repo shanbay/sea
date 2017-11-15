@@ -6,7 +6,7 @@ from sea.server import Server, started, stopped
 
 
 def test_server(app, logstream):
-    s = Server(app, '127.0.0.1')
+    s = Server(app)
     assert not s._stopped
 
     def log_started(s):

@@ -6,10 +6,8 @@ from sea.server import Server
 
 
 @jobm.job('server', aliases=['s'], help='Run Server')
-@jobm.option('-b', '--host', required=True,
-             help='published host which others can connect through')
-def server(host):
-    s = Server(current_app, host)
+def server():
+    s = Server(current_app)
     s.run()
     return 0
 
