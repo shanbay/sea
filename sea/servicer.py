@@ -31,9 +31,14 @@ class ServicerMeta(type):
         return super().__new__(cls, name, bases, _kws)
 
 
-def msg2dict(msg, keys=None):
+def msg2dict(msg, keys=None,
+             including_default_value_fields=False,
+             preserving_proto_field_name=True):
 
-    d = MessageToDict(msg)
+    d = MessageToDict(
+        msg, including_default_value_fields=including_default_value_fields,
+        preserving_proto_field_name=preserving_proto_field_name
+    )
     if keys is not None:
         return {k: d.get(k) for k in keys}
     return d
