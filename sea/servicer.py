@@ -1,5 +1,10 @@
 from types import FunctionType
 from functools import wraps
+import json
+from google.protobuf.json_format import (
+    MessageToDict,
+    ParseDict
+)
 
 from sea import current_app
 
@@ -27,11 +32,20 @@ class ServicerMeta(type):
 
 
 def msg2dict(msg, keys=None):
-    if keys is not None:
-        return {k: getattr(msg, k) for k in keys}
 
-    return {k.name: v
-            for k, v in msg.ListFields()}
+    d = MessageToDict(msg)
+    if keys is not None:
+        return {k: d.get(k) for k in keys}
+    return d
+
+
+def msg2json(msg, keys=None, indent=4, sort_keys=False):
+    d = msg2dict(msg, keys=keys)
+    return json.dumps(d, indent=indent, sort_keys=sort_keys)
+
+
+def dict2msg(d, message, ignore_unknown_fields=False):
+    return ParseDict(d, message, ignore_unknown_fields=ignore_unknown_fields)
 
 
 def stream2dict(stream):
