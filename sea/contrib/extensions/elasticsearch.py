@@ -12,7 +12,7 @@ class Elasticsearch(AbstractExtension):
         opts = app.config.get_namespace('ELASTICSEARCH_')
         connections = []
         for i in range(10):
-            connections.append(elasticsearch.Elasticsearch(**opts))
+            connections.append(elasticsearch.Elasticsearch(), **opts)
         self._pool = elasticsearch.ConnectionPool(connections)
 
     @property
