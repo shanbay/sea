@@ -6,13 +6,14 @@ from sea.extensions import AbstractExtension
 class Elasticsearch(AbstractExtension):
 
     def __init__(self):
-        self.connections = []
+        self._pool = None
 
     def init_app(self, app):
         opts = app.config.get_namespace('ELASTICSEARCH_')
+        connections = []
         for i in range(10):
-            self.connections.append(elasticsearch.Elasticsearch(**opts))
-        self._pool = elasticsearch.ConnectionPool(self.connections)
+            connections.append(elasticsearch.Elasticsearch(**opts))
+        self._pool = elasticsearch.ConnectionPool(connections)
 
     @property
     def _client(self):
