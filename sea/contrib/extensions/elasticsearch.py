@@ -10,7 +10,11 @@ class Elasticsearch(AbstractExtension):
 
     def init_app(self, app):
         opts = app.config.get_namespace('ELASTICSEARCH_')
-        self._client = elasticsearch.Elasticsearch(**opts)
+        connections = []
+        for i in range(10):
+            connections.append(elasticsearch.Elasticsearch(**opts))
+        self._pool = elasticsearch.ConnectionPool(connections)
+        self._client = self._pool.get_connection()
 
     def __getattr__(self, name):
         return getattr(self._client, name)
