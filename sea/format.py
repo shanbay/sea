@@ -38,11 +38,11 @@ def msg2dict(pb, keys=None, use_enum_labels=False):
     result_dict = {}
     extensions = {}
     if keys:
-        fields = [(pb.DESCRIPTOR.fields_by_name[key], getattr(pb, key))
+        field_values = [(pb.DESCRIPTOR.fields_by_name[key], getattr(pb, key))
                   for key in keys]
     else:
-        fields = pb.ListFields()
-    for field, value in fields:
+        field_values = pb.ListFields()
+    for field, value in field_values:
         if field.message_type and field.message_type.has_options and \
                 field.message_type.GetOptions().map_entry:
             result_dict[field.name] = dict()
