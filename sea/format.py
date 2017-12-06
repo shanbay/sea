@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import json
-from google.protobuf.message import Message
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.json_format import ParseDict
 EXTENSION_CONTAINER = '___X'
@@ -38,8 +37,8 @@ def msg2dict(pb, keys=None, use_enum_labels=False):
     result_dict = {}
     extensions = {}
     if keys:
-        field_values = [(pb.DESCRIPTOR.fields_by_name[key], getattr(pb, key))
-                  for key in keys]
+        field_values = [(pb.DESCRIPTOR.fields_by_name[key],
+                         getattr(pb, key)) for key in keys]
     else:
         field_values = pb.ListFields()
     for field, value in field_values:
