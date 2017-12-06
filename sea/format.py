@@ -38,11 +38,13 @@ def msg2dict(pb, keys=None, use_enum_labels=False):
     result_dict = {}
     extensions = {}
     if keys:
-        fields = [(pb.DESCRIPTOR.fields_by_name[key], getattr(pb, key)) for key in keys]
+        fields = [(pb.DESCRIPTOR.fields_by_name[key], getattr(pb, key))
+                  for key in keys]
     else:
         fields = pb.ListFields()
     for field, value in fields:
-        if field.message_type and field.message_type.has_options and field.message_type.GetOptions().map_entry:
+        if field.message_type and field.message_type.has_options and \
+                field.message_type.GetOptions().map_entry:
             result_dict[field.name] = dict()
             value_field = field.message_type.fields_by_name['value']
             type_callable = _get_field_value_adaptor(
@@ -65,6 +67,7 @@ def msg2dict(pb, keys=None, use_enum_labels=False):
     if extensions:
         result_dict[EXTENSION_CONTAINER] = extensions
     return result_dict
+
 
 def _get_field_value_adaptor(pb, field, use_enum_labels=False):
     if field.type == FieldDescriptor.TYPE_MESSAGE:
