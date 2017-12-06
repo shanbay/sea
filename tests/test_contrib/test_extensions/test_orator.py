@@ -70,9 +70,22 @@ def test_model_meta(app, cache, db):
 
 
 def test_cli(app):
-    sys.argv = ['sea', 'orator', '-h']
-    with pytest.raises(SystemExit):
+
+    class EntryPoint:
+
+        def load(self):
+            from sea.contrib.extensions.orator.cmd import main
+            return main
+
+    def new_entry_iter(name):
+        return [EntryPoint()]
+
+    with mock.patch('pkg_resources.iter_entry_points', new=new_entry_iter), \
+            pytest.raises(SystemExit), mock.patch('sys.stdout.write') as mocked:
+        sys.argv = 'sea orator -h'.split()
         cli.main()
+    mocked.assert_called_once_with('usage: sea orator [-h]\n\noptional arguments:\n'
+                                   '  -h, --help  show this help message and exit\n')
 
     with mock.patch('sea.contrib.extensions.orator.cmd.application'):
         with mock.patch.object(app, 'root_path', new='.'):

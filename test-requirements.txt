@@ -4,10 +4,11 @@ mysqlclient
 redis
 celery
 python-consul
-pytest
+pytest==3.2.5
 pytest-cov
 flake8
 coveralls
 codeclimate-test-reporter
 coverage>=4.0,<4.4
 sphinx
+elasticsearch>=6.0,<7.0
