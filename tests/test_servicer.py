@@ -1,6 +1,7 @@
 import grpc
 
-from sea.servicer import ServicerMeta, msg2dict, stream2dict
+from sea.servicer import ServicerMeta
+from sea.format import msg2dict, stream2dict
 from sea import exceptions
 from sea.pb2 import default_pb2
 from tests.wd.protos import helloworld_pb2
