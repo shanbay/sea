@@ -38,8 +38,8 @@ def test_msg2dict(app):
     assert res['enm'] == "C"
 
     # test keys
-    res = msg2dict(pb, keys=['bol', 'flot'])
-    assert res == {"bol": True, "flot": 3.14}
+    res = msg2dict(pb, keys=['bol', 'i32'])
+    assert res == {"bol": True, "i32": 666}
 
 
 def test_msg2json():
@@ -58,18 +58,15 @@ def test_msg2json():
     assert round(res['flot'], 2) == 3.14
     assert res['nested'] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
-    assert res["simpleMap"]['s1'] == 3.1415
+    assert round(res["simpleMap"]['s1'], 4) == 3.1415
 
 
 def test_dict2msg():
-    d = {'flot': 3.14, 'i32': 666, 'bol': True, 'nested': {'req': 'hahahaa'},
-         'enm': 2, 'str_repeated': ['dhueife', 'fhrvrjvnj'],
-         'simpleMap': {'s1': 3.1415, 's2': 4.1235}}
+    d = {'i32': 666, 'bol': True, 'nested': {'req': 'hahahaa'},
+         'enm': 2, 'str_repeated': ['dhueife', 'fhrvrjvnj']}
     res_msg = dict2msg(d, sample_pb2.MessageOfTypes())
     res = msg2dict(res_msg)
     for k, v in d.items():
-        if isinstance(res[k], float):
-            res[k] = round(res[k], 4)
         assert res[k] == v
 
 

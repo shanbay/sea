@@ -84,7 +84,11 @@ def msg2dict(pb, keys=None, use_enum_labels=False,
             if _is_map_entry(field):
                 result_dict[field.name] = {}
             else:
-                result_dict[field.name] = field.default_value
+                try:
+                    result_dict[field.name] = field.default_value
+                except NotImplementedError:
+                    result_dict[field.name] = None
+
     if extensions:
         result_dict[EXTENSION_CONTAINER] = extensions
     return result_dict
