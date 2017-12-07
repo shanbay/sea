@@ -24,15 +24,22 @@ TYPE_CALLABLE_MAP = {
 }
 
 
-def _repeated(type_callable):
+def repeated(type_callable):
     return lambda value_list: [type_callable(value) for value in value_list]
 
 
-def _enum_label_name(field, value):
+def enum_label_name(field, value):
     return field.enum_type.values_by_number[int(value)].name
 
 
-def msg2dict(pb, keys=None, use_enum_labels=False):
+def _is_map_entry(field):
+    return (field.type == FieldDescriptor.TYPE_MESSAGE and
+            field.message_type.has_options and
+            field.message_type.GetOptions().map_entry)
+
+
+def msg2dict(pb, keys=None, use_enum_labels=False,
+             including_default_value_fields=False):
 
     result_dict = {}
     extensions = {}
@@ -52,10 +59,10 @@ def msg2dict(pb, keys=None, use_enum_labels=False):
             for k, v in value.items():
                 result_dict[field.name][k] = type_callable(v)
             continue
-        type_callable = _get_field_value_adaptor(pb, field,
-                                                 use_enum_labels)
+        type_callable = _get_field_value_adaptor(
+            pb, field, use_enum_labels, including_default_value_fields,)
         if field.label == FieldDescriptor.LABEL_REPEATED:
-            type_callable = _repeated(type_callable)
+            type_callable = repeated(type_callable)
 
         if field.is_extension:
             extensions[str(field.number)] = type_callable(value)
@@ -63,18 +70,36 @@ def msg2dict(pb, keys=None, use_enum_labels=False):
 
         result_dict[field.name] = type_callable(value)
 
+    # Serialize default value if including_default_value_fields is True.
+    if including_default_value_fields:
+        for field in pb.DESCRIPTOR.fields:
+            # Singular message fields and oneof fields will not be affected.
+            if ((field.label != FieldDescriptor.LABEL_REPEATED and
+                 field.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE) or
+                    field.containing_oneof):
+                continue
+            if field.name in result_dict:
+                # Skip the field which has been serailized already.
+                continue
+            if _is_map_entry(field):
+                result_dict[field.name] = {}
+            else:
+                result_dict[field.name] = field.default_value
     if extensions:
         result_dict[EXTENSION_CONTAINER] = extensions
     return result_dict
 
 
-def _get_field_value_adaptor(pb, field, use_enum_labels=False):
+def _get_field_value_adaptor(pb, field, use_enum_labels=False,
+                             including_default_value_fields=False):
     if field.type == FieldDescriptor.TYPE_MESSAGE:
         # recursively encode protobuf sub-message
-        return lambda pb: msg2dict(pb, use_enum_labels=use_enum_labels)
+        return lambda pb: msg2dict(
+            pb, use_enum_labels=use_enum_labels,
+            including_default_value_fields=including_default_value_fields)
 
     if use_enum_labels and field.type == FieldDescriptor.TYPE_ENUM:
-        return lambda value: _enum_label_name(field, value)
+        return lambda value: enum_label_name(field, value)
 
     if field.type in TYPE_CALLABLE_MAP:
         return TYPE_CALLABLE_MAP[field.type]
@@ -83,7 +108,7 @@ def _get_field_value_adaptor(pb, field, use_enum_labels=False):
         pb.__class__.__name__, field.name, field.type))
 
 
-def msg2json(msg, keys=None, indent=4, sort_keys=False):
+def msg2json(msg, keys=None, indent=2, sort_keys=False):
     d = msg2dict(msg, keys=keys)
     return json.dumps(d, indent=indent, sort_keys=sort_keys)
 
