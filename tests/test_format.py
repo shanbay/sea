@@ -20,10 +20,10 @@ def test_msg2dict(app):
     pb.simpleMap['s2'] = 4.1235
     res = msg2dict(pb)
     assert res['bol'] == True
-    assert res['flot'] == 3.14
+    assert round(res['flot'], 2) == 3.14
     assert res['nested'] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
-    assert res["simpleMap"]['s1'] == 3.1415
+    assert round(res["simpleMap"]['s1'], 4) == 3.1415
 
     # test including_default_value_fields
     res = msg2dict(pb, including_default_value_fields=True)
@@ -55,7 +55,7 @@ def test_msg2json():
     pb.simpleMap['s2'] = 4.1235
     res_json = msg2json(pb)
     res = json.loads(res_json)
-    assert res['flot'] == 3.14
+    assert round(res['flot'], 2) == 3.14
     assert res['nested'] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
     assert res["simpleMap"]['s1'] == 3.1415
@@ -68,6 +68,8 @@ def test_dict2msg():
     res_msg = dict2msg(d, sample_pb2.MessageOfTypes())
     res = msg2dict(res_msg)
     for k, v in d.items():
+        if isinstance(res[k], float):
+            res[k] = round(res[k], 4)
         assert res[k] == v
 
 
