@@ -38,6 +38,11 @@ def _is_map_entry(field):
             field.message_type.GetOptions().map_entry)
 
 
+def _is_repeat_message(field):
+    return (field.type == FieldDescriptor.TYPE_MESSAGE and
+            field.label == FieldDescriptor.LABEL_REPEATED)
+
+
 def msg2dict(pb, keys=None, use_enum_labels=False,
              including_default_value_fields=False):
 
@@ -83,11 +88,10 @@ def msg2dict(pb, keys=None, use_enum_labels=False,
                 continue
             if _is_map_entry(field):
                 result_dict[field.name] = {}
+            elif _is_repeat_message(field):
+                result_dict[field.name] = []
             else:
-                try:
-                    result_dict[field.name] = field.default_value
-                except NotImplementedError:
-                    result_dict[field.name] = None
+                result_dict[field.name] = field.default_value
 
     if extensions:
         result_dict[EXTENSION_CONTAINER] = extensions
