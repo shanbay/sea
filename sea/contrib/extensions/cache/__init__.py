@@ -28,6 +28,25 @@ def default_key(f, *args, **kwargs):
     return 'default.{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
 
 
+def classmethod_caches_key(cls):
+    return 'classmethod_caches.{}.{}'.format(cls.__module__, cls.__name__)
+
+
+def register_to_classmethod_caches(f, cls, *args, **kwargs):
+    cache = current_app.extensions.cache
+    key = cache._backend.trans_key(classmethod_caches_key(cls))
+    redis = cache._backend._client
+    cached_key = cache._backend.trans_key(
+        f.make_cache_key(cls, *args, **kwargs))
+    redis.sadd(key, cached_key)
+    redis.expire(key, cache._backend.default_ttl)
+    return True
+
+
+def classmethod_register(f, ins, cls, *args, **kwargs):
+    return register_to_classmethod_caches(f, cls, *args, **kwargs)
+
+
 class CacheNone:
     pass
 
@@ -58,7 +77,8 @@ class Cache(AbstractExtension):
 
 class cached:
     def __init__(self, func=None, ttl=None, cache_key=default_key,
-                 unless=None, fallbacked=None, cache_none=False):
+                 unless=None, fallbacked=classmethod_register,
+                 cache_none=False):
         self.ttl = ttl
         self.cache_key = cache_key
         self.unless = unless

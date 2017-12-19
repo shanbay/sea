@@ -1,7 +1,7 @@
 from orator.orm import model
 from sea import current_app
 from sea.contrib.extensions import cache as cache_ext
-from sea.contrib.extensions.cache import default_key
+from sea.contrib.extensions.cache import default_key, classmethod_caches_key
 
 
 def _related_caches_key(cls, pk):
@@ -50,15 +50,19 @@ def _bulk_register_to_related_caches(cls, key_model_map):
     return True
 
 
-def _clear_related_caches(instance):
+def _clear_caches(instance):
     cache = current_app.extensions.cache
-    key = cache._backend.trans_key(
+    redis = cache._backend._client
+    related_key = cache._backend.trans_key(
         _related_caches_key(instance.__class__,
                             getattr(instance, instance.__primary_key__)))
-    redis = cache._backend._client
-    related_caches = redis.smembers(key)
-    if related_caches:
-        redis.delete(*related_caches)
+    classmethod_key = cache._backend.trans_key(
+        classmethod_caches_key(instance.__class__))
+    for key in (related_key, classmethod_key):
+        keys = redis.smembers(key)
+        if keys:
+            redis.delete(*keys)
+            redis.srem(key, *keys)
     return True
 
 
@@ -116,5 +120,5 @@ class ModelMeta(model.MetaModel):
 
     def __init__(cls, name, bases, kws):
         super().__init__(name, bases, kws)
-        cls.saved(_clear_related_caches)
-        cls.deleted(_clear_related_caches)
+        cls.saved(_clear_caches)
+        cls.deleted(_clear_caches)
