@@ -1,7 +1,7 @@
 from sea.datatypes import ConstantsObject
 
 
-class ConfigAttribute(object):
+class ConfigAttribute:
     """Makes an attribute forward to the config"""
 
     def __init__(self, name, get_converter=None):
