@@ -38,10 +38,12 @@ def console():
              'the paths are related to the path defined in "-I"')
 def generate(proto_path, protos):
     from grpc_tools import protoc
+    well_known_path = os.path.join(os.path.dirname(protoc.__file__), '_proto')
     proto_out = os.path.join(current_app.root_path, 'protos')
     cmd = [
         'grpc_tools.protoc',
         '--proto_path', proto_path,
+        '--proto_path', well_known_path,
         '--python_out', proto_out,
         '--grpc_python_out', proto_out
     ] + [os.path.join(proto_path, f) for f in protos]

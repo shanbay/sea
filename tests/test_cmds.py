@@ -26,10 +26,14 @@ def test_cmd_generate(app):
     sys.argv = 'sea g -I /path/to/protos hello.proto test.proto'.split()
     with mock.patch('grpc_tools.protoc.main', return_value=0) as mocked:
         assert cli.main() == 0
+        import grpc_tools
+        well_known_path = os.path.join(os.path.dirname(grpc_tools.__file__),
+                                       '_proto')
         proto_out = os.path.join(app.root_path, 'protos')
         cmd = [
             'grpc_tools.protoc',
             '--proto_path', '/path/to/protos',
+            '--proto_path', well_known_path,
             '--python_out', proto_out,
             '--grpc_python_out', proto_out,
             '/path/to/protos/hello.proto',
