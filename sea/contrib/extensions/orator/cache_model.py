@@ -1,7 +1,7 @@
 from orator.orm import model
 from sea import current_app
 from sea.contrib.extensions import cache as cache_ext
-from sea.contrib.extensions.cache import default_key
+from sea.contrib.extensions.cache import default_key, auto_cleared_caches_key
 
 
 def _related_caches_key(cls, pk):
@@ -59,6 +59,25 @@ def _clear_related_caches(instance):
     related_caches = redis.smembers(key)
     if related_caches:
         redis.delete(*related_caches)
+        redis.srem(key, *related_caches)
+    return True
+
+
+def _clear_auto_cleared_caches(instance):
+    cache = current_app.extensions.cache
+    redis = cache._backend._client
+    key = cache._backend.trans_key(
+        auto_cleared_caches_key(instance.__class__))
+    auto_cleared_caches = redis.smembers(key)
+    if auto_cleared_caches:
+        redis.delete(*auto_cleared_caches)
+        redis.srem(key, *auto_cleared_caches)
+    return True
+
+
+def clear_caches(instance):
+    _clear_related_caches(instance)
+    _clear_auto_cleared_caches(instance)
     return True
 
 

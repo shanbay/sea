@@ -28,6 +28,21 @@ def default_key(f, *args, **kwargs):
     return 'default.{}.{}.{}'.format(f.__module__, f.__name__, '.'.join(keys))
 
 
+def auto_cleared_caches_key(cls):
+    return 'auto_cleared_caches.{}.{}'.format(cls.__module__, cls.__name__)
+
+
+def register_to_auto_cleared_caches(f, ins, cls, *args, **kwargs):
+    cache = current_app.extensions.cache
+    redis = cache._backend._client
+    key = cache._backend.trans_key(auto_cleared_caches_key(cls))
+    cached_key = cache._backend.trans_key(
+        f.make_cache_key(cls, *args, **kwargs))
+    redis.sadd(key, cached_key)
+    redis.expire(key, cache._backend.default_ttl)
+    return True
+
+
 class CacheNone:
     pass
 
@@ -58,7 +73,8 @@ class Cache(AbstractExtension):
 
 class cached:
     def __init__(self, func=None, ttl=None, cache_key=default_key,
-                 unless=None, fallbacked=None, cache_none=False):
+                 unless=None, fallbacked=None,
+                 cache_none=False):
         self.ttl = ttl
         self.cache_key = cache_key
         self.unless = unless
