@@ -21,7 +21,7 @@ def _default_cls_attr(name, type_, cls_value):
     })
 
 
-class Proxy(object):
+class Proxy:
     """Proxy to another object."""
 
     # Code stolen from werkzeug.local.Proxy.
