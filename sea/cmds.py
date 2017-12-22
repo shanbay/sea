@@ -111,7 +111,7 @@ def new(project, **extra):
                     else:
                         shutil.copyfile(src, dst)
 
-                    print('created: {}'.format(dst))
+                    print('created: {}'.format(r if ext == '.tmpl' else dst))
 
     path = os.path.join(os.getcwd(), project)
     if os.path.exists(path):
