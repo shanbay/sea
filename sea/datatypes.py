@@ -66,3 +66,6 @@ class ConstantsObject(ImmutableDict):
 
     def __dir__(self):
         return self.keys()
+
+    def __setattr__(self, name, val):
+        is_immutable(self)
