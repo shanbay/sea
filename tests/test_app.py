@@ -8,8 +8,8 @@ from sea import app, exceptions
 
 def test_baseapp():
     root_path = './tests/wd'
-    sys.path.append(root_path)
-    sys.path.append(os.path.join(root_path, 'protos'))
+    sys.path.insert(0, root_path)
+    sys.path.insert(1, os.path.join(root_path, 'protos'))
 
     _app = app.BaseApp(root_path, env='testing')
     assert not _app.debug
