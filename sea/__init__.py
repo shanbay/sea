@@ -15,8 +15,8 @@ def create_app(root_path=None):
 
     if root_path is None:
         root_path = os.getcwd()
-    sys.path.append(root_path)
-    sys.path.append(os.path.join(root_path, 'protos'))
+    sys.path.insert(0, root_path)
+    sys.path.insert(1, os.path.join(root_path, 'protos'))
 
     env = os.environ.get('SEA_ENV', 'development')
     config = import_string('configs.{}'.format(env))

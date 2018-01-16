@@ -51,7 +51,7 @@ jobm = JobManager()
 
 def _load_jobs():
     path = os.getcwd()
-    sys.path.append(path)
+    sys.path.insert(0, path)
 
     # load builtin
     import_string('sea.cmds')
