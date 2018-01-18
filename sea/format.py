@@ -55,7 +55,7 @@ def msg2dict(pb, keys=None, use_enum_labels=False,
         pb, field_values, use_enum_labels, including_default_value_fields)
     # Serialize default value if including_default_value_fields is True.
     if including_default_value_fields:
-        result_dict = _handle_default_value_fields(pb, result_dict)
+        result_dict = _handle_default_value_fields(pb, keys, result_dict)
 
     if extensions:
         result_dict[EXTENSION_CONTAINER] = extensions
@@ -102,8 +102,10 @@ def _handle_field_values(pb, field_values,
     return result_dict, extensions
 
 
-def _handle_default_value_fields(pb, result_dict):
+def _handle_default_value_fields(pb, keys, result_dict):
     for field in pb.DESCRIPTOR.fields:
+        if field.name not in field_values:
+            continue
         # Singular message fields and oneof fields will not be affected.
         if ((field.label != FieldDescriptor.LABEL_REPEATED and
              field.cpp_type == FieldDescriptor.CPPTYPE_MESSAGE) or
