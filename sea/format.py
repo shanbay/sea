@@ -86,7 +86,7 @@ def _handle_field_values(pb, field_values,
             value_field = field.message_type.fields_by_name['value']
             type_callable = _get_field_value_adaptor(
                 pb, value_field,
-                use_enum_labels)
+                use_enum_labels, including_default_value_fields)
             for k, v in value.items():
                 result_dict[field.name][k] = type_callable(v)
             continue
@@ -123,8 +123,8 @@ def _handle_default_value_fields(pb, keys, result_dict):
     return result_dict
 
 
-def _get_field_value_adaptor(pb, field, use_enum_labels=False,
-                             including_default_value_fields=False):
+def _get_field_value_adaptor(pb, field, use_enum_labels,
+                             including_default_value_fields):
     if field.type == FieldDescriptor.TYPE_MESSAGE:
         # recursively encode protobuf sub-message
         return lambda pb: msg2dict(
