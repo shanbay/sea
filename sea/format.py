@@ -43,7 +43,7 @@ def _is_repeat_label(field):
 
 
 def msg2dict(pb, keys=None, use_enum_labels=False,
-             including_default_value_fields=False):
+             including_default_value_fields=True):
 
     if keys:
         field_values = [(pb.DESCRIPTOR.fields_by_name[key],
