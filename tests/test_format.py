@@ -53,7 +53,8 @@ def test_msg2json():
 
     pb.simpleMap['s1'] = 3.1415
     pb.simpleMap['s2'] = 4.1235
-    res_json = msg2json(pb)
+    res_json = msg2json(
+        pb, keys=['flot', 'nested', 'str_repeated', 'simpleMap'])
     res = json.loads(res_json)
     assert round(res['flot'], 2) == 3.14
     assert res['nested'] == {"req": "hahahaa"}
