@@ -38,9 +38,8 @@ def _is_map_entry(field):
             field.message_type.GetOptions().map_entry)
 
 
-def _is_repeat_message(field):
-    return (field.type == FieldDescriptor.TYPE_MESSAGE and
-            field.label == FieldDescriptor.LABEL_REPEATED)
+def _is_repeat_label(field):
+    return field.label == FieldDescriptor.LABEL_REPEATED
 
 
 def msg2dict(pb, keys=None, use_enum_labels=False,
@@ -115,7 +114,7 @@ def _handle_default_value_fields(pb, result_dict):
             continue
         if _is_map_entry(field):
             result_dict[field.name] = {}
-        elif _is_repeat_message(field):
+        elif _is_repeat_label(field):
             result_dict[field.name] = []
         else:
             result_dict[field.name] = field.default_value
