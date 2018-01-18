@@ -104,7 +104,7 @@ def _handle_field_values(pb, field_values,
 
 def _handle_default_value_fields(pb, keys, result_dict):
     for field in pb.DESCRIPTOR.fields:
-        if field.name not in field_values:
+        if field.name not in keys:
             continue
         # Singular message fields and oneof fields will not be affected.
         if ((field.label != FieldDescriptor.LABEL_REPEATED and
