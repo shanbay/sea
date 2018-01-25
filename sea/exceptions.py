@@ -12,12 +12,13 @@ class RpcException(Exception):
     details = None
 
     def __init__(self, message=None, *args, **kwargs):
-        if message and not isinstance(message, str):
-            try:
-                message = json.dumps(message, default=str, ensure_ascii=True)
-            except TypeError:
-                message = str(message)
-        self.details = message
+        if isinstance(message, (list, dict)):
+            message = json.dumps(
+                message, default=str, ensure_ascii=True)
+        if not isinstance(message, str):
+            message = str(message)
+        if message is not None:
+            self.details = message
         super().__init__(message, *args, **kwargs)
 
 
