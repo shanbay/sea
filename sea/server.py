@@ -58,5 +58,7 @@ class Server:
         signal.signal(signal.SIGQUIT, self._stop_handler)
 
     def _stop_handler(self, signum, frame):
-        self.server.stop(0)
+        grace = self.app.config.get('GRPC_GRACE')
+        self.server.stop(grace)
+        time.sleep(grace or 1)
         self._stopped = True
