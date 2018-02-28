@@ -4,7 +4,7 @@ mysqlclient
 redis
 celery
 python-consul
-pytest==3.2.5
+pytest
 pytest-cov
 flake8
 coveralls

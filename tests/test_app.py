@@ -1,12 +1,14 @@
 import pytest
 import sys
+import logging
 import os.path
 from unittest import mock
 
 from sea import app, exceptions
 
 
-def test_baseapp():
+def test_baseapp(caplog):
+
     root_path = './tests/wd'
     sys.path.append(root_path)
     sys.path.append(os.path.join(root_path, 'protos'))
@@ -48,6 +50,6 @@ def test_baseapp():
     ext = _app.extensions.db
     assert ext is extensions.db
 
-    with mock.patch('sys.stderr') as mocked:
+    with caplog.at_level(logging.DEBUG):
         _app.logger.debug('test')
-        assert len(mocked.method_calls) > 0
+        assert caplog.text
