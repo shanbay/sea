@@ -1,9 +1,7 @@
 import elasticsearch
 
-from sea.extensions import AbstractExtension
 
-
-class Elasticsearch(AbstractExtension):
+class Elasticsearch:
 
     def __init__(self):
         self._pool = None

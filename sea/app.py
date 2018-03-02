@@ -5,7 +5,6 @@ import os.path
 from sea import exceptions, utils
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict, ConstantsObject
-from sea.extensions import AbstractExtension
 
 
 class BaseApp:
@@ -113,10 +112,10 @@ class BaseApp:
         return self.middlewares
 
     def load_extensions_in_module(self, module):
-        for _ext_name in dir(module):
-            _ext = getattr(module, _ext_name)
-            if isinstance(_ext, AbstractExtension):
-                self._register_extension(_ext_name, _ext)
+        def is_ext(ins):
+            return not inspect.isclass(ins) and hasattr(ins, 'init_app')
+        for n, ext in inspect.getmembers(module, is_ext):
+            self._register_extension(n, ext)
         return self.extensions
 
     def load_servicers_in_module(self, module):

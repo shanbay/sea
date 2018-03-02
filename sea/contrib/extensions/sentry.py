@@ -3,10 +3,8 @@ import raven
 from raven.conf import setup_logging
 from raven.handlers.logging import SentryHandler
 
-from sea.extensions import AbstractExtension
 
-
-class Sentry(AbstractExtension):
+class Sentry:
 
     def init_app(self, app):
         dsn = app.config.get('SENTRY_DSN')

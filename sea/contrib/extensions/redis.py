@@ -1,9 +1,7 @@
 import redis
 
-from sea.extensions import AbstractExtension
 
-
-class Redis(AbstractExtension):
+class Redis:
 
     def __init__(self):
         self._client = None

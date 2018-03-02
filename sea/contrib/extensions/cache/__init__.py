@@ -2,7 +2,6 @@ import functools
 import logging
 
 from sea import current_app
-from sea.extensions import AbstractExtension
 from . import backends
 
 
@@ -32,7 +31,7 @@ class CacheNone:
     pass
 
 
-class Cache(AbstractExtension):
+class Cache:
 
     PROTO_METHODS = ('get', 'get_many', 'set', 'set_many', 'delete',
                      'delete_many', 'expire', 'expireat', 'clear',
