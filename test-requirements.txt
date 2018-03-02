@@ -1,9 +1,8 @@
 -r requirements.txt
-git+https://github.com/shanbay/sorator
+sorator
 mysqlclient
 redis
 celery
-python-consul
 pytest
 pytest-cov
 flake8

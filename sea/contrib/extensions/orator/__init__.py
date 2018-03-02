@@ -1,11 +1,10 @@
 import orator
 import pendulum
 
-from sea.extensions import AbstractExtension
 from sea import current_app
 
 
-class Orator(AbstractExtension):
+class Orator:
 
     def __init__(self):
         self._dbmanager = None
