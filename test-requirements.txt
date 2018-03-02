@@ -1,4 +1,5 @@
-peewee
+-r requirements.txt
+sorator
 mysqlclient
 redis
 celery
