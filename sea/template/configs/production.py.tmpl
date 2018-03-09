@@ -12,9 +12,6 @@ CACHE_HOST = os.environ['CACHE_HOST']
 CACHE_PASSWORD = os.environ['CACHE_PASSWORD']
 {%- endif %}
 
-{% if not skip_orator -%}
-DATABASES['db'].update({
-    'host': os.environ['DB_HOST'],
-    'password': os.environ['DB_PASSWORD'],
-})
+{% if not skip_peewee -%}
+PW_DB_URL = 'sqlite+smart:///{{ project }}.db'
 {%- endif %}

@@ -43,12 +43,12 @@ def test_baseapp(caplog):
         servicers.GreeterServicer)
 
     with pytest.raises(exceptions.ConfigException):
-        _app._register_extension('db', extensions.db)
-        _app._register_extension('db', extensions.db)
+        _app._register_extension('pwx', extensions.pwx)
+        _app._register_extension('pwx', extensions.pwx)
     _app._extensions = {}
     _app.load_extensions_in_module(extensions)
-    ext = _app.extensions.db
-    assert ext is extensions.db
+    ext = _app.extensions.pwx
+    assert ext is extensions.pwx
 
     with caplog.at_level(logging.DEBUG):
         _app.logger.debug('test')

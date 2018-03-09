@@ -67,7 +67,7 @@ def runtest(argv):
 @jobm.option('project', help='project name')
 @jobm.option('--skip-git', action='store_true',
              help='skip add git files and run git init')
-@jobm.option('--skip-orator', action='store_true', help='skip orator')
+@jobm.option('--skip-peewee', action='store_true', help='skip peewee')
 @jobm.option('--skip-cache', action='store_true', help='skip cache')
 @jobm.option('--skip-celery', action='store_true', help='skip celery')
 @jobm.option('--skip-sentry', action='store_true', help='skip sentry')
@@ -76,9 +76,8 @@ def new(project, **extra):
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
         'git': ['gitignore'],
-        'orator': ['configs/default/orator.py.tmpl',
-                   'app/models.py.tmpl',
-                   'db/.keep'],
+        'peewee': ['configs/default/peewee.py.tmpl',
+                   'app/models.py.tmpl'],
         'cache': ['configs/default/cache.py.tmpl'],
         'sentry': [],
         'celery': ['configs/default/celery.py.tmpl',

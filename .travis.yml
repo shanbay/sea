@@ -6,7 +6,7 @@ python:
   - "3.5"
   - "3.6"
 install:
-  - pip install -r test-requirements.txt
+  - pip install -r test-requirements.txt -U
 script:
   - flake8 sea --exclude=*_pb2.py
   - pytest tests

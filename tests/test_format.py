@@ -3,6 +3,7 @@ from sea.format import msg2dict, stream2dict, msg2json, dict2msg
 from tests.wd.protos import helloworld_pb2
 from tests.wd.protos import sample_pb2
 
+
 def test_msg2dict(app):
     request = helloworld_pb2.HelloRequest(name="value")
     ret = msg2dict(request)
@@ -19,7 +20,7 @@ def test_msg2dict(app):
     pb.simpleMap['s1'] = 3.1415
     pb.simpleMap['s2'] = 4.1235
     res = msg2dict(pb)
-    assert res['bol'] == True
+    assert res['bol'] is True
     assert round(res['flot'], 2) == 3.14
     assert res['nested'] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
