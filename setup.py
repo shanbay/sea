@@ -67,7 +67,6 @@ setup(
         ],
         'sea.jobs': [
             'celery=sea.contrib.extensions.celery.cmd:main',
-            'peewee=sea.contrib.extensions.peewee.cmd:main'
         ]
     }
 )
