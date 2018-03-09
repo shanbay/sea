@@ -10,11 +10,11 @@ def test_app():
 
     from configs import default
     from app.servicers import GreeterServicer, helloworld_pb2_grpc
-    from app.extensions import db
+    from app.extensions import pwx
 
     assert app.config.get('CACHE_BACKEND') == default.CACHE_BACKEND
     servicer = app.servicers['GreeterServicer']
     assert servicer == (
         helloworld_pb2_grpc.add_GreeterServicer_to_server, GreeterServicer)
-    extension = app.extensions.db
-    assert extension is db
+    extension = app.extensions.pwx
+    assert extension is pwx

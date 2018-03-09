@@ -45,7 +45,7 @@ def test_cmd_generate(app):
 def test_cmd_new():
     shutil.rmtree('tests/myproject', ignore_errors=True)
     sys.argv = ('sea new tests/myproject'
-                ' --skip-git --skip-orator').split()
+                ' --skip-git --skip-peewee').split()
     assert cli.main() == 0
     correct_code = """\
     # import myproject_pb2
@@ -63,7 +63,7 @@ def test_cmd_new():
 
     from textwrap import dedent
     assert content == dedent(correct_code).rstrip()
-    assert not os.path.exists('./tests/myproject/condfigs/default/orator.py')
+    assert not os.path.exists('./tests/myproject/condfigs/default/peewee.py')
     assert os.path.exists('./tests/myproject/app/tasks.py')
 
     correct_code = """\

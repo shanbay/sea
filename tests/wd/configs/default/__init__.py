@@ -1,4 +1,4 @@
-from .orator import *
+from .peewee import *
 from .celery import *
 
 CACHE_BACKEND = 'Redis'
@@ -13,3 +13,4 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 
 TIMEZONE = 'Asia/Shanghai'
+GRPC_GRACE =0

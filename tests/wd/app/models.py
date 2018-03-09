@@ -1,24 +1,7 @@
-from orator.orm import has_one, has_many, belongs_to
-from sea.contrib.extensions.orator import Model, cache_model
+from app.extensions import pwx
+import peewee
 
 
-class User(Model, metaclass=cache_model.ModelMeta):
+class User(pwx.Model):
 
-    __fillable__ = ('username', 'age')
-    __cache_version__ = '1.1'
-
-    @belongs_to
-    def husband(self):
-        return User
-
-    @has_one('husband_id')
-    def wife(self):
-        return User
-
-    @belongs_to
-    def father(self):
-        return User
-
-    @has_many('father_id')
-    def children(self):
-        return User
+    name = peewee.CharField()

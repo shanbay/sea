@@ -1,7 +1,7 @@
 from sea.contrib.extensions.cache import Cache
-from sea.contrib.extensions.orator import Orator
+from peeweext import Peeweext
 from sea.contrib.extensions.celery import Celery
 
 cache = Cache()
-db = Orator()
+pwx = Peeweext()
 celeryapp = Celery()

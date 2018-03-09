@@ -1,4 +1,4 @@
-{% if not skip_orator -%}from .orator import *{%- endif %}
+{% if not skip_peewee -%}from .peewee import *{%- endif %}
 {% if not skip_celery -%}from .celery import *{%- endif %}
 {% if not skip_cache -%}from .cache import *{%- endif %}
 

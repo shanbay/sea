@@ -1,5 +1,5 @@
-{%- if not skip_orator -%}
-from sea.contrib.extensions.orator import Orator
+{%- if not skip_peewee -%}
+from peeweext import Peeweext
 {% endif %}
 {%- if not skip_cache -%}
 from sea.contrib.extensions.cache import Cache
@@ -11,8 +11,8 @@ from sea.contrib.extensions.celery import Celery
 from sea.contrib.extensions.sentry import Sentry
 {% endif %}
 
-{%- if not skip_orator -%}
-db = Orator()
+{%- if not skip_peewee -%}
+pwx = Peeweext()
 {% endif %}
 {%- if not skip_cache -%}
 cache = Cache()
