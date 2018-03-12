@@ -11,4 +11,4 @@
 
 
 [GitHub](https://github.com/shanbay/sea)
-[Documents](#关于-sea)
+[Documents](?id=documents)
