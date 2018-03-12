@@ -1,4 +1,6 @@
-# [Home Page](https://shanbay.github.io/sea)
+# Sea
+
+**A framework for GRPC. Powered by [Shanbay](https://www.shanbay.com)**
 
 [![](http://img.shields.io/travis/shanbay/sea.svg?style=flat-square)](https://travis-ci.org/shanbay/sea)
 [![Maintainability](https://api.codeclimate.com/v1/badges/774db211d37720bb2599/maintainability)](https://codeclimate.com/github/shanbay/sea/maintainability)
@@ -6,3 +8,7 @@
 [![](https://img.shields.io/pypi/v/sea.svg)](https://github.com/shanbay/sea)
 [![](https://img.shields.io/pypi/pyversions/sea.svg)](https://github.com/shanbay/sea)
 [![](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://shanbay.mit-license.org)
+
+
+[GitHub](https://github.com/shanbay/sea)
+[Documents](#关于-sea)
