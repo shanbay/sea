@@ -1,5 +1,8 @@
 import json
-from sea.format import msg2dict, stream2dict, msg2json, dict2msg
+
+from datetime import datetime, date, time
+
+from sea.format import msg2dict, stream2dict, msg2json, dict2msg, cast_dict, datetime_converter
 from tests.wd.protos import helloworld_pb2
 from tests.wd.protos import sample_pb2
 
@@ -61,6 +64,14 @@ def test_msg2json():
     assert res['nested'] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
     assert round(res["simpleMap"]['s1'], 4) == 3.1415
+
+
+def test_cast_dict():
+    d = {'datetime': datetime.now(), 'date': date.today(), 'nested': {'time': time()}}
+    d = cast_dict(d, datetime_converter)
+    assert isinstance(d['datetime'], str)
+    assert isinstance(d['date'], str)
+    assert isinstance(d['nested']['time'], str)
 
 
 def test_dict2msg():

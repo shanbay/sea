@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
 import json
+
+import datetime
 from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.json_format import ParseDict
+
 EXTENSION_CONTAINER = '___X'
 
 TYPE_CALLABLE_MAP = {
@@ -44,7 +47,6 @@ def _is_repeat_label(field):
 
 def msg2dict(pb, keys=None, use_enum_labels=False,
              including_default_value_fields=True):
-
     if keys:
         field_values = [(pb.DESCRIPTOR.fields_by_name[key],
                          getattr(pb, key)) for key in keys]
@@ -67,7 +69,27 @@ def msg2json(msg, keys=None, indent=2, sort_keys=False):
     return json.dumps(d, indent=indent, sort_keys=sort_keys)
 
 
-def dict2msg(d, message, ignore_unknown_fields=False):
+def datetime_converter(obj):
+    if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
+        return obj.isoformat()
+    return obj
+
+
+def cast_dict(d, converter):
+    """
+    recursively convert fields by converter
+    """
+    for key, value in d:
+        if isinstance(value, dict):
+            d[key] = cast_dict(value, converter)
+        else:
+            d[key] = converter(value)
+    return d
+
+
+def dict2msg(d, message, ignore_unknown_fields=False, converter=datetime_converter):
+    if converter:
+        d = cast_dict(d, converter)
     return ParseDict(d, message, ignore_unknown_fields=ignore_unknown_fields)
 
 
