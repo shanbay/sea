@@ -79,7 +79,7 @@ def cast_dict(d, converter):
     """
     recursively convert fields by converter
     """
-    for key, value in d:
+    for key, value in d.items():
         if isinstance(value, dict):
             d[key] = cast_dict(value, converter)
         else:
@@ -87,7 +87,8 @@ def cast_dict(d, converter):
     return d
 
 
-def dict2msg(d, message, ignore_unknown_fields=False, converter=datetime_converter):
+def dict2msg(d, message,
+             ignore_unknown_fields=False, converter=datetime_converter):
     if converter:
         d = cast_dict(d, converter)
     return ParseDict(d, message, ignore_unknown_fields=ignore_unknown_fields)
