@@ -77,3 +77,5 @@ class TestConstantsObject:
         data = {'foo': 1, 'bar': 2, 'baz': 3}
         d = datatypes.ConstantsObject(data)
         assert d.foo == 1
+        with pytest.raises(TypeError) as exc:
+            d.foo = 2
