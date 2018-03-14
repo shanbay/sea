@@ -6,12 +6,12 @@ Sea 内建对 pytest 测试框架的支持，
 
 **fixture**
 
-- `sea.test.fixtures:app`
-- `sea.test.fixtures:cache` # 如果启用了cache
+- `sea.test.fixtures.app`
+- `sea.test.fixtures.cache` # 如果启用了cache
 
 **测试 grpc 接口**
 
-可以利用 `sea.test.stub:Stub` 来做grpc接口的测试。
+可以利用 `sea.test.stub.Stub` 来做grpc接口的测试。
 
 例如：
 

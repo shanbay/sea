@@ -12,7 +12,6 @@
     - [测试](testing)
 - 其他模块
     - [数据结构](datatypes)
-    - [局部数据](local)
     - [工具类和函数](utils)
 - 内置扩展
     - [Cache](contrib/cache)
