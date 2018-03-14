@@ -1,6 +1,6 @@
 # 命令系统
 
-### 如何编写和运行命令
+## 如何编写和运行命令
 
 有时候为了执行一些操作，需要写一些命令，例如数据迁移。
 为 sea 的项目编写命令是非常简单的。
@@ -28,11 +28,13 @@ $ sea print -d 2017-12-12 Hello
 Hello at 2017-12-12
 ```
 
-**`@jobm.option(*args, **kwargs)`**
+**关于 jobm的具体用法**
+
+`@jobm.option(*args, **kwargs)`
 
 `*args` 和 `**kwargs`: 同 [argparse.ArgumentParser.add_argument](https://docs.python.org/3/library/argparse.html#the-add-argument-method)
 
-**`@jobm.job(name, inapp=True, env='development', proxy=False, *args, **kwargs)`**
+`@jobm.job(name, inapp=True, env='development', proxy=False, *args, **kwargs)`
 
 `name`: 命令的名称，例如上例中的 name 为 'print'，可以在命令中通过 `sea print` 来执行
 
@@ -59,7 +61,7 @@ Hello World at 2017-11-11
 `*args` 和 `**kwargs`: 同 [argparse.ArgumentParser](https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser)
 
 
-### 内置的命令
+## 内置的命令
 
 sea 内置一些命令，包括：
 
@@ -72,7 +74,7 @@ sea 内置一些命令，包括：
 
 对应用法均可在命令后加上 `--help/-h` 参数查看
 
-### 第三方库中的命令
+## 第三方库中的命令
 
 如果第三方库需要提供命令，可以将相关命令加入到 setup.py 中的 setup 的 entry_points 的 `sea.jobs` 列表中。
 例如你的第三方库叫 "sea_ext"，其中 `sea_ext.cmds` 中定义了如下命令：
@@ -95,6 +97,6 @@ entry_points={
 
 则就可以通过 `sea sayhello` 调用相关命令了
 
-### 项目中的命令
+## 项目中的命令
 
 项目中的命令可以定义在 `jobs` 目录下的 `__init__.py`或者其他 `py` 文件中
