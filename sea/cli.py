@@ -2,6 +2,7 @@ import sys
 import os
 import argparse
 import pkg_resources
+import logging
 
 from sea.utils import import_string
 from sea import create_app
@@ -58,7 +59,12 @@ def _load_jobs():
 
     # load lib jobs
     for ep in pkg_resources.iter_entry_points('sea.jobs'):
-        ep.load()
+        try:
+            ep.load()
+        except Exception as e:
+            logger = logging.getLogger('sea.cmd')
+            logger.debug(
+                'error has occurred during pkg loading: {}'.format(e))
 
     # load app jobs
     appjobs = os.path.join(path, 'jobs')
