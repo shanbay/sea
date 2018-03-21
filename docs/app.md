@@ -7,6 +7,25 @@
 
 在项目代码中，可以通过 `sea.current_app` 来获得当前 app
 
+## `ready` 方法
+
+如果我们需要在 `App` 创建完成时，执行一些特定的代码，则可以通过定义 `App` 的 `ready` 方法，来实现。
+
+例如：
+
+`app/__init__.py`
+
+```python
+from sea.app import BaseApp
+
+class App(BaseApp):
+    def ready(self):
+        print("Ready!!")
+
+```
+
+上面的代码中，App 初始化完成后，会打印 "Ready!!"
+
 ## class sea.app.BaseApp
 
 `config_class` (class):
