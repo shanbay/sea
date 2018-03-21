@@ -13,6 +13,7 @@
 - 其他模块
     - [数据结构](datatypes)
     - [工具类和函数](utils)
+    - [protobuf相关格式转化](format)
 - 内置扩展
     - [Cache](contrib/cache)
     - [celery](contrib/celery)
