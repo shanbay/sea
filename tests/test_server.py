@@ -2,7 +2,8 @@ import os
 import signal
 from unittest import mock
 
-from sea.server import Server, started, stopped
+from sea.server import Server
+from sea.signals import server_started, server_stopped
 
 
 def test_server(app, logstream):
@@ -15,8 +16,8 @@ def test_server(app, logstream):
     def log_stopped(s):
         app.logger.warn('stopped!')
 
-    started.connect(log_started)
-    stopped.connect(log_stopped)
+    server_started.connect(log_started)
+    server_stopped.connect(log_stopped)
 
     with mock.patch('time.sleep', new=lambda s: os.kill(os.getpid(), signal.SIGINT)):
         assert s.run()

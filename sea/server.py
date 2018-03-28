@@ -3,11 +3,8 @@ import time
 import logging
 from concurrent import futures
 import grpc
-import blinker
 
-
-started = blinker.signal('server_started')
-stopped = blinker.signal('server_stopped')
+from sea import signals
 
 
 class Server:
@@ -35,11 +32,11 @@ class Server:
         for name, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), self.server)
         self.server.start()
-        started.send(self)
+        signals.server_started.send(self)
         self.register_signal()
         while not self._stopped:
             time.sleep(1)
-        stopped.send(self)
+        signals.server_stopped.send(self)
         return True
 
     def setup_logger(self):
