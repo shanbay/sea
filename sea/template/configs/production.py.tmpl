@@ -13,5 +13,5 @@ CACHE_PASSWORD = os.environ['CACHE_PASSWORD']
 {%- endif %}
 
 {% if not skip_peewee -%}
-PW_DB_URL = 'sqlite+smart:///{{ project }}.db'
+PW_DB_URL = 'sqlite:///{{ project }}.db'
 {%- endif %}
