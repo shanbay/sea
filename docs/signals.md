@@ -17,7 +17,9 @@ before_rpc.connect(handler)
 
 ### `after_rpc`
 
-rpc调用后触发，Sender 为 `None`，无额外参数。例如：
+rpc调用后触发，Sender 为 `None`，无额外参数。
+
+**注意**当 rpc 调用发生未处理的异常，该信号不会触发。
 
 ### `server_started`
 
