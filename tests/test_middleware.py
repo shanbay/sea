@@ -2,7 +2,6 @@ from unittest import mock
 import logging
 
 from sea.middleware import BaseMiddleware, GuardMiddleware
-from sea.signals import before_rpc, after_rpc
 
 
 class FakeInMiddleware(BaseMiddleware):
@@ -31,23 +30,14 @@ def handler(servicer, request, context):
     return context
 
 
-def test_base_middleware(app, caplog):
-    def logrpc(sender):
-        assert sender is None
-        app.logger.info('hit rpc')
+def test_base_middleware(app):
 
     h = FakeInMiddleware(app, handler, handler)
     h = FakeOutMiddleware(app, h, handler)
     h = BaseMiddleware(app, h, handler)
     h = GuardMiddleware(app, h, handler)
 
-    before_rpc.connect(logrpc)
-    after_rpc.connect(logrpc)
-
-    with caplog.at_level(logging.INFO):
-        ret = h(None, None, {'msg': ''})
-        assert 'hit rpc' in caplog.text
-
+    ret = h(None, None, {'msg': ''})
     assert ret['msg'].strip().split('\n') == [
         'Out.before_handler',
         'In.before_handler',
