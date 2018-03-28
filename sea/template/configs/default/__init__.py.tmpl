@@ -11,5 +11,6 @@ DEBUG = True
 
 MIDDLEWARES = [
     'sea.middleware.ServiceLogMiddleware',
-    'sea.middleware.RpcErrorMiddleware'
+    'sea.middleware.RpcErrorMiddleware',
+    {% if not skip_peewee -%}'peeweext.sea.PeeweextMiddleware'{%- endif %}
 ]
