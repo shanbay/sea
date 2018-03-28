@@ -1,7 +1,7 @@
 import pendulum
 import grpc
 
-from sea import exceptions
+from sea import exceptions, signals
 from sea.pb2 import default_pb2
 
 
@@ -26,7 +26,10 @@ class BaseMiddleware:
 class GuardMiddleware(BaseMiddleware):
     def __call__(self, servicer, request, context):
         try:
-            return self.handler(servicer, request, context)
+            signals.before_rpc.send()
+            rv = self.handler(servicer, request, context)
+            signals.after_rpc.send()
+            return rv
         except Exception as e:
             self.app.logger.exception(
                 str(e), exc_info=True)
