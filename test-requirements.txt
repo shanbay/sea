@@ -1,6 +1,6 @@
 -r requirements.txt
 peeweext
-redis
+cachext
 celery
 pytest
 pytest-cov
@@ -9,4 +9,3 @@ coveralls
 codeclimate-test-reporter
 coverage>=4.0,<4.4
 sphinx
-elasticsearch>=6.0,<7.0

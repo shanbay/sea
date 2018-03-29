@@ -1,4 +1,4 @@
-from sea.contrib.extensions.cache import Cache
+from cachext.exts import Cache
 from peeweext.sea import Peeweext
 from sea.contrib.extensions.celery import Celery
 
