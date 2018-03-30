@@ -48,6 +48,14 @@
 
 > GRPC server 的 grace 参数，默认值：`5`
 
+`PROMETHEUS_SCRAPE`
+
+> 是否打开相关服务供 prometheus 抓取 metrics，需要安装 [prometheus_client](https://github.com/prometheus/client_python)，默认值: `False`
+
+`PROMETHEUS_PORT`
+
+> 供 prometheus 抓取的服务的端口，默认值：`9091`
+
 `MIDDLEWARES`
 
 > 按照顺序为“由外到内”排列的 middleware，默认值：`['sea.middleware.RpcErrorMiddleware']`
