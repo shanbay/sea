@@ -2,7 +2,7 @@
 from peeweext.sea import Peeweext
 {% endif %}
 {%- if not skip_cache -%}
-from sea.contrib.extensions.cache import Cache
+from cachext.exts import Cache
 {% endif %}
 {%- if not skip_celery -%}
 from sea.contrib.extensions.celery import Celery
