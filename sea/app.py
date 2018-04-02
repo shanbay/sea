@@ -28,6 +28,8 @@ class BaseApp:
         'GRPC_LOG_HANDLER': logging.StreamHandler(),
         'GRPC_LOG_FORMAT': '[%(asctime)s %(levelname)s in %(module)s] %(message)s',  # NOQA
         'GRPC_GRACE': 5,
+        'PROMETHEUS_SCRAPE': False,
+        'PROMETHEUS_PORT': 9091,
         'MIDDLEWARES': [
             'sea.middleware.RpcErrorMiddleware'
         ]

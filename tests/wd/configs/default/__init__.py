@@ -14,3 +14,4 @@ REDIS_DB = 0
 
 TIMEZONE = 'Asia/Shanghai'
 GRPC_GRACE =0
+PROMETHEUS_SCRAPE = True
