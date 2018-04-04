@@ -1,2 +1,7 @@
 [run]
 omit = *.tmpl
+
+[report]
+exclude_lines =
+	^VERSION =
+	raise NotImplementedError
