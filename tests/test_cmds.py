@@ -68,7 +68,7 @@ def test_cmd_new():
 
     correct_code = """\
     sea
-    redis
+    cachext
     celery
     raven
     """
