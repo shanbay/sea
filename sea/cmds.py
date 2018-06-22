@@ -31,7 +31,7 @@ def console():
 
 
 @jobm.job('generate', aliases=['g'], help='Generate RPC')
-@jobm.option('-I', '--proto_path', required=True,
+@jobm.option('-I', '--proto_path', required=True, action='append',
              help="the dir in which we'll search the proto files")
 @jobm.option('protos', nargs='+',
              help='the proto files which will be compiled.'
@@ -40,13 +40,17 @@ def generate(proto_path, protos):
     from grpc_tools import protoc
     well_known_path = os.path.join(os.path.dirname(protoc.__file__), '_proto')
     proto_out = os.path.join(current_app.root_path, 'protos')
+    proto_path.append(well_known_path)
+    proto_path_args = []
+    for protop in proto_path:
+        proto_path_args += ['--proto_path', protop]
     cmd = [
         'grpc_tools.protoc',
-        '--proto_path', proto_path,
-        '--proto_path', well_known_path,
+        *proto_path_args,
         '--python_out', proto_out,
-        '--grpc_python_out', proto_out
-    ] + [os.path.join(proto_path, f) for f in protos]
+        '--grpc_python_out', proto_out,
+        *protos
+    ]
     return protoc.main(cmd)
 
 
