@@ -20,7 +20,7 @@ def test_baseapp(caplog):
     from configs import testing
 
     _app.config.from_object(testing)
-    assert _app.debug
+    assert _app.debug is False
     assert _app.testing
     _app.load_middlewares()
 

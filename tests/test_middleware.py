@@ -1,7 +1,10 @@
-from unittest import mock
 import logging
+import warnings
+from unittest import mock
 
-from sea.middleware import BaseMiddleware, GuardMiddleware
+from sea.middleware import (BaseMiddleware, GuardMiddleware,
+                            ServiceLogMiddleware)
+from sea.pb2 import default_pb2
 
 
 class FakeInMiddleware(BaseMiddleware):
@@ -43,8 +46,22 @@ def test_base_middleware(app):
         'In.before_handler',
         'In.after_handler',
         'Out.after_handler'
-        ]
+    ]
 
     ctx = mock.MagicMock()
     ret = h(None, 1, ctx)
     assert ctx.set_code.called
+
+
+def test_service_log_middleware(app):
+    app.debug = True
+    app.env = 'production'
+    with warnings.catch_warnings(record=True) as w:
+        h = ServiceLogMiddleware(
+            app=app,
+            handler=lambda servicer, request, context: default_pb2.Empty(),
+            origin_handler=handler
+        )
+        h(None, default_pb2.Empty(), {'msg': ''})
+        assert len(w) == 1
+        assert 'ServiceLogMiddleware' in str(w[0].message)
