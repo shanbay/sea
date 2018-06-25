@@ -57,8 +57,8 @@ class ServiceLogMiddleware(BaseMiddleware):
         is_low_log_level = (app.debug or log_level < logging.WARNING)
         if is_production and is_low_log_level:
             warnings.warn(
-                'Using ServiceLogMiddleware in production with a low log level'
-                '(app.debug == True or log level is less than logging.WARNING) '
+                'Using ServiceLogMiddleware in production with a low log_level'
+                '(app.debug is True or log_level < logging.WARNING) '
                 'is definitely not recommended!'
             )
 
