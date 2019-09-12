@@ -66,7 +66,8 @@ setup(
             'sea=sea.cli:main'
         ],
         'sea.jobs': [
-            'celery=sea.contrib.extensions.celery.cmd:main',
+            'async_task=sea.contrib.extensions.celery.cmd:async_task',
+            'bus=sea.contrib.extensions.celery.cmd:bus'
         ]
     }
 )

@@ -1,7 +1,8 @@
 from cachext.exts import Cache
 from peeweext.sea import Peeweext
-from sea.contrib.extensions.celery import Celery
+from sea.contrib.extensions.celery import AsyncTask, Bus
 
 cache = Cache()
 pwx = Peeweext()
-celeryapp = Celery()
+async_task = AsyncTask()
+bus = Bus()

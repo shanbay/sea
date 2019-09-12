@@ -1,1 +1,0 @@
-from app.extensions import celeryapp

@@ -1,7 +1,7 @@
-from sea.contrib.extensions import celery
+from sea.contrib.extensions.celery import AsyncTask, Bus
 
 
 def test_celery(app):
-    c = celery.Celery()
-    c.init_app(app)
+    AsyncTask().init_app(app)
+    Bus().init_app(app)
     # assert c.conf.broker_url == 'redis://localhost:6379/2'
