@@ -5,7 +5,7 @@ peeweext
 {%- if not skip_cache -%}
 cachext
 {% endif -%}
-{%- if not skip_celery -%}
+{%- if not (skip_bus and skip_async_task)-%}
 celery
 {% endif -%}
 {%- if not skip_sentry -%}

@@ -69,7 +69,8 @@ sea 内置一些命令，包括：
 - `console`: 运行一个　sea 项目的交互命令行，需要在 sea 项目目录中执行
 - `generate`: 编译 proto 文件为对应的 py 文件，需要在 sea 项目目录中执行
 - `test`: 运行项目测试，需要在 sea 项目目录中执行
-- `celery`: 启动 celery worker，需要在 sea 项目目录中执行
+- `async_task`: 启动执行异步任务的 celery worker，需要在 sea 项目目录中执行
+- `bus`: 启动执行 bus 任务的 celery worker，需要在 sea 项目目录中执行
 - `new`：新建 sea 项目，不需要在 sea 项目目录中执行
 
 对应用法均可在命令后加上 `--help/-h` 参数查看

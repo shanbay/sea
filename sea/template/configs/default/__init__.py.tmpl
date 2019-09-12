@@ -1,5 +1,6 @@
 {% if not skip_peewee -%}from .peewee import *{%- endif %}
-{% if not skip_celery -%}from .celery import *{%- endif %}
+{% if not skip_async_task -%}from .async_task import *{%- endif %}
+{% if not skip_bus -%}from .bus import *{%- endif %}
 {% if not skip_cache -%}from .cache import *{%- endif %}
 
 {% if not skip_sentry -%}
