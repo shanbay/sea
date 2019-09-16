@@ -6,7 +6,9 @@ from sea.cli import jobm
 
 
 def celery(argv, app):
-    sys.argv = ["celery"] + argv + ["-A", "app.extensions:{app}".format(app)]
+    sys.argv = (
+        ["celery"] + argv + ["-A", "app.extensions:{app}".format(app=app)]
+    )
     return celerymain()
 
 
