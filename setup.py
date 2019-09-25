@@ -38,6 +38,7 @@ setup(
     version=version,
     description='shanbay rpc framework',
     long_description=readme,
+    long_description_content_type='text/markdown',
     url='https://github.com/shanbay/sea',
     author='Michael Ding',
     author_email='yandy.ding@gmail.com',
