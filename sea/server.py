@@ -26,7 +26,7 @@ class Server:
         self.pk_path = self.app.config['GRPC_PRIVATE_KEY_PATH']
         self.cc_chain_path = self.app.config['GRPC_CERT_CHAIN_PATH']
 
-        if bool(self.pk_path).strip() and bool(self.cc_chain_path).strip():
+        if bool(self.pk_path.strip()) and bool(self.cc_chain_path.strip()):
             pk = open(self.pk_path, 'rb').read()
             cc = open(self.cc_chain_path, 'rb').read()
             self.credentials = grpc.ssl_server_credentials(((pk, cc,),))
