@@ -22,8 +22,19 @@ class Server:
         self.server = grpc.server(
             futures.ThreadPoolExecutor(
                 max_workers=self.workers))
-        self.server.add_insecure_port(
-            '{}:{}'.format(self.host, self.port))
+
+        self.pk_path = self.app.config['GRPC_PRIVATE_KEY_PATH']
+        self.cc_chain_path = self.app.config['GRPC_CERT_CHAIN_PATH']
+
+        if bool(self.pk_path).strip() and bool(self.cc_chain_path).strip():
+            pk = open(self.pk_path, 'rb').read()
+            cc = open(self.cc_chain_path, 'rb').read()
+            self.credentials = grpc.ssl_server_credentials(((pk, cc,),))
+            self.server.add_secure_port('{}:{}'.format(self.host, self.port), self.credentials) 
+        
+        else:
+            self.server.add_insecure_port('{}:{}'.format(self.host, self.port))
+        
         self._stopped = False
 
     def run(self):
