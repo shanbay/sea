@@ -10,7 +10,7 @@ install:
 - pip install -r test-requirements.txt -U
 script:
 - flake8 sea --exclude=*_pb2.py
-- pytest tests/test_contrib/test_extensions/test_celery.py::test_celery_no_app --cov-fail-under=30
+- pytest tests/test_contrib/test_extensions/test_celery.py::test_celery_no_app --cov-fail-under=10
 - pytest tests
 after_success:
 - CODECLIMATE_REPO_TOKEN=19c5e18e184070a726bb6fc703e321e526ca638df16f9623654044bcccdb1a9d

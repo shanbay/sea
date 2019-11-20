@@ -1,7 +1,7 @@
 import os
 import sys
 import mock
-import importlib
+from sea import import_string
 from sea.contrib.extensions.celery import AsyncTask, Bus
 from sea.contrib.extensions.celery.cmd import async_task, bus
 
@@ -24,14 +24,9 @@ def test_celery_no_app():
         """单独跑"""
         os.environ.setdefault('SEA_ENV', 'testing')
         sys.path.append(root_path)
-        extensions = importlib.import_module("app.extensions")
-        celeryapp = extensions.async_task
-        assert celeryapp.conf["broker_url"] is None
-    else:
-        """一起跑（app.extensions已经被初始化）"""
-        extensions = importlib.import_module("app.extensions")
-        celeryapp = extensions.async_task
-        assert celeryapp.conf["broker_url"] == 'redis://localhost:6379/2'
+    celeryapp = import_string(
+        "sea.contrib.extensions.celery.empty_celeryapp.capp")
+    assert celeryapp.conf["broker_url"] is None
 
     with mock.patch("sea.contrib.extensions.celery.cmd.celerymain") as mocked:
         async_task("inspect ping -d wd@$HOSTNAME".split())
