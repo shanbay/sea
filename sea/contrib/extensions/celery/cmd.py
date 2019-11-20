@@ -14,7 +14,8 @@ def celery(argv, app):
         config = importlib.import_module('configs.{}'.format(config_name))
         extensions = importlib.import_module("app.extensions")
         celeryapp = getattr(extensions, app)
-        celeryapp.config_from_object(config, namespace=f"{app}_".upper())
+        celeryapp.config_from_object(
+            config, namespace="{}_".format(app).upper())
     else:
         create_app()
     sys.argv = (
