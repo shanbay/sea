@@ -10,7 +10,8 @@ engines:
     enabled: true
     config:
       languages:
-      - python
+        python:
+          count_threshold: 3
 ratings:
   paths:
   - "**.py"

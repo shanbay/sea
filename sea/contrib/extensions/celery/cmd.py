@@ -1,24 +1,18 @@
-import os
 import sys
 
 from celery.__main__ import main as celerymain
 
 from sea import create_app
 from sea.cli import jobm
-from sea.utils import import_string
 
 
 def celery(argv, app):
     if argv[0] == "inspect":
-        config_name = os.environ.get("SEA_ENV")
-        config = import_string('configs.{}'.format(config_name))
-        celeryapp = import_string(
-            "sea.contrib.extensions.celery.empty_celeryapp.capp")
-        celeryapp.config_from_object(
-            config, namespace="{}_".format(app).upper())
+        from sea.contrib.extensions.celery import empty_celeryapp
+        empty_celeryapp.load_config(app)
         sys.argv = (
-            ["celery"] + argv + ["-A",
-                                 "sea.contrib.extensions.celery.empty_celeryapp.capp".format(app=app)]
+            ["celery"] + argv
+            + ["-A", "sea.contrib.extensions.celery.empty_celeryapp.capp"]
         )
     else:
         create_app()

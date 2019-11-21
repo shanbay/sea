@@ -33,3 +33,6 @@ def test_celery_no_app():
         assert mocked.called
     assert celeryapp.conf["broker_url"] == "redis://localhost:6379/2"
     assert celeryapp.conf["TASK_DEFAULT_QUEUE"] == "wd.celery"
+    assert celeryapp.conf["imports"] == []
+    assert celeryapp.conf["IMPORTS"] == []
+    assert celeryapp.conf["async_task_imports".upper()] == []
