@@ -74,7 +74,8 @@ def runtest(argv):
              help='skip add git files and run git init')
 @jobm.option('--skip-peewee', action='store_true', help='skip peewee')
 @jobm.option('--skip-cache', action='store_true', help='skip cache')
-@jobm.option('--skip-celery', action='store_true', help='skip celery')
+@jobm.option('--skip-async-task', action='store_true', help='skip async_task')
+@jobm.option('--skip-bus', action='store_true', help='skip bus')
 @jobm.option('--skip-sentry', action='store_true', help='skip sentry')
 def new(project, **extra):
     PACKAGE_DIR = os.path.dirname(__file__)
@@ -85,8 +86,9 @@ def new(project, **extra):
                    'app/models.py.tmpl'],
         'cache': ['configs/default/cache.py.tmpl'],
         'sentry': [],
-        'celery': ['configs/default/celery.py.tmpl',
-                   'app/tasks.py.tmpl'],
+        'async_task': ['configs/default/async_task.py.tmpl',
+                       'app/tasks.py.tmpl'],
+        'bus': ['configs/default/bus.py.tmpl', 'app/buses.py.tmpl'],
     }
 
     def _build_skip_files(extra):

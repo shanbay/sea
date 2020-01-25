@@ -4,7 +4,8 @@
 
 配置由项目根目录下的 python 模块: `configs` 决定
 `configs`根据运行环境分成若干子模块，默认包括： development, production, testing
-程序运行的时候，会根据 `SEA_ENV` 环境变量的值加载同名的 `configs` 子模块
+程序运行的时候，会根据 `SEA_ENV` 环境变量的值加载同名的 `configs` 子模块。需要注意:
+**配置名称不得包含小写字母，否则会被忽略。**
 
 ## 基本配置
 

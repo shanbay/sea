@@ -3,8 +3,11 @@ import os
 
 DEBUG = False
 
-{% if not skip_celery -%}
-CELERY_BROKER_URL = os.environ['CELERY_BROKER_URL']
+{% if not skip_async_task -%}
+ASYNC_TASK_BROKER_URL = os.environ['ASYNC_TASK_BROKER_URL']
+{%- endif %}
+{% if not skip_bus -%}
+BUS_BROKER_URL = os.environ['BUS_BROKER_URL']
 {%- endif %}
 
 {% if not skip_cache -%}

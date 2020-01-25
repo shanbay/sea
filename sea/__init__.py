@@ -4,7 +4,7 @@ import sys
 from sea.utils import import_string
 from sea.local import Proxy
 
-__version__ = '1.4.3'
+__version__ = "2.1.0"
 _app = None
 
 
@@ -16,18 +16,18 @@ def create_app(root_path=None):
     if root_path is None:
         root_path = os.getcwd()
     sys.path.append(root_path)
-    sys.path.append(os.path.join(root_path, 'protos'))
+    sys.path.append(os.path.join(root_path, "protos"))
 
-    env = os.environ.get('SEA_ENV', 'development')
-    config = import_string('configs.{}'.format(env))
+    env = os.environ.get("SEA_ENV", "development")
+    config = import_string("configs.{}".format(env))
 
-    app_class = import_string('app:App')
+    app_class = import_string("app:App")
     _app = app_class(root_path, env=env)
     _app.config.from_object(config)
 
     _app.load_middlewares()
-    _app.load_extensions_in_module(import_string('app.extensions'))
-    _app.load_servicers_in_module(import_string('app.servicers'))
+    _app.load_extensions_in_module(import_string("app.extensions"))
+    _app.load_servicers_in_module(import_string("app.servicers"))
 
     _app.ready()
 
