@@ -72,5 +72,6 @@ def send_bus(**kwargs):
 
 `sea async_task/bus`，会自动设置 `-A` 参数，并调用原生 `celery`。例如：
 
-`sea celery async_task` => `celery worker -A 'app.extensions:async_task'`
-`sea celery bus` => `celery worker -A 'app.extensions:bus'`
+`sea async_task worker` => `celery worker -A 'app.extensions:async_task'`
+
+`sea bus worker` => `celery worker -A 'app.extensions:bus'`
