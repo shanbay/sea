@@ -1,3 +1,4 @@
+import inspect
 import os
 import signal
 import threading
@@ -12,18 +13,24 @@ def test_server(app, logstream):
     assert not s._stopped
 
     def log_started(s):
-        app.logger.warn('started!')
+        app.logger.warning("started!")
 
     def log_stopped(s):
-        app.logger.warn('stopped!')
+        app.logger.warning("stopped!")
+
+    def _mocked(*args, **kwargs):
+        curframe = inspect.currentframe()
+        caller_name = inspect.getouterframes(curframe, 2)[1][3]
+        if caller_name == "run":
+            os.kill(os.getpid(), signal.SIGINT)
 
     server_started.connect(log_started)
     server_stopped.connect(log_stopped)
 
-    with mock.patch('time.sleep', new=lambda s: os.kill(os.getpid(), signal.SIGINT)):
+    with mock.patch("time.sleep", new=_mocked):
         assert s.run()
         assert threading.active_count() > 1
         assert s._stopped
 
     content = logstream.getvalue()
-    assert 'started!' in content and 'stopped!' in content
+    assert "started!" in content and "stopped!" in content
