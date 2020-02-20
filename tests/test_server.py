@@ -13,10 +13,10 @@ def test_server(app, logstream):
     assert not s._stopped
 
     def log_started(s):
-        app.logger.warn("started!")
+        app.logger.warning("started!")
 
     def log_stopped(s):
-        app.logger.warn("stopped!")
+        app.logger.warning("stopped!")
 
     def _mocked(*args, **kwargs):
         curframe = inspect.currentframe()
