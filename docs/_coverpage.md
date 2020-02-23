@@ -1,6 +1,6 @@
 # Sea
 
-**A framework for GRPC. Powered by [Shanbay](https://www.shanbay.com)**
+**A framework for gRPC. Powered by [Shanbay](https://www.shanbay.com)**
 
 [![](https://img.shields.io/travis/shanbay/sea.svg?style=flat-square)](https://travis-ci.org/shanbay/sea)
 [![Maintainability](https://api.codeclimate.com/v1/badges/774db211d37720bb2599/maintainability)](https://codeclimate.com/github/shanbay/sea/maintainability)
