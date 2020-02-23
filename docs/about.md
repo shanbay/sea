@@ -1,8 +1,8 @@
 # 关于 Sea
 
-`Sea` 由 [扇贝](https://www.shanbay.com) 的后端团队开发，是一个基于 [GRPC](https://grpc.io/) 的 framework。
+`Sea` 由 [扇贝](https://www.shanbay.com) 的后端团队开发，是一个基于 [gRPC](https://grpc.io/) 的 framework。
 
-`GRPC` 是RPC的一种协议和实现，然而要开发完整的项目，除了协议层面，还有大量的业务逻辑需要编写。开发`Sea`的目的正是是方便大家更方便的编写这些代码。
+`gRPC` 是RPC的一种协议和实现，然而要开发完整的项目，除了协议层面，还有大量的业务逻辑需要编写。开发`Sea`的目的正是为了让大家更方便的编写这些代码。
 
 `Sea` 核心包含了配置管理，项目初始化，测试框架，中间件，服务日志等内容。
 
