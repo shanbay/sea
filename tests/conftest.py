@@ -14,11 +14,11 @@ def logstream():
 
 @pytest.fixture
 def app(logstream):
-    os.environ.setdefault('SEA_ENV', 'testing')
-    logger = logging.getLogger('sea')
+    os.environ.setdefault("SEA_ENV", "testing")
+    logger = logging.getLogger("sea")
     h = logging.StreamHandler(logstream)
     logger.addHandler(h)
-    root = os.path.join(os.path.dirname(__file__), 'wd')
+    root = os.path.join(os.path.dirname(__file__), "wd")
     app = sea.create_app(root)
     yield app
     logger.removeHandler(h)

@@ -16,21 +16,19 @@ class Server:
     def __init__(self, app):
         self.app = app
         self.setup_logger()
-        self.workers = self.app.config['GRPC_WORKERS']
-        self.host = self.app.config['GRPC_HOST']
-        self.port = self.app.config['GRPC_PORT']
-        self.server = grpc.server(
-            futures.ThreadPoolExecutor(
-                max_workers=self.workers))
-        self.server.add_insecure_port(
-            '{}:{}'.format(self.host, self.port))
+        self.workers = self.app.config["GRPC_WORKERS"]
+        self.host = self.app.config["GRPC_HOST"]
+        self.port = self.app.config["GRPC_PORT"]
+        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.workers))
+        self.server.add_insecure_port("{}:{}".format(self.host, self.port))
         self._stopped = False
 
     def run(self):
         # run prometheus client
-        if self.app.config['PROMETHEUS_SCRAPE']:
+        if self.app.config["PROMETHEUS_SCRAPE"]:
             from prometheus_client import start_http_server
-            start_http_server(self.app.config['PROMETHEUS_PORT'])
+
+            start_http_server(self.app.config["PROMETHEUS_PORT"])
         # run grpc server
         for name, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), self.server)
@@ -43,9 +41,9 @@ class Server:
         return True
 
     def setup_logger(self):
-        fmt = self.app.config['GRPC_LOG_FORMAT']
-        lvl = self.app.config['GRPC_LOG_LEVEL']
-        h = self.app.config['GRPC_LOG_HANDLER']
+        fmt = self.app.config["GRPC_LOG_FORMAT"]
+        lvl = self.app.config["GRPC_LOG_LEVEL"]
+        h = self.app.config["GRPC_LOG_HANDLER"]
         h.setFormatter(logging.Formatter(fmt))
         logger = logging.getLogger()
         logger.setLevel(lvl)
@@ -58,7 +56,7 @@ class Server:
         signal.signal(signal.SIGQUIT, self._stop_handler)
 
     def _stop_handler(self, signum, frame):
-        grace = self.app.config['GRPC_GRACE']
+        grace = self.app.config["GRPC_GRACE"]
         self.server.stop(grace)
         time.sleep(grace or 1)
         self._stopped = True

@@ -8,9 +8,7 @@ from tests.wd.protos import helloworld_pb2
 
 
 def test_meta_servicer(app, logstream):
-
-    class HelloContext():
-
+    class HelloContext:
         def __init__(self):
             self.code = None
             self.details = None
@@ -22,12 +20,11 @@ def test_meta_servicer(app, logstream):
             self.details = details
 
     class HelloServicer(metaclass=ServicerMeta):
-
         def return_error(self, request, context):
-            raise exceptions.BadRequestException('error')
+            raise exceptions.BadRequestException("error")
 
         def return_normal(self, request, context):
-            return 'Got it!'
+            return "Got it!"
 
     logstream.truncate(0)
     logstream.seek(0)
@@ -37,14 +34,14 @@ def test_meta_servicer(app, logstream):
     ret = servicer.return_error(None, context)
     assert isinstance(ret, default_pb2.Empty)
     assert context.code is grpc.StatusCode.INVALID_ARGUMENT
-    assert context.details == 'error'
+    assert context.details == "error"
 
     p = logstream.tell()
     assert p > 0
     content = logstream.getvalue()
-    assert 'HelloServicer.return_error' in content
+    assert "HelloServicer.return_error" in content
 
     ret = servicer.return_normal(None, context)
-    assert ret == 'Got it!'
+    assert ret == "Got it!"
 
     assert logstream.tell() > p

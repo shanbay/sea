@@ -17,29 +17,29 @@ def test_msg2dict(app):
     pb.str_repeated.append("dhueife")
     pb.str_repeated.append("fhrvrjvnj")
 
-    pb.simpleMap['s1'] = 3.1415
-    pb.simpleMap['s2'] = 4.1235
+    pb.simpleMap["s1"] = 3.1415
+    pb.simpleMap["s2"] = 4.1235
     res = msg2dict(pb)
-    assert res['bol'] is True
-    assert round(res['flot'], 2) == 3.14
-    assert res['nested'] == {"req": "hahahaa"}
+    assert res["bol"] is True
+    assert round(res["flot"], 2) == 3.14
+    assert res["nested"] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
-    assert round(res["simpleMap"]['s1'], 4) == 3.1415
+    assert round(res["simpleMap"]["s1"], 4) == 3.1415
 
     # test including_default_value_fields
     res = msg2dict(pb, including_default_value_fields=True)
-    assert res['i64'] == 0
-    assert res['strng'] == ""
+    assert res["i64"] == 0
+    assert res["strng"] == ""
 
     # test user_enum_label
     pb.enm = 2
     res = msg2dict(pb)
-    assert res['enm'] == 2
+    assert res["enm"] == 2
     res = msg2dict(pb, use_enum_labels=True)
-    assert res['enm'] == "C"
+    assert res["enm"] == "C"
 
     # test keys
-    res = msg2dict(pb, keys=['bol', 'i32'])
+    res = msg2dict(pb, keys=["bol", "i32"])
     assert res == {"bol": True, "i32": 666}
 
 
@@ -52,20 +52,24 @@ def test_msg2json():
     pb.str_repeated.append("dhueife")
     pb.str_repeated.append("fhrvrjvnj")
 
-    pb.simpleMap['s1'] = 3.1415
-    pb.simpleMap['s2'] = 4.1235
-    res_json = msg2json(
-        pb, keys=['flot', 'nested', 'str_repeated', 'simpleMap'])
+    pb.simpleMap["s1"] = 3.1415
+    pb.simpleMap["s2"] = 4.1235
+    res_json = msg2json(pb, keys=["flot", "nested", "str_repeated", "simpleMap"])
     res = json.loads(res_json)
-    assert round(res['flot'], 2) == 3.14
-    assert res['nested'] == {"req": "hahahaa"}
+    assert round(res["flot"], 2) == 3.14
+    assert res["nested"] == {"req": "hahahaa"}
     assert res["str_repeated"] == ["dhueife", "fhrvrjvnj"]
-    assert round(res["simpleMap"]['s1'], 4) == 3.1415
+    assert round(res["simpleMap"]["s1"], 4) == 3.1415
 
 
 def test_dict2msg():
-    d = {'i32': 666, 'bol': True, 'nested': {'req': 'hahahaa'},
-         'enm': 2, 'str_repeated': ['dhueife', 'fhrvrjvnj']}
+    d = {
+        "i32": 666,
+        "bol": True,
+        "nested": {"req": "hahahaa"},
+        "enm": 2,
+        "str_repeated": ["dhueife", "fhrvrjvnj"],
+    }
     res_msg = dict2msg(d, sample_pb2.MessageOfTypes())
     res = msg2dict(res_msg)
     for k, v in d.items():

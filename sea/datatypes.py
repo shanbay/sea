@@ -2,7 +2,7 @@ from itertools import repeat
 
 
 def is_immutable(self):
-    raise TypeError('%r objects are immutable' % self.__class__.__name__)
+    raise TypeError("%r objects are immutable" % self.__class__.__name__)
 
 
 class ImmutableDict(dict):
@@ -43,10 +43,7 @@ class ImmutableDict(dict):
         is_immutable(self)
 
     def __repr__(self):
-        return '%s(%s)' % (
-            self.__class__.__name__,
-            dict.__repr__(self),
-        )
+        return "%s(%s)" % (self.__class__.__name__, dict.__repr__(self),)
 
     def copy(self):
         """Return a shallow mutable copy of this object.  Keep in mind that
@@ -60,7 +57,6 @@ class ImmutableDict(dict):
 
 
 class ConstantsObject(ImmutableDict):
-
     def __getattr__(self, name):
         return self[name]
 

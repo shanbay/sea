@@ -1,7 +1,7 @@
 import grpc
 
 
-class Context():
+class Context:
     def __init__(self):
         self.code = grpc.StatusCode.OK
         self.details = None
@@ -20,8 +20,7 @@ class Context():
         return self.metadata
 
 
-class Stub():
-
+class Stub:
     def __init__(self, servicer=None):
         self.servicer = servicer
 
@@ -33,4 +32,5 @@ class Stub():
             self.ctx = Context()
             self.ctx.initial_metadata(metadata)
             return handler(msg, self.ctx)
+
         return wrapped

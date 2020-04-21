@@ -7,7 +7,6 @@ from sea.servicer import ServicerMeta
 
 def test_stub(app):
     class HelloServicer(metaclass=ServicerMeta):
-
         def return_error(self, request, context):
             raise BadRequestException()
 
@@ -15,7 +14,7 @@ def test_stub(app):
             return context.invocation_metadata()
 
     stub = Stub(HelloServicer())
-    data = {'a': 2}
+    data = {"a": 2}
     res = stub.return_normal(None, metadata=data)
     assert res == data
     assert stub.ctx.invocation_metadata() == data

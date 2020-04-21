@@ -17,15 +17,15 @@ def test_celery(app):
 
 def test_celery_no_app():
     """需要独立于其他测试的session单独跑一次"""
-    root_path = os.path.join(os.path.dirname(__file__).replace(
-        '/test_contrib/test_extensions', ''), 'wd')
+    root_path = os.path.join(
+        os.path.dirname(__file__).replace("/test_contrib/test_extensions", ""), "wd"
+    )
 
     if root_path not in sys.path:
         """单独跑"""
-        os.environ.setdefault('SEA_ENV', 'testing')
+        os.environ.setdefault("SEA_ENV", "testing")
         sys.path.append(root_path)
-    celeryapp = import_string(
-        "sea.contrib.extensions.celery.empty_celeryapp.capp")
+    celeryapp = import_string("sea.contrib.extensions.celery.empty_celeryapp.capp")
     assert celeryapp.conf["broker_url"] is None
 
     with mock.patch("sea.contrib.extensions.celery.cmd.celerymain") as mocked:

@@ -2,58 +2,56 @@
 # source: default.proto
 
 import sys
-_b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
+
+_b = sys.version_info[0] < 3 and (lambda x: x) or (lambda x: x.encode("latin1"))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf import descriptor_pb2
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-
-
 DESCRIPTOR = _descriptor.FileDescriptor(
-  name='default.proto',
-  package='sea',
-  syntax='proto3',
-  serialized_pb=_b('\n\rdefault.proto\x12\x03sea\"\x07\n\x05\x45mptyb\x06proto3')
+    name="default.proto",
+    package="sea",
+    syntax="proto3",
+    serialized_pb=_b('\n\rdefault.proto\x12\x03sea"\x07\n\x05\x45mptyb\x06proto3'),
 )
-
-
 
 
 _EMPTY = _descriptor.Descriptor(
-  name='Empty',
-  full_name='sea.Empty',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=22,
-  serialized_end=29,
+    name="Empty",
+    full_name="sea.Empty",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    fields=[],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=22,
+    serialized_end=29,
 )
 
-DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
+DESCRIPTOR.message_types_by_name["Empty"] = _EMPTY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), dict(
-  DESCRIPTOR = _EMPTY,
-  __module__ = 'default_pb2'
-  # @@protoc_insertion_point(class_scope:sea.Empty)
-  ))
+Empty = _reflection.GeneratedProtocolMessageType(
+    "Empty",
+    (_message.Message,),
+    dict(
+        DESCRIPTOR=_EMPTY,
+        __module__="default_pb2"
+        # @@protoc_insertion_point(class_scope:sea.Empty)
+    ),
+)
 _sym_db.RegisterMessage(Empty)

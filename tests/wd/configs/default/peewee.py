@@ -1,1 +1,1 @@
-PW_DB_URL = 'sqlite:///:memory:'
+PW_DB_URL = "sqlite:///:memory:"

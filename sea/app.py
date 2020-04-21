@@ -13,27 +13,28 @@ class BaseApp:
     :param root_path: the root path
     :param env: the env
     """
+
     config_class = Config
-    debug = ConfigAttribute('DEBUG')
-    testing = ConfigAttribute('TESTING')
-    tz = ConfigAttribute('TIMEZONE')
-    default_config = ImmutableDict({
-        'DEBUG': False,
-        'TESTING': False,
-        'TIMEZONE': 'UTC',
-        'GRPC_WORKERS': 3,
-        'GRPC_HOST': '[::]',
-        'GRPC_PORT': 6000,
-        'GRPC_LOG_LEVEL': 'WARNING',
-        'GRPC_LOG_HANDLER': logging.StreamHandler(),
-        'GRPC_LOG_FORMAT': '[%(asctime)s %(levelname)s in %(module)s] %(message)s',  # NOQA
-        'GRPC_GRACE': 5,
-        'PROMETHEUS_SCRAPE': False,
-        'PROMETHEUS_PORT': 9091,
-        'MIDDLEWARES': [
-            'sea.middleware.RpcErrorMiddleware'
-        ]
-    })
+    debug = ConfigAttribute("DEBUG")
+    testing = ConfigAttribute("TESTING")
+    tz = ConfigAttribute("TIMEZONE")
+    default_config = ImmutableDict(
+        {
+            "DEBUG": False,
+            "TESTING": False,
+            "TIMEZONE": "UTC",
+            "GRPC_WORKERS": 3,
+            "GRPC_HOST": "[::]",
+            "GRPC_PORT": 6000,
+            "GRPC_LOG_LEVEL": "WARNING",
+            "GRPC_LOG_HANDLER": logging.StreamHandler(),
+            "GRPC_LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",  # NOQA
+            "GRPC_GRACE": 5,
+            "PROMETHEUS_SCRAPE": False,
+            "PROMETHEUS_PORT": 9091,
+            "MIDDLEWARES": ["sea.middleware.RpcErrorMiddleware"],
+        }
+    )
 
     def __init__(self, root_path, env):
         if not os.path.isabs(root_path):
@@ -48,12 +49,12 @@ class BaseApp:
 
     @utils.cached_property
     def logger(self):
-        logger = logging.getLogger('sea.app')
+        logger = logging.getLogger("sea.app")
         if self.debug and logger.level == logging.NOTSET:
             logger.setLevel(logging.DEBUG)
         if not utils.logger_has_level_handler(logger):
             h = logging.StreamHandler()
-            h.setFormatter(logging.Formatter('%(message)s'))
+            h.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(h)
         return logger
 
@@ -82,16 +83,15 @@ class BaseApp:
         """
         name = servicer.__name__
         if name in self._servicers:
-            raise exceptions.ConfigException(
-                'servicer duplicated: {}'.format(name))
+            raise exceptions.ConfigException("servicer duplicated: {}".format(name))
         add_func = self._get_servicer_add_func(servicer)
         self._servicers[name] = (add_func, servicer)
 
     def _get_servicer_add_func(self, servicer):
         for b in servicer.__bases__:
-            if b.__name__.endswith('Servicer'):
+            if b.__name__.endswith("Servicer"):
                 m = inspect.getmodule(b)
-                return getattr(m, 'add_{}_to_server'.format(b.__name__))
+                return getattr(m, "add_{}_to_server".format(b.__name__))
 
     def _register_extension(self, name, ext):
         """register extension
@@ -101,13 +101,11 @@ class BaseApp:
         """
         ext.init_app(self)
         if name in self._extensions:
-            raise exceptions.ConfigException(
-                'extension duplicated: {}'.format(name))
+            raise exceptions.ConfigException("extension duplicated: {}".format(name))
         self._extensions[name] = ext
 
     def load_middlewares(self):
-        mids = ['sea.middleware.GuardMiddleware'] + \
-            self.config.get('MIDDLEWARES')
+        mids = ["sea.middleware.GuardMiddleware"] + self.config.get("MIDDLEWARES")
         for mn in mids:
             m = utils.import_string(mn)
             self._middlewares.insert(0, m)
@@ -115,14 +113,15 @@ class BaseApp:
 
     def load_extensions_in_module(self, module):
         def is_ext(ins):
-            return not inspect.isclass(ins) and hasattr(ins, 'init_app')
+            return not inspect.isclass(ins) and hasattr(ins, "init_app")
+
         for n, ext in inspect.getmembers(module, is_ext):
             self._register_extension(n, ext)
         return self.extensions
 
     def load_servicers_in_module(self, module):
         for _, _servicer in inspect.getmembers(module, inspect.isclass):
-            if _servicer.__name__.endswith('Servicer'):
+            if _servicer.__name__.endswith("Servicer"):
                 self._register_servicer(_servicer)
         return self.servicers
 

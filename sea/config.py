@@ -21,7 +21,6 @@ class ConfigAttribute:
 
 
 class Config(dict):
-
     def __init__(self, root_path, defaults=None):
         super().__init__(defaults or {})
         self.root_path = root_path
@@ -37,7 +36,7 @@ class Config(dict):
             if not k.startswith(namespace):
                 continue
             if trim_namespace:
-                key = k[len(namespace):]
+                key = k[len(namespace) :]
             else:
                 key = k
             if lowercase:
@@ -46,4 +45,4 @@ class Config(dict):
         return ConstantsObject(rv)
 
     def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))
+        return "<%s %s>" % (self.__class__.__name__, dict.__repr__(self))

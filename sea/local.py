@@ -16,35 +16,33 @@ def _default_cls_attr(name, type_, cls_value):
     def __get__(self, obj, cls=None):
         return self.__getter(obj) if obj is not None else self
 
-    return type(name, (type_,), {
-        '__new__': __new__, '__get__': __get__,
-    })
+    return type(name, (type_,), {"__new__": __new__, "__get__": __get__,})
 
 
 class Proxy(object):
     """Proxy to another object."""
 
     # Code stolen from werkzeug.local.Proxy.
-    __slots__ = ('__local', '__args', '__kwargs', '__dict__')
+    __slots__ = ("__local", "__args", "__kwargs", "__dict__")
 
     def __init__(self, local, args=None, kwargs=None):
-        object.__setattr__(self, '_Proxy__local', local)
-        object.__setattr__(self, '_Proxy__args', args or ())
-        object.__setattr__(self, '_Proxy__kwargs', kwargs or {})
+        object.__setattr__(self, "_Proxy__local", local)
+        object.__setattr__(self, "_Proxy__args", args or ())
+        object.__setattr__(self, "_Proxy__kwargs", kwargs or {})
 
-    @_default_cls_attr('name', str, __name__)
+    @_default_cls_attr("name", str, __name__)
     def __name__(self):
         return self._get_current_object().__name__
 
-    @_default_cls_attr('qualname', str, __name__)
+    @_default_cls_attr("qualname", str, __name__)
     def __qualname__(self):
         return self._get_current_object().__qualname__
 
-    @_default_cls_attr('module', str, __name__)
+    @_default_cls_attr("module", str, __name__)
     def __module__(self):
         return self._get_current_object().__module__
 
-    @_default_cls_attr('doc', str, __doc__)
+    @_default_cls_attr("doc", str, __doc__)
     def __doc__(self):
         return self._get_current_object().__doc__
 
@@ -61,27 +59,27 @@ class Proxy(object):
         object behind the proxy at a time for performance reasons or because
         you want to pass the object into a different context.
         """
-        loc = object.__getattribute__(self, '_Proxy__local')
-        if not hasattr(loc, '__release_local__'):
+        loc = object.__getattribute__(self, "_Proxy__local")
+        if not hasattr(loc, "__release_local__"):
             return loc(*self.__args, **self.__kwargs)
         try:  # pragma: no cover
             # not sure what this is about
             return getattr(loc, self.__name__)
         except AttributeError:  # pragma: no cover
-            raise RuntimeError('no object bound to {0.__name__}'.format(self))
+            raise RuntimeError("no object bound to {0.__name__}".format(self))
 
     @property
     def __dict__(self):
         try:
             return self._get_current_object().__dict__
         except RuntimeError:  # pragma: no cover
-            raise AttributeError('__dict__')
+            raise AttributeError("__dict__")
 
     def __repr__(self):
         try:
             obj = self._get_current_object()
         except RuntimeError:  # pragma: no cover
-            return '<{0} unbound>'.format(self.__class__.__name__)
+            return "<{0} unbound>".format(self.__class__.__name__)
         return repr(obj)
 
     def __bool__(self):
@@ -97,7 +95,7 @@ class Proxy(object):
             return []
 
     def __getattr__(self, name):
-        if name == '__members__':
+        if name == "__members__":
             return dir(self._get_current_object())
         return getattr(self._get_current_object(), name)
 

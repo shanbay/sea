@@ -13,8 +13,7 @@ class RpcException(Exception):
 
     def __init__(self, message=None, *args, **kwargs):
         if isinstance(message, (list, dict)):
-            message = json.dumps(
-                message, default=str, ensure_ascii=True)
+            message = json.dumps(message, default=str, ensure_ascii=True)
         if not isinstance(message, str):
             message = str(message)
         if message is not None:
@@ -25,10 +24,10 @@ class RpcException(Exception):
 class NotFoundException(RpcException):
 
     code = grpc.StatusCode.NOT_FOUND
-    details = 'Not Found'
+    details = "Not Found"
 
 
 class BadRequestException(RpcException):
 
     code = grpc.StatusCode.INVALID_ARGUMENT
-    details = 'Invalid Argument'
+    details = "Invalid Argument"

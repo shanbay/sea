@@ -6,22 +6,23 @@ from sea import utils
 def test_import_string(app):
     from sea.app import BaseApp
     import datetime
-    assert utils.import_string('datetime.date') is datetime.date
-    assert utils.import_string('datetime.date') is datetime.date
-    assert utils.import_string('datetime') is datetime
-    assert utils.import_string('sea.app:BaseApp') is BaseApp
-    m = utils.import_string('app.servicers:GreeterServicer')
+
+    assert utils.import_string("datetime.date") is datetime.date
+    assert utils.import_string("datetime.date") is datetime.date
+    assert utils.import_string("datetime") is datetime
+    assert utils.import_string("sea.app:BaseApp") is BaseApp
+    m = utils.import_string("app.servicers:GreeterServicer")
     from app.servicers import GreeterServicer
+
     assert m is GreeterServicer
     with pytest.raises(ImportError):
-        utils.import_string('notexist')
+        utils.import_string("notexist")
     with pytest.raises(ImportError):
-        utils.import_string('datetime.XXXXXXXXXXXX')
+        utils.import_string("datetime.XXXXXXXXXXXX")
 
 
 def test_cached_property():
     class ForTest:
-
         def __init__(self):
             self.count = 0
 
@@ -52,17 +53,17 @@ def test_logger_has_level_handler():
     root.filters = []
     root.setLevel(logging.ERROR)
 
-    l1 = logging.getLogger('testapp')
+    l1 = logging.getLogger("testapp")
     l1.setLevel(logging.ERROR)
-    l2 = logging.getLogger('testapp.sub')
-    l3 = logging.getLogger('testapp.nest')
+    l2 = logging.getLogger("testapp.sub")
+    l3 = logging.getLogger("testapp.nest")
     l3.propagate = False
 
     assert not utils.logger_has_level_handler(l2)
     assert not utils.logger_has_level_handler(l3)
 
     h1 = logging.StreamHandler()
-    h1.setLevel('INFO')
+    h1.setLevel("INFO")
     l1.addHandler(h1)
     assert utils.logger_has_level_handler(l2)
     assert not utils.logger_has_level_handler(l3)

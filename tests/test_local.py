@@ -3,22 +3,21 @@ from sea.local import Proxy
 
 
 def test_std_class_attributes():
-    assert Proxy.__name__ == 'Proxy'
-    assert Proxy.__module__ == 'sea.local'
-    assert Proxy.__qualname__ == 'sea.local'
+    assert Proxy.__name__ == "Proxy"
+    assert Proxy.__module__ == "sea.local"
+    assert Proxy.__qualname__ == "sea.local"
     assert isinstance(Proxy.__doc__, str)
 
 
 def test_name():
-
     def real():
         """real function"""
-        return 'REAL'
+        return "REAL"
 
     x = Proxy(lambda: real)
-    assert x.__name__ == 'real'
+    assert x.__name__ == "real"
 
-    assert x.__doc__ == 'real function'
+    assert x.__doc__ == "real function"
 
     assert x.__class__ == type(real)
     assert x.__dict__ == real.__dict__
@@ -113,18 +112,17 @@ def test_dir():
 
 
 def test_set_get_del():
-
     class A:
         def __init__(self):
             self.b = 1
 
     a = A()
     ls = Proxy(lambda: a)
-    delattr(ls, 'b')
-    assert not hasattr(ls, 'b')
-    assert not hasattr(a, 'b')
+    delattr(ls, "b")
+    assert not hasattr(ls, "b")
+    assert not hasattr(a, "b")
     a.x = 2
-    assert hasattr(a, 'x')
+    assert hasattr(a, "x")
 
 
 def test_local_proxy_operations_strings():
@@ -158,6 +156,7 @@ def test_deepcopy_on_proxy():
 
         def __deepcopy__(self, memo):
             return self
+
     f = Foo()
     p = Proxy(lambda: f)
     assert p.attr == 42

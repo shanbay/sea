@@ -28,10 +28,9 @@ class GuardMiddleware(BaseMiddleware):
         try:
             return self.handler(servicer, request, context)
         except Exception as e:
-            self.app.logger.exception(
-                str(e), exc_info=True)
+            self.app.logger.exception(str(e), exc_info=True)
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details('Internal Error Occured')
+            context.set_details("Internal Error Occured")
             return default_pb2.Empty()
 
 
@@ -52,11 +51,11 @@ class ServiceLogMiddleware(BaseMiddleware):
         finish_at = pendulum.now(self.app.tz)
         delta = finish_at - start_at
         self.app.logger.info(
-            '[{}] {}.{} Called. Processed in {}s'.format(
+            "[{}] {}.{} Called. Processed in {}s".format(
                 start_at.isoformat(),
                 servicer.__class__.__name__,
                 self.origin_handler.__name__,
-                delta.total_seconds()
+                delta.total_seconds(),
             )
         )
         return response
