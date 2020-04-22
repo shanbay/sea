@@ -108,6 +108,7 @@ def new(project, **extra):
                 src = os.path.join(dirpath, fn)
                 if src not in skip:
                     relfn = os.path.relpath(src, TMPLPATH)
+                    relfn = relfn.replace(os.path.sep, '/')
                     dst = os.path.join(path, relfn)
                     # create the parentdir if not exists
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
