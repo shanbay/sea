@@ -1,7 +1,9 @@
+import logging
+import os
 import signal
 import time
-import logging
 from concurrent import futures
+
 import grpc
 
 from sea import signals
@@ -53,9 +55,10 @@ class Server:
 
     def register_signal(self):
         signal.signal(signal.SIGINT, self._stop_handler)
-        signal.signal(signal.SIGHUP, self._stop_handler)
         signal.signal(signal.SIGTERM, self._stop_handler)
-        signal.signal(signal.SIGQUIT, self._stop_handler)
+        if os.sys.platform != 'win32':
+            signal.signal(signal.SIGHUP, self._stop_handler)
+            signal.signal(signal.SIGQUIT, self._stop_handler)
 
     def _stop_handler(self, signum, frame):
         grace = self.app.config['GRPC_GRACE']
