@@ -108,13 +108,23 @@ def test_cmd_job(app):
 
             return f2
 
-    def new_entry_iter(name):
-        return [EntryPoint()]
+    class FailedEntryPoint:
+        def load(self):
+            raise Exception("Failed entry point")
 
-    with mock.patch("pkg_resources.iter_entry_points", new=new_entry_iter):
+    def new_entry_iter(name):
+        return [EntryPoint(), FailedEntryPoint()]
+
+    mock_logger = mock.Mock()
+    with mock.patch(
+        "pkg_resources.iter_entry_points", new=new_entry_iter
+    ), mock.patch("logging.getLogger", return_value=mock_logger):
         sys.argv = "sea xyz".split()
         assert cli.main() is None
         assert app.config.get("XYZ") == "hello"
+        mock_logger.error.assert_called_with(
+            "error has occurred during pkg loading: Failed entry point"
+        )
 
 
 def test_main():
