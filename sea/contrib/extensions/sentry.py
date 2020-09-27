@@ -1,7 +1,6 @@
-import logging
-import raven
-from raven.conf import setup_logging
-from raven.handlers.logging import SentryHandler
+import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations import DidNotEnable
 
 
 class Sentry:
@@ -10,14 +9,14 @@ class Sentry:
         dsn = app.config.get('SENTRY_DSN')
         if dsn:
             config = app.config.get_namespace('SENTRY_')
-            self.client = raven.Client(**config)
-            handler = SentryHandler(self.client)
-            handler.setLevel(logging.ERROR)
-            setup_logging(handler)
+            sentry_logging = LoggingIntegration()
+            integrations = [sentry_logging]
+
             try:
-                from raven.contrib.celery import (
-                    register_signal, register_logger_signal)
-                register_logger_signal(self.client)
-                register_signal(self.client)
-            except ImportError:
+                from sentry_sdk.integrations.celery import CeleryIntegration
+
+                integrations.append(CeleryIntegration())
+            except DidNotEnable:
                 pass
+
+            sentry_sdk.init(**config, integrations=integrations)
