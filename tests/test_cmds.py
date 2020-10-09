@@ -83,7 +83,7 @@ def test_cmd_new():
     sea
     cachext
     celery
-    raven
+    sentry-sdk
     """
     with open("./tests/myproject/requirements.txt", "r") as f:
         content = f.read()
