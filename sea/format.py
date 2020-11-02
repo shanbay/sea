@@ -68,7 +68,7 @@ def msg2json(msg, keys=None, indent=2, sort_keys=False):
 
 
 def dict2msg(d, message, ignore_unknown_fields=False):
-    return ParseDict(d, message, ignore_unknown_fields=ignore_unknown_fields)
+    return ParseDict(d, message(), ignore_unknown_fields=ignore_unknown_fields)
 
 
 def stream2dict(stream):
