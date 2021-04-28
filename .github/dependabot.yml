@@ -1,0 +1,20 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "21:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: grpcio-tools
+    versions:
+    - 1.35.0
+    - 1.36.0
+  - dependency-name: grpcio
+    versions:
+    - 1.35.0
+    - 1.36.0
+  - dependency-name: coverage
+    versions:
+    - "5.4"
