@@ -1,15 +1,13 @@
 import os
 import re
 import ast
+
+import versioneer
+
 from setuptools import setup, find_packages
 
 
-_version_re = re.compile(r'__version__\s+=\s+(.*)')
 _root = os.path.abspath(os.path.dirname(__file__))
-
-with open(os.path.join(_root, 'sea/__init__.py')) as f:
-    version = str(ast.literal_eval(_version_re.search(
-        f.read()).group(1)))
 
 with open(os.path.join(_root, 'requirements.txt')) as f:
     requirements = f.readlines()
@@ -35,7 +33,8 @@ def find_package_data(package):
 
 setup(
     name='sea',
-    version=version,
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='shanbay rpc framework',
     long_description=readme,
     long_description_content_type='text/markdown',

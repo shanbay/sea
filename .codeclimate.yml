@@ -19,3 +19,5 @@ exclude_paths:
 - dist/
 - tests/
 - docs/
+- versioneer.py
+- "*/_version.py"

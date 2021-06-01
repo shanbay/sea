@@ -10,3 +10,4 @@ coveralls
 codeclimate-test-reporter
 coverage>=4.0,<5.6
 prometheus_client
+versioneer
