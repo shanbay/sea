@@ -1,5 +1,8 @@
 [run]
-omit = *.tmpl
+omit = 
+	*.tmpl
+	versioneer.py
+	*/_version.py
 
 [report]
 exclude_lines =

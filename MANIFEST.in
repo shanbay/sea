@@ -2,3 +2,5 @@ include README.md LICENSE requirements.txt
 recursive-exclude tests *
 recursive-exclude examples *
 recursive-exclude benchmark *
+include versioneer.py
+include sea/_version.py
