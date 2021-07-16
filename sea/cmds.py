@@ -81,22 +81,25 @@ def new(project, **extra):
     PACKAGE_DIR = os.path.dirname(__file__)
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
-        'git': ['gitignore'],
-        'peewee': ['configs/default/peewee.py.tmpl',
-                   'app/models.py.tmpl'],
-        'cache': ['configs/default/cache.py.tmpl'],
+        'git': [['gitignore']],
+        'peewee': [['configs', 'default', 'peewee.py.tmpl'],
+                   ['app', 'models.py.tmpl']],
+        'cache': [['configs', 'default', 'cache.py.tmpl']],
         'sentry': [],
-        'async_task': ['configs/default/async_task.py.tmpl',
-                       'app/tasks.py.tmpl'],
-        'bus': ['configs/default/bus.py.tmpl', 'app/buses.py.tmpl'],
+        'async_task': [['configs', 'default', 'async_task.py.tmpl'],
+                       ['app', 'async_tasks.py.tmpl']],
+        'bus': [['configs', 'default', 'bus.py.tmpl'], ['app', 'buses.py.tmpl']],
     }
 
     def _build_skip_files(extra):
         skipped = set()
         for ignore_key in IGNORED_FILES.keys():
             if extra[('skip_' + ignore_key)]:
-                for f in IGNORED_FILES[ignore_key]:
-                    skipped.add(os.path.join(TMPLPATH, f))
+                for fp in IGNORED_FILES[ignore_key]:
+                    f = TMPLPATH
+                    for c in fp:
+                        f = os.path.join(f, c)
+                    skipped.add(f)
         return skipped
 
     def _gen_project(path, skip=set(), ctx={}):
@@ -114,7 +117,8 @@ def new(project, **extra):
                     r, ext = os.path.splitext(dst)
                     if ext == '.tmpl':
                         with open(r, 'w') as f:
-                            tmpl = env.get_template(relfn)
+                            # jinja2 always expect forward slashes here
+                            tmpl = env.get_template(relfn.replace(os.path.sep, '/'))
                             f.write(tmpl.render(**ctx))
                     else:
                         shutil.copyfile(src, dst)
