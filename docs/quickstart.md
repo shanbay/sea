@@ -5,7 +5,7 @@
 让我们来创建第一个项目 helloworld:
 
 ```
-$ sea new --skip-peewee --skip-cache --skip-async_task --skip-bus --skip-sentry helloworld
+$ sea new --skip-peewee --skip-cache --skip-async-task --skip-bus --skip-sentry helloworld
 ```
 
 这条命令会自动生成以下目录及文件:

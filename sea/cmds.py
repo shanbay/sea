@@ -102,28 +102,31 @@ def new(project, **extra):
                     skipped.add(f)
         return skipped
 
-    def _gen_project(path, skip=set(), ctx={}):
+    def _gen_project_file(path, tmpl_file, env, ctx):
         import shutil
+        relfn = os.path.relpath(tmpl_file, TMPLPATH)
+        dst = os.path.join(path, relfn)
+        # create the parentdir if not exists
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        r, ext = os.path.splitext(dst)
+        if ext == '.tmpl':
+            with open(r, 'w') as f:
+                # jinja2 always expect forward slashes here
+                tmpl = env.get_template(relfn.replace(os.path.sep, '/'))
+                f.write(tmpl.render(**ctx))
+        else:
+            shutil.copyfile(tmpl_file, dst)
+
+        print('created: {}'.format(dst))
+
+    def _gen_project(path, skip=set(), ctx={}):
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader(TMPLPATH))
         for dirpath, dirnames, filenames in os.walk(TMPLPATH):
             for fn in filenames:
                 src = os.path.join(dirpath, fn)
                 if src not in skip:
-                    relfn = os.path.relpath(src, TMPLPATH)
-                    dst = os.path.join(path, relfn)
-                    # create the parentdir if not exists
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    r, ext = os.path.splitext(dst)
-                    if ext == '.tmpl':
-                        with open(r, 'w') as f:
-                            # jinja2 always expect forward slashes here
-                            tmpl = env.get_template(relfn.replace(os.path.sep, '/'))
-                            f.write(tmpl.render(**ctx))
-                    else:
-                        shutil.copyfile(src, dst)
-
-                    print('created: {}'.format(dst))
+                    _gen_project_file(path, src, env, ctx)
 
     path = os.path.join(os.getcwd(), project)
     if os.path.exists(path):
