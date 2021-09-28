@@ -1,4 +1,4 @@
-grpcio>=1.27.0,<1.39.0
+grpcio>=1.27.0,<1.42.0
 grpcio-tools>=1.27.0,<1.39.0
 pendulum
 blinker
