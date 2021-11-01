@@ -15,9 +15,9 @@ class RpcException(Exception):
         if isinstance(message, (list, dict)):
             message = json.dumps(
                 message, default=str, ensure_ascii=True)
-        if not isinstance(message, str):
-            message = str(message)
         if message is not None:
+            if not isinstance(message, str):
+                message = str(message)
             self.details = message
         super().__init__(message, *args, **kwargs)
 
