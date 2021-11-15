@@ -11,13 +11,16 @@ def celery(argv, app):
         from sea.contrib.extensions.celery import empty_celeryapp
         empty_celeryapp.load_config(app)
         sys.argv = (
-            ["celery"] + argv
+            ["celery"]
             + ["-A", "sea.contrib.extensions.celery.empty_celeryapp.capp"]
+            + argv
         )
     else:
         create_app()
         sys.argv = (
-            ["celery"] + argv + ["-A", "app.extensions:{app}".format(app=app)]
+            ["celery"]
+            + ["-A", "app.extensions:{app}".format(app=app)]
+            + argv
         )
     return celerymain()
 
