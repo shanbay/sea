@@ -9,3 +9,8 @@ grpc server 启动前触发，Sender 为 `sea.server.Server`对象，无额外�
 ### `server_stopped`
 
 grpc server 结束后触发，Sender 为 `sea.server.Server`对象，无额外参数。
+
+
+### `post_ready`
+
+sea app ready 后触发，Sender 为 `sea.app.BaseApp`的子类对象，无额外参数。

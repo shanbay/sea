@@ -3,6 +3,7 @@ import sys
 
 from sea.utils import import_string
 from sea.local import Proxy
+from sea.signals import post_ready
 
 from ._version import get_versions
 __version__ = get_versions()['version']
@@ -33,6 +34,7 @@ def create_app(root_path=None):
     _app.load_servicers_in_module(import_string("app.servicers"))
 
     _app.ready()
+    post_ready.send(_app)
 
     return _app
 

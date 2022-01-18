@@ -1,12 +1,18 @@
 import sea
+from sea.signals import post_ready
+from unittest.mock import Mock
 
 
 def test_app():
+    mock_func = Mock(spec={})
+    post_ready.connect(mock_func)
+
     assert not sea.current_app
     app = sea.create_app('./tests/wd')
     assert app == sea.current_app
     assert sea.create_app('./tests/wd') is app
     assert app.testing
+    mock_func.assert_called_with(app)
 
     from configs import default
     from app.servicers import GreeterServicer, helloworld_pb2_grpc
