@@ -9,6 +9,7 @@ python:
 install:
 - pip install -r test-requirements.txt -U
 script:
+- echo $(git log -1 --pretty=%B) > latest_commit_msg; pre-commit run --hook-stage commit-msg commitlint --commit-msg-filename latest_commit_msg; rm -rf latest_commit_msg
 - flake8 sea --exclude=*_pb2.py
 - pytest tests/test_contrib/test_extensions/test_celery.py::test_celery_no_app --cov-fail-under=10
 - pytest tests

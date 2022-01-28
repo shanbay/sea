@@ -1,0 +1,50 @@
+# CHANGELOG
+
+
+## [Unreleased]
+### Added
+- Added `post_ready` signal that will be sended after sea app is ready
+
+## [2.3.2] - 2022-01-12
+### Changed
+- Update grpcio-tools requirement from <1.39.0,>=1.27.0 to >=1.27.0,<1.44.0
+
+## [2.3.1] - 2021-06-01
+### Fixed
+- fix(version): fix unchanged version tag
+
+## [2.3.0] - 2021-04-13
+### Changed
+- Update grpcio-tools requirement from <1.33.0,>=1.27.0 to >=1.27.0,<1.38.0
+
+## [2.2.3] - 2020-10-09
+### Changed
+- change log level when load lib jobs
+- fix test
+- bump version
+
+## [2.2.2] - 2020-09-28
+### Changed
+- Update __init__.py
+
+## [2.2.1] - 2020-09-17
+### Changed
+- bump version
+
+## [2.2.0] - 2020-03-13
+### Changed
+- update grpc version
+
+## [2.1.0] - 2019-11-21
+### Changed
+- celery inspect 不调用 create_app
+
+## [2.0.2] - 2019-10-15
+### Changed
+- bump version
+
+## [2.0.1] - 2019-10-15
+### Changed
+- update travis ci
+
+## [0.3.0] - 2017-08-16
