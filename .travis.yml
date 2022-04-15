@@ -7,6 +7,8 @@ python:
 - '3.7'
 - '3.8'
 install:
+- pip install -U importlib-metadata
+- pip list
 - pip install -r test-requirements.txt -U
 script:
 - echo $(git log -1 --pretty=%B) > latest_commit_msg; pre-commit run --hook-stage commit-msg commitlint --commit-msg-filename latest_commit_msg; rm -rf latest_commit_msg
