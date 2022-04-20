@@ -1,4 +1,5 @@
 import json
+import os
 
 from sea.config import ConfigAttribute, Config
 
@@ -27,6 +28,26 @@ def test_config_from_class():
     assert 'TEST_KEY' in d
     s = repr(config)
     assert '<Config' in s
+
+
+def test_config_load_from_env():
+    config = Config('.', {'KEY_INT': 1, 'KEY_STR': 'str', 'KEY_BOOL': True})
+    os.environ['KEY_INT'] = "300"
+    os.environ['KEY_STR'] = "TESTING"
+    os.environ['KEY_BOOL'] = "False"
+
+    assert config['KEY_INT'] == 1
+    assert config['KEY_STR'] == 'str'
+    assert config['KEY_BOOL'] == True  # noqa
+
+    config.load_config_from_env()
+    assert config['KEY_INT'] == 300
+    assert config['KEY_STR'] == 'TESTING'
+    assert config['KEY_BOOL'] == False  # noqa
+
+    os.environ['TEST'] = 'True'
+    config.load_config_from_env()
+    assert 'TEST' not in config
 
 
 def test_config_attribute():

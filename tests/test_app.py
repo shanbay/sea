@@ -20,6 +20,10 @@ def test_baseapp(caplog):
     from configs import testing
 
     _app.config.from_object(testing)
+    assert _app.config["PORT"] == 4000
+    os.environ["PORT"] = "4001"
+    _app.config.load_config_from_env()
+    assert _app.config["PORT"] == 4001
     assert _app.debug
     assert _app.testing
     _app.load_middlewares()

@@ -1,4 +1,8 @@
+import numbers
+import os
+
 from sea.datatypes import ConstantsObject
+from sea.utils import strtobool
 
 
 class ConfigAttribute:
@@ -44,6 +48,24 @@ class Config(dict):
                 key = key.lower()
             rv[key] = v
         return ConstantsObject(rv)
+
+    def load_config_from_env(self):
+        """
+        read environment variables and overwrite same name key's values.
+        `True` will be converted to python's bool `True`.
+        `1` will be converted to python's int `1`.
+        """
+        keys = self.keys()
+
+        for k in keys:
+            env_value = os.getenv(k)
+            if not env_value:
+                continue
+            value_type = type(self[k])
+            if value_type is bool:
+                self[k] = strtobool(env_value)
+            elif isinstance(env_value, (str, numbers.Number)):
+                self[k] = value_type(env_value)
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))

@@ -4,6 +4,7 @@
 ## [Unreleased]
 ### Added
 - Added `post_ready` signal that will be sended after sea app is ready
+- Added reading default config from environment variables, will overwrite the config file
 
 ## [2.3.2] - 2022-01-12
 ### Changed
