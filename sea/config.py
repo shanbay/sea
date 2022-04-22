@@ -1,8 +1,11 @@
+import logging
 import numbers
 import os
 
 from sea.datatypes import ConstantsObject
 from sea.utils import strtobool
+
+log = logging.getLogger("sea.config")
 
 
 class ConfigAttribute:
@@ -52,6 +55,7 @@ class Config(dict):
     def load_config_from_env(self):
         """
         read environment variables and overwrite same name key's values.
+        only bool/str/numbers.Number could be overwritten
         `True` will be converted to python's bool `True`.
         `1` will be converted to python's int `1`.
         """
@@ -61,11 +65,16 @@ class Config(dict):
             env_value = os.getenv(k)
             if not env_value:
                 continue
+            log.info("config item {} overwriting by env {}={}",
+                     k.upper(), k.upper(), env_value)
             value_type = type(self[k])
             if value_type is bool:
                 self[k] = strtobool(env_value)
             elif isinstance(env_value, (str, numbers.Number)):
                 self[k] = value_type(env_value)
+            else:
+                log.debug("{} type config item {} can't cast from env",
+                          value_type, k.upper())
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))
