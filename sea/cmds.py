@@ -81,45 +81,52 @@ def new(project, **extra):
     PACKAGE_DIR = os.path.dirname(__file__)
     TMPLPATH = os.path.join(PACKAGE_DIR, 'template')
     IGNORED_FILES = {
-        'git': ['gitignore'],
-        'peewee': ['configs/default/peewee.py.tmpl',
-                   'app/models.py.tmpl'],
-        'cache': ['configs/default/cache.py.tmpl'],
+        'git': [['gitignore']],
+        'peewee': [['configs', 'default', 'peewee.py.tmpl'],
+                   ['app', 'models.py.tmpl']],
+        'cache': [['configs', 'default', 'cache.py.tmpl']],
         'sentry': [],
-        'async_task': ['configs/default/async_task.py.tmpl',
-                       'app/tasks.py.tmpl'],
-        'bus': ['configs/default/bus.py.tmpl', 'app/buses.py.tmpl'],
+        'async_task': [['configs', 'default', 'async_task.py.tmpl'],
+                       ['app', 'async_tasks.py.tmpl']],
+        'bus': [['configs', 'default', 'bus.py.tmpl'], ['app', 'buses.py.tmpl']],
     }
 
     def _build_skip_files(extra):
         skipped = set()
         for ignore_key in IGNORED_FILES.keys():
             if extra[('skip_' + ignore_key)]:
-                for f in IGNORED_FILES[ignore_key]:
-                    skipped.add(os.path.join(TMPLPATH, f))
+                for fp in IGNORED_FILES[ignore_key]:
+                    f = TMPLPATH
+                    for c in fp:
+                        f = os.path.join(f, c)
+                    skipped.add(f)
         return skipped
 
-    def _gen_project(path, skip=set(), ctx={}):
+    def _gen_project_file(path, tmpl_file, env, ctx):
         import shutil
+        relfn = os.path.relpath(tmpl_file, TMPLPATH)
+        dst = os.path.join(path, relfn)
+        # create the parentdir if not exists
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        r, ext = os.path.splitext(dst)
+        if ext == '.tmpl':
+            with open(r, 'w') as f:
+                # jinja2 always expect forward slashes here
+                tmpl = env.get_template(relfn.replace(os.path.sep, '/'))
+                f.write(tmpl.render(**ctx))
+        else:
+            shutil.copyfile(tmpl_file, dst)
+
+        print('created: {}'.format(dst))
+
+    def _gen_project(path, skip=set(), ctx={}):
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader(TMPLPATH))
         for dirpath, dirnames, filenames in os.walk(TMPLPATH):
             for fn in filenames:
                 src = os.path.join(dirpath, fn)
                 if src not in skip:
-                    relfn = os.path.relpath(src, TMPLPATH)
-                    dst = os.path.join(path, relfn)
-                    # create the parentdir if not exists
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    r, ext = os.path.splitext(dst)
-                    if ext == '.tmpl':
-                        with open(r, 'w') as f:
-                            tmpl = env.get_template(relfn)
-                            f.write(tmpl.render(**ctx))
-                    else:
-                        shutil.copyfile(src, dst)
-
-                    print('created: {}'.format(dst))
+                    _gen_project_file(path, src, env, ctx)
 
     path = os.path.join(os.getcwd(), project)
     if os.path.exists(path):
