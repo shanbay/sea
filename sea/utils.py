@@ -39,6 +39,9 @@ class cached_property:
                 res = instance.__dict__[self.name] = self.func(instance)
                 return res
 
+if sys.version_info.minor >= 8:
+    del cached_property
+    from functools import cached_property
 
 class Singleton(type):
     _instances = {}
