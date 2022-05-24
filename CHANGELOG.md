@@ -1,7 +1,8 @@
 # CHANGELOG
 
-
 ## [Unreleased]
+
+## [2.3.3] - 2022-04-22
 ### Added
 - Added `post_ready` signal that will be sended after sea app is ready
 - Added reading default config from environment variables, will overwrite the config file
