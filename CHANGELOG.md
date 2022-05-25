@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## [Unreleased]
+### Changed
+- Use cached_property from standard lib when possible
 
 ## [2.3.3] - 2022-04-22
 ### Added

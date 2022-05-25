@@ -1,10 +1,16 @@
 import inspect
 import logging
 import os.path
+import sys
 
 from sea import exceptions, utils
 from sea.config import Config, ConfigAttribute
 from sea.datatypes import ImmutableDict, ConstantsObject
+
+if sys.version_info.minor >= 8:
+    from functools import cached_property
+else:
+    from sea.utils import cached_property
 
 
 class BaseApp:
@@ -46,7 +52,7 @@ class BaseApp:
         self._extensions = {}
         self._middlewares = []
 
-    @utils.cached_property
+    @cached_property
     def logger(self):
         logger = logging.getLogger('sea.app')
         if self.debug and logger.level == logging.NOTSET:
@@ -57,19 +63,19 @@ class BaseApp:
             logger.addHandler(h)
         return logger
 
-    @utils.cached_property
+    @cached_property
     def servicers(self):
         rv = ConstantsObject(self._servicers)
         del self._servicers
         return rv
 
-    @utils.cached_property
+    @cached_property
     def extensions(self):
         rv = ConstantsObject(self._extensions)
         del self._extensions
         return rv
 
-    @utils.cached_property
+    @cached_property
     def middlewares(self):
         rv = tuple(self._middlewares)
         del self._middlewares

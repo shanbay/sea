@@ -13,6 +13,9 @@ utils.import_string('sea.app:BaseApp')
 
 ## `cached_property`
 
+> 如果你使用的是 python 3.8 以上版本，标准库中已经提供 cached_property 装饰器，推荐使用官方版本
+> `from functools import cached_property`
+
 property 的值初次计算后会缓存在 instance 上，重复调用不会重复计算
 
 ```python
