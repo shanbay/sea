@@ -28,8 +28,6 @@ def create_app(root_path=None):
     app_class = import_string("app:App")
     _app = app_class(root_path, env=env)
     _app.config.from_object(config)
-    # only filter default configurations
-    _app.config.load_config_from_env()
 
     _app.load_middlewares()
     _app.load_extensions_in_module(import_string("app.extensions"))

@@ -4,7 +4,7 @@ import signal
 import threading
 from unittest import mock
 
-from sea.server import Server
+from sea.server.threading import Server
 from sea.signals import server_started, server_stopped
 
 

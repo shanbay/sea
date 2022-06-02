@@ -1,5 +1,6 @@
 import inspect
 import logging
+import os
 import os.path
 import sys
 
@@ -20,11 +21,9 @@ class BaseApp:
     :param env: the env
     """
     config_class = Config
-    debug = ConfigAttribute('DEBUG')
     testing = ConfigAttribute('TESTING')
     tz = ConfigAttribute('TIMEZONE')
     default_config = ImmutableDict({
-        'DEBUG': False,
         'TESTING': False,
         'TIMEZONE': 'UTC',
         'GRPC_WORKERS': 3,
@@ -47,13 +46,25 @@ class BaseApp:
         self.root_path = root_path
         self.name = os.path.basename(root_path)
         self.env = env
+        self.debug = (os.environ.get("SEA_DEBUG") or env == "development")
         self.config = self.config_class(root_path, self.default_config)
         self._servicers = {}
         self._extensions = {}
         self._middlewares = []
 
+    def _setup_root_logger(self):
+        fmt = self.config['GRPC_LOG_FORMAT']
+        lvl = self.config['GRPC_LOG_LEVEL']
+        h = self.config['GRPC_LOG_HANDLER']
+        h.setFormatter(logging.Formatter(fmt))
+        root = logging.getLogger()
+        root.setLevel(lvl)
+        root.addHandler(h)
+
     @cached_property
     def logger(self):
+        self._setup_root_logger()
+
         logger = logging.getLogger('sea.app')
         if self.debug and logger.level == logging.NOTSET:
             logger.setLevel(logging.DEBUG)

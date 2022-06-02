@@ -2,7 +2,7 @@ import os
 
 from sea.cli import jobm, JobException
 from sea import current_app
-from sea.server import Server
+from sea.server.multiprocessing import Server
 
 
 @jobm.job('server', aliases=['s'], help='Run Server')

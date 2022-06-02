@@ -15,7 +15,6 @@ class Server:
 
     def __init__(self, app):
         self.app = app
-        self.setup_logger()
         self.workers = self.app.config['GRPC_WORKERS']
         self.host = self.app.config['GRPC_HOST']
         self.port = self.app.config['GRPC_PORT']
@@ -41,15 +40,6 @@ class Server:
             time.sleep(1)
         signals.server_stopped.send(self)
         return True
-
-    def setup_logger(self):
-        fmt = self.app.config['GRPC_LOG_FORMAT']
-        lvl = self.app.config['GRPC_LOG_LEVEL']
-        h = self.app.config['GRPC_LOG_HANDLER']
-        h.setFormatter(logging.Formatter(fmt))
-        logger = logging.getLogger()
-        logger.setLevel(lvl)
-        logger.addHandler(h)
 
     def register_signal(self):
         signal.signal(signal.SIGINT, self._stop_handler)
