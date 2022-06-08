@@ -1,11 +1,13 @@
 import contextlib
+import glob
 import multiprocessing
 import signal
 import socket
 import time
-import logging
 from concurrent import futures
 import grpc
+
+import os
 
 from sea import signals
 
@@ -19,6 +21,9 @@ GRPC_GRACE
 GRPC_LOG_FORMAT
 GRPC_LOG_LEVEL
 GRPC_LOG_HANDLER
+
+PROMETHEUS_SCRAPE
+PROMETHEUS_PORT
 """
 
 
@@ -31,7 +36,7 @@ class Server:
     def __init__(self, app):
         self.app = app
         self.worker_num = self.app.config['GRPC_WORKERS']
-        self.thread_num = self.app.config.get('GRPC_THREADS', 1)
+        self.thread_num = self.app.config.get('GRPC_THREADS')
         self.host = self.app.config['GRPC_HOST']
         self.port = self.app.config['GRPC_PORT']
         self.workers = []
@@ -47,20 +52,42 @@ class Server:
                 # ("grpc.use_local_subchannel_pool", 1),
             ],
         ) 
+        self.server = server # set server in slave process
+
         for _, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), server)
         server.add_insecure_port(bind_address)
         server.start()
-        self.server = server # set server in slave process
 
         signals.server_started.send(self)
+
+        # hang up here, to make slave run always
         server.wait_for_termination()
+    
+    def _run_prometheus_http_server(self):
+        """Run prometheus_client built-in http server.
+
+        Duing to prometheus_client multiprocessing details, 
+        PROMETHEUS_MULTIPROC_DIR must set in environment variables."""
+        if not self.app.config['PROMETHEUS_SCRAPE']:
+            return
+
+        from prometheus_client import start_http_server, REGISTRY
+        from prometheus_client.multiprocess import MultiProcessCollector
+
+        MultiProcessCollector(REGISTRY)
+        start_http_server(self.app.config['PROMETHEUS_PORT'])
+    
+    def _clean_prometheus(self):
+        if not self.app.config['PROMETHEUS_SCRAPE']:
+            return
+        dir = os.getenv("PROMETHEUS_MULTIPROC_DIR")
+        self.app.logger.info(f"clean prometheus dir {dir}")
+        for f in glob.glob(os.path.join(dir, "*")):
+            os.remove(f)
 
     def run(self):
-        # # run prometheus client
-        # if self.app.config['PROMETHEUS_SCRAPE']:
-        #     from prometheus_client import start_http_server
-        #     start_http_server(self.app.config['PROMETHEUS_PORT'])
+        self._run_prometheus_http_server()
         
         self.register_signal()
 
@@ -72,6 +99,8 @@ class Server:
                 self.workers.append(worker)
             for worker in self.workers:
                 worker.join()
+        
+        self._clean_prometheus()
         
         return True
 
@@ -86,6 +115,7 @@ class Server:
         grace = max(self.app.config['GRPC_GRACE'], 5) if self.app.config['GRPC_GRACE'] else 5
         if not self.server:
             self.app.logger.warning("master process received signal {}, sleep {} to wait slave done".format(signum, grace))
+            signals.server_stopped.send(self)
 
             # master process sleep to wait slaves end their lives
             time.sleep(grace)
@@ -98,10 +128,10 @@ class Server:
             self.app.logger.warning("master exit")
         else:
             # slave process sleep less 3s to make grace more reliable
+            signals.server_stopped.send(self)
             self.app.logger.warning("slave process received signal {}, try to stop process".format(signum))
             self.server.stop(grace - 3)
             time.sleep(grace - 3)
-            signals.server_stopped.send(self)
 
 @contextlib.contextmanager
 def _reserve_address_port(host, port):
