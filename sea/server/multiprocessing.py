@@ -120,7 +120,16 @@ class Server:
             if self.app.config["GRPC_GRACE"]
             else 5
         )
+
+        if self._stopped:
+            self.app.logger.debug(
+                "stop signal has received, ignore duplicated function signal"
+            )
+            return
+        self._stopped = True
+
         if not self.server:
+            # master
             self.app.logger.warning(
                 "master process received signal {}, sleep {} to wait slave done".format(
                     signum, grace
@@ -142,11 +151,12 @@ class Server:
                     worker.kill()
             self.app.logger.warning("master exit")
         else:
-            # slave process sleep less 3s to make grace more reliable
+            # slave
             signals.server_stopped.send(self)
             self.app.logger.warning(
                 "slave process received signal {}, try to stop process".format(signum)
             )
+            # slave process sleep less 3s to make grace more reliable
             self.server.stop(grace - 3)
             time.sleep(grace - 3)
 
