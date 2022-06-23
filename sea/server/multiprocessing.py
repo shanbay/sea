@@ -11,38 +11,27 @@ import grpc
 
 from sea import signals
 
-"""
-GRPC_WORKERS
-GRPC_THREADS
-GRPC_HOST
-GRPC_PORT
-GRPC_GRACE
-
-GRPC_LOG_FORMAT
-GRPC_LOG_LEVEL
-GRPC_LOG_HANDLER
-
-PROMETHEUS_SCRAPE
-PROMETHEUS_PORT
-"""
-
 
 class Server:
-    """sea multiprocessing server implements
+    """sea multiprocessing server implementation
 
     :param app: application instance
     """
 
     def __init__(self, app):
+        # application instance
         self.app = app
+        # worker process number
         self.worker_num = self.app.config["GRPC_WORKERS"]
+        # worker thread number
         self.thread_num = self.app.config.get("GRPC_THREADS")
         self.host = self.app.config["GRPC_HOST"]
         self.port = self.app.config["GRPC_PORT"]
+        # slave worker refs, master node contains all slave workers refs
         self.workers = []
         self._stopped = False
-
-        self.server = None  # slave process server object
+        # slave worker server instance ref
+        self.server = None
 
     def _run_server(self, bind_address):
         server = grpc.server(
