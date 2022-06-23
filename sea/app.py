@@ -28,7 +28,7 @@ class BaseApp:
         {
             "TESTING": False,
             "TIMEZONE": "UTC",
-            "GRPC_WORKERS": 3,
+            "GRPC_WORKERS": 4,
             "GRPC_THREADS": 1,  # Only appliable in multiprocessing server
             "GRPC_HOST": "0.0.0.0",
             "GRPC_PORT": 6000,
