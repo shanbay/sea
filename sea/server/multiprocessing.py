@@ -82,8 +82,7 @@ class Server:
 
         self._register_signals()
 
-        with _reserve_address_port(self.host, self.port):
-            bind_address = "{}:{}".format(self.host, self.port)
+        with _reserve_address_port(self.host, self.port) as bind_address:
             for _ in range(self.worker_num):
                 worker = multiprocessing.Process(
                     target=self._run_server, args=(bind_address,)
@@ -153,12 +152,27 @@ class Server:
 @contextlib.contextmanager
 def _reserve_address_port(host, port):
     """Find and reserve a port for all subprocesses to use."""
-    sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+
+    from ipaddress import IPv6Address, ip_address
+
+    ipv6 = False
+    if host and type(ip_address(host)) is IPv6Address:
+        ipv6 = True
+
+    sock = socket.socket(
+        socket.AF_INET6 if ipv6 else socket.AF_INET, socket.SOCK_STREAM
+    )
+
+    # ENABLE SO_REUSEPORt
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     if sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT) == 0:
         raise RuntimeError("Failed to set SO_REUSEPORT.")
-    sock.bind(("", port))
+
+    sock.bind((host, port))
     try:
-        yield sock.getsockname()[1]
+        if ipv6:
+            yield "[{0}]:{1}".format(*sock.getsockname())
+        else:
+            yield "{0}:{1}".format(*sock.getsockname())
     finally:
         sock.close()
