@@ -91,7 +91,7 @@ class Server:
     def run(self):
         self._run_prometheus_http_server()
 
-        self.register_signal()
+        self._register_signals()
 
         with _reserve_address_port(self.host, self.port):
             bind_address = "{}:{}".format(self.host, self.port)
@@ -108,7 +108,7 @@ class Server:
 
         return True
 
-    def register_signal(self):
+    def _register_signals(self):
         signal.signal(signal.SIGINT, self._stop_handler)
         signal.signal(signal.SIGHUP, self._stop_handler)
         signal.signal(signal.SIGTERM, self._stop_handler)
