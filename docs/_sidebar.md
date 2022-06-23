@@ -18,3 +18,5 @@
 - 内置扩展
     - [celery](contrib/celery)
     - [Sentry](contrib/sentry)
+- 性能测试
+    - [benchmark](benchmark)
