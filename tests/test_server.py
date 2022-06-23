@@ -2,6 +2,7 @@ import inspect
 import os
 import signal
 import threading
+import time
 from unittest import mock
 
 from sea.signals import server_started, server_stopped
@@ -38,31 +39,39 @@ def test_thread_server(app, logstream):
 
 
 def test_multiprocessing_server(app, logstream):
-    from sea.server.multiprocessing import Server
+    # In multiprocessing mode, prometheus dir must be set
+    try:
+        os.mkdir("/tmp/prometheus_metrics")
+        os.environ.setdefault("PROMETHEUS_MULTIPROC_DIR", "/tmp/prometheus_metrics")
 
-    s = Server(app)
-    assert not s._stopped
+        app.config["PROMETHEUS_PORT"] = 9092
 
-    def log_started(s):
-        app.logger.warning("started!")
+        from sea.server.multiprocessing import Server
 
-    def log_stopped(s):
-        app.logger.warning("stopped!")
+        s = Server(app)
+        assert not s._stopped
 
-    def _mocked(*args, **kwargs):
-        curframe = inspect.currentframe()
-        caller_name = inspect.getouterframes(curframe, 2)[1][3]
-        if caller_name == "run":
+        def log_started(s):
+            app.logger.warning("started!")
+
+        def log_stopped(s):
+            app.logger.warning("stopped!")
+
+        server_started.connect(log_started)
+        server_stopped.connect(log_stopped)
+
+        def kill_later(sec):
+            time.sleep(sec)
             os.kill(os.getpid(), signal.SIGINT)
 
-    server_started.connect(log_started)
-    server_stopped.connect(log_stopped)
+        # 3 seconds to wait before killing server
+        threading.Thread(target=kill_later, args=[3]).start()
 
-    with mock.patch("time.sleep", new=_mocked):
+        # with mock.patch("time.sleep", new=_mocked):
         assert s.run()
-        process_num = os.open("ps ax | grep sea | grep -v grep | wc -l")
-        print(process_num)
         assert s._stopped
 
-    content = logstream.getvalue()
-    assert "started!" in content and "stopped!" in content
+        content = logstream.getvalue()
+        assert "stopped!" in content
+    finally:
+        os.rmdir("/tmp/prometheus_metrics")
