@@ -1,8 +1,9 @@
-import pytest
-import sys
 import logging
 import os.path
+import sys
 from unittest import mock
+
+import pytest
 
 from sea import app, exceptions
 
@@ -19,6 +20,8 @@ def test_baseapp(caplog):
 
     from configs import testing
 
+    os.environ["SEA_DEBUG"] = "true"
+    _app = app.BaseApp(root_path, env='testing')
     _app.config.from_object(testing)
     assert _app.config["PORT"] == 4000
     os.environ["PORT"] = "4001"
@@ -31,7 +34,7 @@ def test_baseapp(caplog):
     assert len(_app.middlewares) == 3
 
     with mock.patch('sea._app', new=_app):
-        from app import servicers, extensions
+        from app import extensions, servicers
 
     with pytest.raises(exceptions.ConfigException):
         _app._register_servicer(servicers.GreeterServicer)

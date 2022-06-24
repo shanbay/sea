@@ -1,6 +1,7 @@
 import os
 import sys
-import mock
+from unittest import mock
+
 from sea import import_string
 from sea.contrib.extensions.celery import AsyncTask, Bus
 from sea.contrib.extensions.celery.cmd import async_task, bus
