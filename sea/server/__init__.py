@@ -1,1 +1,1 @@
-from .threading import Server as Server 
+from .threading import Server as Server  # noqa
