@@ -104,11 +104,7 @@ class Server:
         signal.signal(signal.SIGQUIT, self._stop_handler)
 
     def _stop_handler(self, signum, frame):
-        grace = (
-            max(self.app.config["GRPC_GRACE"], 5)
-            if self.app.config["GRPC_GRACE"]
-            else 5
-        )
+        grace = max(self.app.config.get("GRPC_GRACE", 0), 5)
 
         if self._stopped:
             self.app.logger.debug(
@@ -168,7 +164,7 @@ def _reserve_address_port(host, port):
         socket.AF_INET6 if ipv6 else socket.AF_INET, socket.SOCK_STREAM
     )
 
-    # ENABLE SO_REUSEPORt
+    # ENABLE SO_REUSEPORT
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     if sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT) == 0:
         raise RuntimeError("Failed to set SO_REUSEPORT.")
