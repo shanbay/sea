@@ -1,15 +1,21 @@
-import sys
-import pytest
 import os
 import shutil
+import sys
 from unittest import mock
+
+import pytest
 
 from sea import cli
 
 
 def test_cmd_server(app):
     sys.argv = "sea s".split()
-    with mock.patch("sea.cmds.Server", autospec=True) as mocked:
+    with mock.patch("sea.server.threading.Server", autospec=True) as mocked:
+        assert cli.main() == 0
+        mocked.return_value.run.assert_called_with()
+
+    sys.argv = "sea s -M multiprocessing".split()
+    with mock.patch("sea.server.multiprocessing.Server", autospec=True) as mocked:
         assert cli.main() == 0
         mocked.return_value.run.assert_called_with()
 

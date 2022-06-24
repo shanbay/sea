@@ -2,12 +2,26 @@ import os
 
 from sea import current_app
 from sea.cli import JobException, jobm
-from sea.server import Server
 
 
 @jobm.job("server", aliases=["s"], help="Run Server")
-def server():
-    s = Server(current_app)
+@jobm.option(
+    "-M",
+    "--worker_mode",
+    required=False,
+    action="store",
+    help="Worker mode. threading|multiprocessing",
+)
+def server(worker_mode):
+    worker_mode = worker_mode or current_app.config["GRPC_WORKER_MODE"]
+    if worker_mode == "threading":
+        from sea.server.threading import Server
+
+        s = Server(current_app)
+    else:
+        from sea.server.multiprocessing import Server
+
+        s = Server(current_app)
     s.run()
     return 0
 
