@@ -6,6 +6,7 @@ import signal
 import socket
 import time
 from concurrent import futures
+from typing import List
 
 import grpc
 
@@ -22,16 +23,16 @@ class Server:
         # application instance
         self.app = app
         # worker process number
-        self.worker_num = self.app.config["GRPC_WORKERS"]
+        self.worker_num: int = self.app.config["GRPC_WORKERS"]
         # worker thread number
-        self.thread_num = self.app.config.get("GRPC_THREADS")
-        self.host = self.app.config["GRPC_HOST"]
-        self.port = self.app.config["GRPC_PORT"]
+        self.thread_num: int = self.app.config.get("GRPC_THREADS")
+        self.host: str = self.app.config["GRPC_HOST"]
+        self.port: int = self.app.config["GRPC_PORT"]
         # slave worker refs, master node contains all slave workers refs
-        self.workers = []
-        self._stopped = False
+        self.workers: List[multiprocessing.Process] = []
+        self._stopped: bool = False
         # slave worker server instance ref
-        self.server = None
+        self.server: grpc.Server = None
 
     def _run_server(self, bind_address):
         server = grpc.server(
@@ -136,7 +137,11 @@ class Server:
                             worker.pid, grace
                         )
                     )
-                    worker.kill()
+                    # compatitable with 3.6 and before
+                    if callable(getattr(worker, "kill", None)):
+                        worker.kill()
+                    else:
+                        os.kill(worker.pid, signal.SIGKILL)
             self.app.logger.warning("master exit")
         else:
             # slave
