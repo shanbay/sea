@@ -12,7 +12,7 @@ Memory: 16GB DDR4
 时长：30s
 
 延迟比较
-![Latency](/docs/assets/images/2022-06-23-latency.jpg "Latency")
+![Latency](/assets/images/2022-06-23-latency.jpg "Latency")
 
 QPS比较
-![QPS](/docs/assets/images/2022-06-23-qps.jpg "QPS")
+![QPS](/assets/images/2022-06-23-qps.jpg "QPS")
