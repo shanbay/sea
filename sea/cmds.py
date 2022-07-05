@@ -13,7 +13,7 @@ from sea.cli import JobException, jobm
     help="Worker mode. threading|multiprocessing",
 )
 def server(worker_mode):
-    worker_mode = worker_mode or current_app.config["GRPC_WORKER_MODE"]
+    worker_mode = worker_mode or current_app.config.get("GRPC_WORKER_MODE", "threading")
     if worker_mode == "threading":
         from sea.server.threading import Server
 
