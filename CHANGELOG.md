@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [Unreleased]
+## [3.0.0] - 2022-06-24
 
 ### Added
 - Added multiprocessing worker class
