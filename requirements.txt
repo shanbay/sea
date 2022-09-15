@@ -1,5 +1,5 @@
 grpcio>=1.27.0,<1.44.0
-grpcio-tools>=1.27.0,<1.44.0
+grpcio-tools>=1.27.0,<1.50.0
 pendulum
 blinker
 jinja2
