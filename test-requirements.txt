@@ -3,12 +3,12 @@ peeweext
 cachext
 redis
 celery
-pytest
-pytest-cov
+pytest>7.0.0
+pytest-cov>=4.0.0
 flake8
 coveralls
 codeclimate-test-reporter
-coverage>=4.0,<6.4
+coverage>=4.0,<6.6
 prometheus_client
 versioneer
 pre-commit
