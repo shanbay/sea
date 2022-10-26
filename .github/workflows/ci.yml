@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - run: pip install -r test-requirements.txt -U
+      - name: Run git-lint
+        run: gitlint --commits "8d1d969b..HEAD"
+      - name: Run python code lint
+        run: flake8 sea --exclude=*_pb2.py
+  
+  tests:
+    name: "Python ${{ matrix.py-version }} unit-tests"
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        py-version: ['3.7', '3.8', '3.9', '3.10']
+    services:
+      redis-server:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.py-version }}
+          cache: 'pip'
+      - run: pip install -r test-requirements.txt -U
+      - name: Run test_celery_no_app
+        run: pytest tests/test_contrib/test_extensions/test_celery.py::test_celery_no_app --cov-fail-under=10
+      - name: Run unit-tests
+        run: pytest tests --cov sea
+      - name: Coveralls Parallel
+        uses: AndreMiras/coveralls-python-action@develop
+        with:
+          flag-name: "Integration Test - ${{ matrix.py-version }}"
+          parallel: true
+  
+  report_coverage:
+    name: Report testing coverage
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: AndreMiras/coveralls-python-action@develop
+        with:
+          parallel-finished: true

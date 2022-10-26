@@ -3,6 +3,7 @@ omit =
 	*.tmpl
 	versioneer.py
 	*/_version.py
+relative_files = True
 
 [report]
 exclude_lines =
