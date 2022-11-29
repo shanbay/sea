@@ -1,4 +1,4 @@
-grpcio>=1.27.0,<1.49.0
+grpcio>=1.27.0,<1.52.0
 grpcio-tools>=1.27.0,<1.49.0
 protobuf<4.0.0
 pendulum
