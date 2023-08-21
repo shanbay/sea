@@ -45,6 +45,9 @@ class Server:
             ],
         )
         self.server = server  # set server in slave process
+        if self.app.config.get("GRPC_REFLECTION", True):
+            from grpc_reflection.v1alpha import reflection
+            reflection.enable_server_reflection((reflection.SERVICE_NAME,), server)
 
         for _, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), server)

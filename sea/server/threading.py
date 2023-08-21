@@ -28,6 +28,9 @@ class Server:
             from prometheus_client import start_http_server
 
             start_http_server(self.app.config["PROMETHEUS_PORT"])
+        if self.app.config.get("GRPC_REFLECTION", True):
+            from grpc_reflection.v1alpha import reflection
+            reflection.enable_server_reflection((reflection.SERVICE_NAME,), self.server)
         # run grpc server
         for name, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), self.server)
