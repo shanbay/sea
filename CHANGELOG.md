@@ -1,13 +1,15 @@
 # CHANGELOG
 
-## [Unreleased] - 2022-10-25
+## [Unreleased] - 2023-08-21
+### Added
+- Support grpc reflection
 
+## [3.1.0] - 2022-11-10
 ### Changed
 - Upgrade depebdebcies to support python 3.10+
 - Changed CI from Travis CI to Github Actions
 
 ## [3.0.0] - 2022-06-24
-
 ### Added
 - Added multiprocessing worker class
 ### Changed

@@ -9,6 +9,7 @@ from concurrent import futures
 from typing import List
 
 import grpc
+from grpc_reflection.v1alpha import reflection
 
 from sea import signals
 
@@ -45,9 +46,9 @@ class Server:
             ],
         )
         self.server = server  # set server in slave process
-        if self.app.config.get("GRPC_REFLECTION", True):
-            from grpc_reflection.v1alpha import reflection
-            reflection.enable_server_reflection((reflection.SERVICE_NAME,), server)
+        # register reflection service
+        if self.app.config.get("GRPC_REFLECTION_SERVICES"):
+            reflection.enable_server_reflection((reflection.SERVICE_NAME, *self.app.config["GRPC_REFLECTION_SERVICES"]), self.server)
 
         for _, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), server)
