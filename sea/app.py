@@ -137,7 +137,19 @@ class BaseApp:
         def is_ext(ins):
             return not inspect.isclass(ins) and hasattr(ins, "init_app")
 
-        for n, ext in inspect.getmembers(module, is_ext):
+        # guarantee the order of extension initialization by load_order attribute
+        def sort_ext(member):
+            _, ext = member
+            ORDER_ATTR = "load_order"
+            DEFAULT_LOWER_ORDER = 10
+
+            if ORDER_ATTR in ext.__dict__:
+                return getattr(ext, ORDER_ATTR)
+            return DEFAULT_LOWER_ORDER
+
+        for n, ext in sorted(
+            inspect.getmembers(module, is_ext), key=sort_ext
+        ):
             self._register_extension(n, ext)
         return self.extensions
 
