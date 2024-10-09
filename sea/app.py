@@ -99,7 +99,7 @@ class BaseApp:
         return rv
 
     def _register_servicer(self, servicer):
-        """register serviser
+        """register servicer
 
         :param servicer: servicer
         """

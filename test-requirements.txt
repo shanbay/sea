@@ -13,3 +13,4 @@ prometheus_client
 versioneer
 pre-commit
 gitlint
+pytest-asyncio
