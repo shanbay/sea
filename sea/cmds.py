@@ -29,7 +29,13 @@ def server(worker_mode):
         from sea.server.asyncio import Server
 
         s = Server(current_app)
-        asyncio.run(s.run())
+        # asyncio.run(s.run())
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(s.run())
+        finally:
+            loop.run_until_complete(s._stop_handler())
+            loop.close()
     return 0
 
 
