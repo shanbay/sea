@@ -127,7 +127,10 @@ class BaseApp:
         self._extensions[name] = ext
 
     def load_middlewares(self):
-        mids = ["sea.middleware.GuardMiddleware"] + self.config.get("MIDDLEWARES")
+        config_mids = self.config.get("MIDDLEWARES")
+        mids_from_env = os.environ.get("SEA_MIDDLEWARES", "").split(",")
+        env_mids = [mid for mid in mids_from_env if mid and mid not in config_mids]
+        mids = ["sea.middleware.GuardMiddleware"] + env_mids + config_mids
         for mn in mids:
             m = utils.import_string(mn)
             self._middlewares.insert(0, m)

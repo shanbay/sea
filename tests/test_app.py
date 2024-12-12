@@ -29,9 +29,10 @@ def test_baseapp(caplog):
     assert _app.config["PORT"] == 4001
     assert _app.debug
     assert _app.testing
+    os.environ["SEA_MIDDLEWARES"] = "sea.middleware.BaseMiddleware,sea.middleware.ServiceLogMiddleware,"
     _app.load_middlewares()
 
-    assert len(_app.middlewares) == 3
+    assert len(_app.middlewares) == 4
 
     with mock.patch('sea._app', new=_app):
         from app import extensions, servicers
