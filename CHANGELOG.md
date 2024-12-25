@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## [Unreleased] - 2023-08-21
+## [3.1.2] - 2024-12-18
+### Added
+- Support reading grpc middlewares from env and removing duplicates according to config middlewares
+
+## [3.1.1] - 2023-08-21
 ### Added
 - Support grpc reflection
 
