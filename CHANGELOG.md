@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [3.1.4] - 2024-12-26
+### Changed
+- bump version
+
 ## [3.1.3] - 2024-12-26
 ### Added
 - Lock requirements using pip-tools
