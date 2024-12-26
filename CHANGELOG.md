@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [3.1.3] - 2024-12-26
+### Added
+- Lock requirements using pip-tools
+
 ## [3.1.2] - 2024-12-18
 ### Added
 - Support reading grpc middlewares from env and removing duplicates according to config middlewares

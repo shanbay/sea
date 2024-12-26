@@ -1,0 +1,7 @@
+grpcio>=1.27.0,<1.49.0
+grpcio-tools>=1.27.0,<1.49.0
+grpcio-reflection
+protobuf<4.0.0
+pendulum<3.0.0
+blinker
+jinja2
