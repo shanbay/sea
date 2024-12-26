@@ -3,5 +3,6 @@ grpcio-tools>=1.27.0,<1.49.0
 grpcio-reflection
 protobuf<4.0.0
 pendulum<3.0.0
-blinker
-jinja2
+blinker<=1.8.2
+jinja2==3.1.2
+markupsafe<3.0.0
