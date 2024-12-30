@@ -4,7 +4,6 @@
 #
 #    pip-compile --index-url=https://mirrors.aliyun.com/pypi/simple --output-file=requirements.txt requirements.in
 #
---index-url https://mirrors.aliyun.com/pypi/simple
 
 blinker==1.6.2
     # via -r requirements.in
