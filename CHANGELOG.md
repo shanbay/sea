@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [3.1.5] - 2025-04-07
+### Changed
+- remove version restrictions on dependencies to provide more flexibility
+
 ## [3.1.4] - 2024-12-26
 ### Changed
 - bump version
