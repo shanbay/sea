@@ -4,6 +4,7 @@
 ## [3.1.6] - 2025-05-16
 ### Changed
 - Update grpcio-tools requirements
+- [CI] Drop Python 3.7
 
 ## [3.1.5] - 2025-04-07
 ### Changed
