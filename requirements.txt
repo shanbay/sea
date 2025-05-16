@@ -1,7 +1,7 @@
 grpcio>=1.27.0,<1.69.0
 grpcio-tools>=1.27.0,<1.69.0
 grpcio-reflection
-protobuf<=3.21
+protobuf<=6.30.2
 pendulum
 blinker<=1.8.2
 jinja2==3.1.2
