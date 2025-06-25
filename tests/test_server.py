@@ -4,6 +4,8 @@ import signal
 import threading
 import time
 from unittest import mock
+import pytest
+import asyncio
 
 from sea.signals import server_started, server_stopped
 
@@ -75,3 +77,37 @@ def test_multiprocessing_server(app, logstream):
         assert "stopped!" in content
     finally:
         os.rmdir("/tmp/prometheus_metrics")
+
+
+@pytest.mark.asyncio
+async def test_asyncio_server(app, logstream):
+    from sea.server.asyncio import Server
+
+    s = Server(app)
+    assert not s._stopped
+
+    def log_started(s):
+        app.logger.warning("started!")
+
+    def log_stopped(s):
+        app.logger.warning("stopped!")
+
+    server_started.connect(log_started)
+    server_stopped.connect(log_stopped)
+
+    async def stop_server_later(sec):
+        await asyncio.sleep(sec)
+        await s._stop_handler()
+        # server_stopped.send(s)
+
+    # Run the server and stop it after 3 seconds in parallel
+    await asyncio.gather(s.run(), stop_server_later(3))
+
+    # asyncio.create_task(stop_server_later(3))
+
+    # await s.run()
+    assert s._stopped
+
+    content = logstream.getvalue()
+    assert "started!" in content
+    # assert "started!" in content and "stopped!" in content
