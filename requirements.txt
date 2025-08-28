@@ -1,5 +1,5 @@
 grpcio>=1.49.0,<1.69.0
-grpcio-tools>=1.49.0,<1.69.0
+grpcio-tools>=1.49.0,<1.75.0
 grpcio-reflection
 protobuf<=6.31.1
 pendulum
