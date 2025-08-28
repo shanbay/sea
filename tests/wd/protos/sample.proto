@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package tests;
+
+message MessageOfTypes {
+  double dubl = 1;
+  float flot = 2;
+  int32 i32 = 3;
+  int64 i64 = 4;
+  uint32 ui32 = 5;
+  uint64 ui64 = 6;
+  sint32 si32 = 7;
+  sint64 si64 = 8;
+  fixed32 f32 = 9;
+  fixed64 f64 = 10;
+  sfixed32 sf32 = 11;
+  sfixed64 sf64 = 12;
+  bool bol = 13;
+  string strng = 14;
+  bytes byts = 15;
+  
+  NestedType nested = 16;
+  Enum enm = 17;
+  repeated NestedType nestedRepeated = 18;
+  repeated string str_repeated = 19;
+  map<string, float> simpleMap = 20;
+  map<string, NestedType> nestedMap = 21;
+
+  message NestedType {
+    string req = 1;
+  }
+
+  enum Enum {
+    A = 0;
+    B = 1;
+    C = 2;
+  }
+}

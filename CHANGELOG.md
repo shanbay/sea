@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.0.0] - 2025-08-28
+### Changed
+- Update protobuf requirement
+- Regenerate proto files
 
 ## [3.1.6] - 2025-05-16
 ### Changed
