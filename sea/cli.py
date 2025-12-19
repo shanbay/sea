@@ -1,11 +1,25 @@
 import sys
 import os
 import argparse
-import pkg_resources
 import logging
 
 from sea.utils import import_string
 from sea import create_app
+
+# Use importlib.metadata for Python 3.8+, fallback to pkg_resources for older versions
+try:
+    from importlib.metadata import entry_points
+except ImportError:
+    # Python < 3.8
+    try:
+        import pkg_resources
+
+        def entry_points(group=None):
+            return pkg_resources.iter_entry_points(group)
+    except ImportError:
+        # Fallback if neither is available
+        def entry_points(group=None):
+            return []
 
 
 class JobException(RuntimeError):
@@ -60,12 +74,25 @@ def _load_jobs():
     import_string("sea.cmds")
 
     # load lib jobs
-    for ep in pkg_resources.iter_entry_points("sea.jobs"):
+    try:
+        # Try Python 3.10+ API first: entry_points(group="...")
         try:
-            ep.load()
-        except Exception as e:
-            logger = logging.getLogger("sea.cmd")
-            logger.error("error has occurred during pkg loading: {}".format(e))
+            eps = entry_points(group="sea.jobs")
+        except TypeError:
+            # Python 3.8-3.9: entry_points() returns a dict-like object
+            all_eps = entry_points()
+            eps = all_eps.get("sea.jobs", [])
+
+        # Iterate over entry points (works for both EntryPoints object and list/iterator)
+        for ep in eps:
+            try:
+                ep.load()
+            except Exception as e:
+                logger = logging.getLogger("sea.cmd")
+                logger.error("error has occurred during pkg loading: {}".format(e))
+    except Exception as e:
+        logger = logging.getLogger("sea.cmd")
+        logger.warning("Failed to load entry points: {}".format(e))
 
     # load app jobs
     appjobs = os.path.join(path, "jobs")
