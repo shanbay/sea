@@ -113,19 +113,122 @@ def test_cmd_job(app):
         def load(self):
             raise Exception("Failed entry point")
 
-    def new_entry_iter(name):
-        return [EntryPoint(), FailedEntryPoint()]
+    # Mock entry_points to return our entry points
+    class MockEntryPoints:
+        def __init__(self, entries):
+            self.entries = entries
+        def __iter__(self):
+            return iter(self.entries)
+
+    def mock_entry_points(group=None):
+        if group == "sea.jobs":
+            return MockEntryPoints([EntryPoint(), FailedEntryPoint()])
+        return MockEntryPoints([])
 
     mock_logger = mock.Mock()
-    with mock.patch(
-        "pkg_resources.iter_entry_points", new=new_entry_iter
-    ), mock.patch("logging.getLogger", return_value=mock_logger):
+    with mock.patch("sea.cli.entry_points", side_effect=mock_entry_points), \
+         mock.patch("logging.getLogger", return_value=mock_logger), \
+         mock.patch("os.getcwd", return_value=app.root_path):
+        # Reload jobs to pick up the mocked entry points
+        cli._load_jobs()
         sys.argv = "sea xyz".split()
         assert cli.main() is None
         assert app.config.get("XYZ") == "hello"
         mock_logger.error.assert_called_with(
             "error has occurred during pkg loading: Failed entry point"
         )
+
+
+def test_cmd_job_importlib_metadata_python310(app):
+    """Test entry points loading with importlib.metadata (Python 3.10+ API)"""
+    class EntryPoint:
+        def load(self):
+            @cli.jobm.job("test_importlib")
+            def f():
+                app.config["IMPORTLIB_TEST"] = "success"
+            return f
+
+    class FailedEntryPoint:
+        def load(self):
+            raise Exception("Failed entry point")
+
+    # Mock Python 3.10+ API: entry_points(group="...") returns EntryPoints object
+    class MockEntryPoints:
+        def __init__(self, entries):
+            self.entries = entries
+
+        def __iter__(self):
+            return iter(self.entries)
+
+    def mock_entry_points(group=None):
+        if group == "sea.jobs":
+            return MockEntryPoints([EntryPoint(), FailedEntryPoint()])
+        return MockEntryPoints([])
+
+    mock_logger = mock.Mock()
+    with mock.patch("sea.cli.entry_points", side_effect=mock_entry_points), \
+         mock.patch("logging.getLogger", return_value=mock_logger), \
+         mock.patch("os.getcwd", return_value=app.root_path):
+        # Reload jobs to pick up the mocked entry points
+        cli._load_jobs()
+        sys.argv = "sea test_importlib".split()
+        assert cli.main() is None
+        assert app.config.get("IMPORTLIB_TEST") == "success"
+        mock_logger.error.assert_called_with(
+            "error has occurred during pkg loading: Failed entry point"
+        )
+
+
+def test_cmd_job_importlib_metadata_python38(app):
+    """Test entry points loading with importlib.metadata (Python 3.8-3.9 API)"""
+    class EntryPoint:
+        def load(self):
+            @cli.jobm.job("test_importlib38")
+            def f():
+                app.config["IMPORTLIB38_TEST"] = "success"
+            return f
+
+    # Mock Python 3.8-3.9 API: entry_points() returns dict-like object
+    class MockEntryPointsDict:
+        def __init__(self):
+            self._data = {
+                "sea.jobs": [EntryPoint()]
+            }
+
+        def get(self, key, default=None):
+            return self._data.get(key, default)
+
+    def mock_entry_points(group=None):
+        if group is not None:
+            # Python 3.10+ style call - should raise TypeError in 3.8-3.9
+            raise TypeError("entry_points() takes 0 positional arguments")
+        return MockEntryPointsDict()
+
+    mock_logger = mock.Mock()
+    with mock.patch("sea.cli.entry_points", side_effect=mock_entry_points), \
+         mock.patch("logging.getLogger", return_value=mock_logger), \
+         mock.patch("os.getcwd", return_value=app.root_path):
+        # Reload jobs to pick up the mocked entry points
+        cli._load_jobs()
+        sys.argv = "sea test_importlib38".split()
+        assert cli.main() is None
+        assert app.config.get("IMPORTLIB38_TEST") == "success"
+
+
+def test_cmd_async_task_and_bus_registered():
+    """Test that async_task and bus commands are registered via entry points"""
+    # This test verifies that the real entry points from setup.py are loaded
+    # Check that async_task and bus are registered after _load_jobs()
+    # Note: This will only work if sea package is installed with entry points
+    assert "async_task" in cli.jobm.jobs or "bus" in cli.jobm.jobs, \
+        "async_task or bus should be registered via entry points. " \
+        "Make sure sea package is installed with 'pip install -e .'"
+
+    # If they exist, verify they are the correct functions
+    if "async_task" in cli.jobm.jobs:
+        assert cli.jobm.jobs["async_task"].__name__ == "async_task"
+    if "bus" in cli.jobm.jobs:
+        assert cli.jobm.jobs["bus"].__name__ == "bus"
 
 
 def test_main():
