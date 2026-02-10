@@ -118,12 +118,27 @@ def test_cmd_job(app):
         def load(self):
             raise Exception("Failed entry point")
 
-    def new_entry_iter(name):
-        return [EntryPoint(), FailedEntryPoint()]
+    class MockEntryPoints:
+        """Mock entry_points that works for both Python 3.8-3.9 and 3.10+"""
+        def __call__(self, *args, **kwargs):
+            if "group" in kwargs and kwargs["group"] == "sea.jobs":
+                # Python 3.10+ style: entry_points(group="sea.jobs")
+                return [EntryPoint(), FailedEntryPoint()]
+            elif not args and not kwargs:
+                # Python 3.8-3.9 style: entry_points().get("sea.jobs", [])
+                class MockEntryPointsDict:
+                    def get(self, key, default):
+                        if key == "sea.jobs":
+                            return [EntryPoint(), FailedEntryPoint()]
+                        return default
+                return MockEntryPointsDict()
+            else:
+                # Fallback: return empty list
+                return []
 
     mock_logger = mock.Mock()
     with mock.patch(
-        "pkg_resources.iter_entry_points", new=new_entry_iter
+        "sea.cli.entry_points", new=MockEntryPoints()
     ), mock.patch("logging.getLogger", return_value=mock_logger):
         sys.argv = "sea xyz".split()
         assert cli.main() is None

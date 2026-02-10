@@ -1,8 +1,8 @@
 import sys
 import os
 import argparse
-import pkg_resources
 import logging
+from importlib.metadata import entry_points
 
 from sea.utils import import_string
 from sea import create_app
@@ -60,7 +60,15 @@ def _load_jobs():
     import_string("sea.cmds")
 
     # load lib jobs
-    for ep in pkg_resources.iter_entry_points("sea.jobs"):
+    try:
+        # Python 3.10+
+        eps = entry_points(group="sea.jobs")
+    except TypeError:
+        # Python < 3.10
+        all_eps = entry_points()
+        eps = all_eps.get("sea.jobs", [])
+
+    for ep in eps:
         try:
             ep.load()
         except Exception as e:

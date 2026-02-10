@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [4.0.1] - 2026-02-10
+### Fixed
+- Replace `pkg_resources` with `importlib.metadata` for setuptools 82.0+ compatibility
+
 ## [4.0.0] - 2025-08-28
 ### Changed
 - Update protobuf requirement
