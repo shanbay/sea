@@ -10,7 +10,7 @@ from sea.cli import JobException, jobm
     "--worker_mode",
     required=False,
     action="store",
-    help="Worker mode. threading|multiprocessing",
+    help="Worker mode. threading|multiprocessing|asycio",
 )
 def server(worker_mode):
     worker_mode = worker_mode or current_app.config["GRPC_WORKER_MODE"]
@@ -18,11 +18,24 @@ def server(worker_mode):
         from sea.server.threading import Server
 
         s = Server(current_app)
-    else:
+        s.run()
+    elif worker_mode == "multiprocessing":
         from sea.server.multiprocessing import Server
 
         s = Server(current_app)
-    s.run()
+        s.run()
+    else:
+        import asyncio
+        from sea.server.asyncio import Server
+
+        s = Server(current_app)
+        # asyncio.run(s.run())
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(s.run())
+        finally:
+            loop.run_until_complete(s._stop_handler())
+            loop.close()
     return 0
 
 
